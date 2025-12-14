@@ -504,7 +504,6 @@ public sealed class AudioService : IAudioService
             // We just need to access the InputNode to force its creation:
             var inputNode = _engine.InputNode;
             Console.WriteLine($"[Audio][MacCatalyst] InputNode accessed. Format: {inputNode.GetBusOutputFormat(0).SampleRate}Hz");
-
             // IMPORTANT: Set up the player node NOW, before the engine starts.
             // If we try to attach/connect nodes after the engine is running, we get
             // kAudioUnitErr_FormatNotSupported (-10868) errors due to format conflicts.
@@ -786,5 +785,4 @@ public sealed class AudioService : IAudioService
         if (_disposed) throw new ObjectDisposedException(nameof(AudioService));
     }
 }
-
 
