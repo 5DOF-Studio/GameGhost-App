@@ -365,7 +365,6 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                 FabCardVariant = FabCardVariant.None;
             });
         };
-
         OnPropertyChanged(nameof(GeminiBackendText));
     }
 
@@ -1085,4 +1084,3 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         }
     }
 }
-
