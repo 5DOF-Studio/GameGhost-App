@@ -21,6 +21,21 @@ Game Ghost is a .NET MAUI desktop application extracted from the Gaimer implemen
 dotnet build src/WitnessDesktop/WitnessDesktop/WitnessDesktop.csproj -f net8.0-maccatalyst -p:EnableCodeSigning=false
 ```
 
+## Preview
+
+![Game Ghost desktop preview](docs/images/game-ghost-preview.png)
+![Game Ghost live board + app](docs/images/game-ghost-preview-2.png)
+
+## Gallery
+
+Add more screenshots to `docs/images/` and reference them here:
+
+```md
+![Main dashboard](docs/images/dashboard.png)
+![Agent selection](docs/images/agent-selection.png)
+![Minimal view](docs/images/minimal-view.png)
+```
+
 ## Notes
 
 - Internal namespaces and some project paths still use `WitnessDesktop` for stability.
