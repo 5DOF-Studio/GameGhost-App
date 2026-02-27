@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:WitnessDesktop.Views"
+             x:Class="WitnessDesktop.Views.WorkbenchPage"
+             BackgroundColor="{StaticResource BgPrimary}"
+             Shell.NavBarIsVisible="False"
+             Title="Workbench">
+
+    <Grid RowDefinitions="Auto,Auto,*"
+          RowSpacing="16"
+          Padding="20">
+
+        <!-- ========== ROW 0: HEADER BAR ========== -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*,Auto"
+              ColumnSpacing="12"
+              Padding="0,8">
+
+            <!-- Back button -->
+            <Button Grid.Column="0"
+                    Text="&#x2190;"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    Padding="0"
+                    CornerRadius="10"
+                    BackgroundColor="{StaticResource BgCard}"
+                    TextColor="{StaticResource TextSecondary}"
+                    FontSize="18"
+                    Clicked="OnBackClicked"/>
+
+            <!-- Title -->
+            <Label Grid.Column="1"
+                   Text="GAME GHOST WORKBENCH"
+                   FontFamily="OrbitronBold"
+                   FontSize="16"
+                   TextColor="{StaticResource TextPrimary}"
+                   VerticalOptions="Center"
+                   CharacterSpacing="1"/>
+
+            <!-- DEV BUILD badge -->
+            <Border Grid.Column="2"
+                    BackgroundColor="{StaticResource AccentPurple}"
+                    Padding="10,4"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10"/>
+                </Border.StrokeShape>
+                <Label Text="DEV BUILD"
+                       FontFamily="RajdhaniSemiBold"
+                       FontSize="10"
+                       TextColor="White"
+                       CharacterSpacing="2"/>
+            </Border>
+        </Grid>
+
+        <!-- ========== ROW 1: COMPONENT SELECTOR ========== -->
+        <ScrollView Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalScrollBarVisibility="Never">
+            <HorizontalStackLayout Spacing="8">
+                <!-- HUD View pill (active by default) -->
+                <Border x:Name="PillHudView"
+                        BackgroundColor="{StaticResource AccentPurple}"
+                        Padding="16,8"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnHudViewPillTapped"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="HUD View"
+                           FontFamily="RajdhaniSemiBold"
+                           FontSize="13"
+                           TextColor="White"/>
+                </Border>
+
+                <!-- Placeholder for future components -->
+                <Border BackgroundColor="{StaticResource BgCard}"
+                        Padding="16,8"
+                        StrokeThickness="0"
+                        Opacity="0.5">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14"/>
+                    </Border.StrokeShape>
+                    <Label Text="More coming..."
+                           FontFamily="RajdhaniRegular"
+                           FontSize="13"
+                           TextColor="{StaticResource TextMuted}"/>
+                </Border>
+            </HorizontalStackLayout>
+        </ScrollView>
+
+        <!-- ========== ROW 2: PREVIEW SURFACE ========== -->
+        <Border Grid.Row="2"
+                BackgroundColor="{StaticResource BgSecondary}"
+                Padding="16"
+                StrokeThickness="1"
+                Stroke="{StaticResource BgCard}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16"/>
+            </Border.StrokeShape>
+
+            <!-- Component preview area -->
+            <Grid>
+                <views:GameGhostHudView x:Name="HudView"
+                                     VerticalOptions="End"
+                                     HorizontalOptions="Center"
+                                     MaximumWidthRequest="400"
+                                     Margin="0,0,0,8"/>
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>

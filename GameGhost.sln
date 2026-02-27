@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{34E80161-C9FE-4675-AEAA-6903F150A710}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameGhost", "GameGhost", "{75EDDCF0-ACC7-41EE-8281-F344E4196DC7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameGhost", "src\WitnessDesktop\WitnessDesktop\WitnessDesktop.csproj", "{9549994E-A966-4480-BB0D-37D11B88CD90}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9549994E-A966-4480-BB0D-37D11B88CD90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9549994E-A966-4480-BB0D-37D11B88CD90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9549994E-A966-4480-BB0D-37D11B88CD90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9549994E-A966-4480-BB0D-37D11B88CD90}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{75EDDCF0-ACC7-41EE-8281-F344E4196DC7} = {34E80161-C9FE-4675-AEAA-6903F150A710}
+		{9549994E-A966-4480-BB0D-37D11B88CD90} = {75EDDCF0-ACC7-41EE-8281-F344E4196DC7}
+	EndGlobalSection
+EndGlobal

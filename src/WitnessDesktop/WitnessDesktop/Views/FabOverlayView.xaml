@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WitnessDesktop.ViewModels"
+             x:Class="WitnessDesktop.Views.FabOverlayView"
+             x:DataType="vm:MainViewModel">
+
+    <!-- FAB BUTTON — ghost mode toggle (100pt to match user profile size) -->
+    <Grid WidthRequest="100" HeightRequest="100">
+
+        <!-- Outer glow ring (yellow when connected, hidden when not) -->
+        <Border WidthRequest="100"
+                HeightRequest="100"
+                BackgroundColor="Transparent"
+                StrokeThickness="2"
+                Stroke="{StaticResource AccentYellow}"
+                IsVisible="{Binding IsFabEnabled}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="50"/>
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="{StaticResource AccentYellow}"
+                        Offset="0,0"
+                        Radius="14"
+                        Opacity="0.6"/>
+            </Border.Shadow>
+        </Border>
+
+        <!-- Inner circle: yellow when off-game, dark when connected -->
+        <Border WidthRequest="90"
+                HeightRequest="90"
+                BackgroundColor="{StaticResource AccentYellow}"
+                StrokeThickness="0"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="45"/>
+            </Border.StrokeShape>
+            <Border.Triggers>
+                <DataTrigger TargetType="Border" Binding="{Binding IsFabEnabled}" Value="True">
+                    <Setter Property="BackgroundColor" Value="{StaticResource BgCard}"/>
+                </DataTrigger>
+            </Border.Triggers>
+
+            <Grid>
+                <!-- Agent portrait (when connected — always visible, including active state) -->
+                <Image Source="{Binding SelectedAgent.PortraitImage, FallbackValue='default_agent.png'}"
+                       WidthRequest="90"
+                       HeightRequest="90"
+                       Aspect="AspectFill"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       IsVisible="{Binding IsFabEnabled}">
+                    <Image.Clip>
+                        <EllipseGeometry Center="45,45" RadiusX="45" RadiusY="45"/>
+                    </Image.Clip>
+                </Image>
+
+                <!-- "Ghost Mode" label (when not connected — off-game state) -->
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     Spacing="0"
+                                     IsVisible="{Binding IsFabEnabled, Converter={StaticResource InvertedBoolConverter}}">
+                    <Label Text="GHOST"
+                           FontSize="15"
+                           FontFamily="OrbitronBold"
+                           TextColor="Black"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="MODE"
+                           FontSize="15"
+                           FontFamily="OrbitronBold"
+                           TextColor="Black"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Tap target covers full area -->
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding ToggleFabCommand}"/>
+        </Grid.GestureRecognizers>
+
+        <!-- Off-game: full opacity but not interactive. In-game: full opacity and interactive. -->
+        <Grid.Triggers>
+            <DataTrigger TargetType="Grid" Binding="{Binding IsFabEnabled}" Value="False">
+                <Setter Property="Opacity" Value="1.0"/>
+                <Setter Property="InputTransparent" Value="True"/>
+            </DataTrigger>
+            <DataTrigger TargetType="Grid" Binding="{Binding IsFabEnabled}" Value="True">
+                <Setter Property="Opacity" Value="1.0"/>
+                <Setter Property="InputTransparent" Value="False"/>
+            </DataTrigger>
+        </Grid.Triggers>
+    </Grid>
+</ContentView>

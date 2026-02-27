@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:WitnessDesktop.Models.Timeline"
+             xmlns:mainmodels="clr-namespace:WitnessDesktop.Models"
+             xmlns:utils="clr-namespace:WitnessDesktop.Utilities"
+             xmlns:views="clr-namespace:WitnessDesktop.Views"
+             x:Class="WitnessDesktop.Views.TimelineView">
+
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <!-- Direct Message Template (full text, no truncation) -->
+            <DataTemplate x:Key="DirectMessageTemplate" x:DataType="models:TimelineEvent">
+                <views:DirectMessageBubble />
+            </DataTemplate>
+
+            <!-- Proactive Alert Template (urgency-colored card) -->
+            <DataTemplate x:Key="ProactiveAlertTemplate" x:DataType="models:TimelineEvent">
+                <views:ProactiveAlertView />
+            </DataTemplate>
+
+            <!-- Default Event Template: Capsule pill -->
+            <DataTemplate x:Key="DefaultEventTemplate" x:DataType="models:TimelineEvent">
+                <Border BackgroundColor="{Binding CapsuleColor}"
+                        Stroke="{Binding CapsuleStroke}"
+                        StrokeThickness="1"
+                        Padding="10,5"
+                        Margin="0,2,6,2"
+                        ToolTipProperties.Text="{Binding FullContent}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <HorizontalStackLayout Spacing="6">
+                        <Image Source="{Binding Icon}"
+                               WidthRequest="20"
+                               HeightRequest="20"
+                               VerticalOptions="Center" />
+                        <Label Text="{Binding Summary}"
+                               FontSize="16"
+                               FontFamily="Rajdhani-Regular"
+                               TextColor="{StaticResource TextPrimary}"
+                               LineBreakMode="TailTruncation"
+                               MaxLines="1"
+                               MaximumWidthRequest="320"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </DataTemplate>
+
+            <!-- Template Selector -->
+            <utils:TimelineEventTemplateSelector x:Key="EventTemplateSelector"
+                DirectMessageTemplate="{StaticResource DirectMessageTemplate}"
+                ProactiveAlertTemplate="{StaticResource ProactiveAlertTemplate}"
+                DefaultTemplate="{StaticResource DefaultEventTemplate}" />
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <CollectionView x:Name="TimelineCollection"
+                    ItemsSource="{Binding TimelineFeed.Checkpoints}"
+                    SelectionMode="None"
+                    ItemsUpdatingScrollMode="KeepLastItemInView">
+
+        <CollectionView.ItemTemplate>
+            <DataTemplate x:DataType="models:TimelineCheckpoint">
+                <VerticalStackLayout Spacing="0" Padding="0,12,0,0">
+
+                    <!-- Checkpoint Header -->
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" Padding="16,10">
+                        <Image Grid.Column="0"
+                               Source="{Binding HeaderIcon}"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               VerticalOptions="Center" />
+
+                        <Label Grid.Column="1"
+                               Text="{Binding DisplayHeader}"
+                               FontSize="18"
+                               FontFamily="Rajdhani-SemiBold"
+                               TextColor="{StaticResource TextMuted}"
+                               VerticalOptions="Center" />
+
+                        <Label Grid.Column="3"
+                               Text="{Binding ContextBadge}"
+                               FontSize="15"
+                               FontFamily="Rajdhani-Regular"
+                               TextColor="{StaticResource TextMuted}"
+                               Opacity="0.6"
+                               VerticalOptions="Center" />
+                    </Grid>
+
+                    <!-- Event Lines -->
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding EventLines}"
+                                         Spacing="2"
+                                         Padding="0,0,0,8">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:EventLine">
+                                <Grid ColumnDefinitions="40,2,*" Padding="16,4">
+
+                                    <!-- Connector line -->
+                                    <BoxView Grid.Column="1"
+                                             WidthRequest="2"
+                                             HeightRequest="32"
+                                             Color="{StaticResource TextMuted}"
+                                             Opacity="0.3"
+                                             VerticalOptions="Center" />
+
+                                    <!-- Capsule events (stacked horizontally) -->
+                                    <FlexLayout Grid.Column="2"
+                                                BindableLayout.ItemsSource="{Binding Events}"
+                                                BindableLayout.ItemTemplateSelector="{StaticResource EventTemplateSelector}"
+                                                Wrap="Wrap"
+                                                JustifyContent="Start"
+                                                AlignItems="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </DataTemplate>
+        </CollectionView.ItemTemplate>
+
+    </CollectionView>
+
+</ContentView>

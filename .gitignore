@@ -1,0 +1,98 @@
+# .NET / MAUI
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# IDE
+.vs/
+.vscode/
+.idea/
+.cursor/
+*.swp
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Rider
+*.sln.iml
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Secrets and API keys
+.env
+.env.local
+.env.*.local
+appsettings.Development.json
+secrets.json
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuget.props
+*.nuget.targets
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# MAUI specific
+*.mlaunch.*
+
+# Packages
+*.app
+*.ipa
+*.apk
+*.aab
+*.msix
+*.msixbundle
+*.appxbundle
+*.appx
+
+# Crash logs
+crashlytics-build.properties
+
+# Local development overrides
+local.settings.json
+
+# Local runtime logs (kept for debugging; never commit)
+run_maccatalyst.log
+
+# Native helper build artifacts (regenerable via build-xcframework.sh)
+.build-xcframework/
+

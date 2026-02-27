@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:WitnessDesktop.Models.Timeline"
+             x:Class="WitnessDesktop.Views.ProactiveAlertView"
+             x:DataType="models:TimelineEvent">
+
+    <Border x:Name="AlertBorder"
+            Padding="14,10"
+            Margin="0,4"
+            StrokeThickness="1"
+            Stroke="{StaticResource TextMuted}"
+            BackgroundColor="Transparent">
+
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10" />
+        </Border.StrokeShape>
+
+        <Border.Triggers>
+            <DataTrigger TargetType="Border"
+                         Binding="{Binding Brain.Urgency}"
+                         Value="high">
+                <Setter Property="Stroke" Value="{StaticResource AccentRed}" />
+                <Setter Property="BackgroundColor" Value="#1AFF4444" />
+            </DataTrigger>
+            <DataTrigger TargetType="Border"
+                         Binding="{Binding Brain.Urgency}"
+                         Value="medium">
+                <Setter Property="Stroke" Value="{StaticResource AccentYellow}" />
+                <Setter Property="BackgroundColor" Value="#1AFFAA00" />
+            </DataTrigger>
+            <DataTrigger TargetType="Border"
+                         Binding="{Binding Brain.Urgency}"
+                         Value="low">
+                <Setter Property="Stroke" Value="{StaticResource AccentGreen}" />
+                <Setter Property="BackgroundColor" Value="#1A22C55E" />
+            </DataTrigger>
+        </Border.Triggers>
+
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+
+            <!-- Signal badge -->
+            <Border Grid.Column="0"
+                    BackgroundColor="{StaticResource BgSecondary}"
+                    StrokeThickness="0"
+                    Padding="8,3"
+                    VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5" />
+                </Border.StrokeShape>
+
+                <Label Text="{Binding Brain.Signal, Converter={StaticResource SignalToUpperCase}}"
+                       FontSize="14"
+                       FontFamily="Rajdhani-SemiBold"
+                       TextColor="{StaticResource TextMuted}" />
+            </Border>
+
+            <!-- Summary text -->
+            <Label Grid.Column="1"
+                   Text="{Binding Summary}"
+                   FontSize="18"
+                   FontFamily="Rajdhani-Regular"
+                   TextColor="{StaticResource TextPrimary}"
+                   VerticalOptions="Center"
+                   LineBreakMode="TailTruncation" />
+
+            <!-- Eval delta (if present) -->
+            <Label Grid.Column="2"
+                   Text="{Binding Brain.EvalDelta, StringFormat='{0:+#;-#;0}cp'}"
+                   FontSize="16"
+                   FontFamily="Rajdhani-SemiBold"
+                   TextColor="{StaticResource TextMuted}"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding Brain.EvalDelta, Converter={StaticResource NotNullToBool}}" />
+
+        </Grid>
+
+    </Border>
+
+</ContentView>

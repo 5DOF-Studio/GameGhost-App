@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:WitnessDesktop.ViewModels"
+             x:Class="WitnessDesktop.Views.AgentSelectionPage"
+             x:DataType="vm:AgentSelectionViewModel"
+             BackgroundColor="#000f0f"
+             Title="Select Your Agent">
+
+    <Grid RowDefinitions="*,Auto" BackgroundColor="#000f0f">
+        
+        <!-- Main Content: Centered focal elements -->
+        <VerticalStackLayout Grid.Row="0" Spacing="24" HorizontalOptions="Center" VerticalOptions="Center">
+            
+            <!-- Product Lockup -->
+            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                <Label Text="GAME GHOST"
+                       FontFamily="OrbitronBold"
+                       FontSize="48"
+                       CharacterSpacing="2"
+                       TextColor="#68c7ec"
+                       HorizontalTextAlignment="Center"/>
+                <Label Text="AI COMPANION"
+                       FontFamily="RajdhaniSemiBold"
+                       FontSize="16"
+                       CharacterSpacing="3"
+                       TextColor="#f2a900"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Card + Chevrons Row -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="16">
+                
+                <!-- Left Chevron -->
+                <Border x:Name="LeftChevronBorder"
+                        BackgroundColor="#051a1d" 
+                        Stroke="#1e5568" 
+                        StrokeThickness="1"
+                        WidthRequest="52" 
+                        HeightRequest="52"
+                        VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnPreviousAgent"/>
+                    </Border.GestureRecognizers>
+                    <Label x:Name="LeftChevronLabel" Text="◀" FontSize="22" TextColor="#555555" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+
+                <!-- Cards Container -->
+                <Grid HorizontalOptions="Center">
+                    
+                    <!-- Derek Card (Adventurer - Green Theme) -->
+                    <Border x:Name="DerekCard"
+                            BackgroundColor="#082227"
+                            Stroke="#2a3a2a"
+                            StrokeThickness="2"
+                            Padding="0"
+                            HorizontalOptions="Center"
+                            WidthRequest="900"
+                            HeightRequest="480">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="28"/>
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="#22c55e"
+                                    Offset="0,6"
+                                    Radius="60"
+                                    Opacity="0.4"/>
+                        </Border.Shadow>
+
+                        <Grid ColumnDefinitions="400,*" Padding="0">
+                            <!-- Left: Portrait Image -->
+                            <Grid Grid.Column="0" BackgroundColor="#001417">
+                                <Image Source="derek_adventurer_icon.png"
+                                       Aspect="AspectFill"
+                                       WidthRequest="400"
+                                       HeightRequest="480">
+                                    <Image.Clip>
+                                        <RoundRectangleGeometry Rect="0,0,400,480" CornerRadius="28,0,0,28"/>
+                                    </Image.Clip>
+                                </Image>
+                            </Grid>
+
+                            <!-- Right: Details -->
+                            <VerticalStackLayout Grid.Column="1" 
+                                                 Spacing="14" 
+                                                 Padding="36,30"
+                                                 VerticalOptions="Center">
+                                <!-- Agent Type Badge -->
+                                <Border BackgroundColor="#1a2e1a"
+                                        Stroke="#4ade80"
+                                        StrokeThickness="1"
+                                        Padding="14,7"
+                                        HorizontalOptions="Start">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="6"/>
+                                    </Border.StrokeShape>
+                                    <Label Text="⚔️ ADVENTURER"
+                                           FontFamily="OrbitronBold"
+                                           FontSize="12"
+                                           TextColor="#4ade80"
+                                           CharacterSpacing="2"/>
+                                </Border>
+
+                                <!-- Name -->
+                                <Label Text="DEREK"
+                                       FontFamily="OrbitronBold"
+                                       FontSize="48"
+                                       TextColor="#ffffff"
+                                       CharacterSpacing="2"/>
+
+                                <!-- Primary Game -->
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="🎮" FontSize="18" VerticalOptions="Center"/>
+                                    <Label Text="Role Playing Games Specialist"
+                                           FontFamily="RajdhaniSemiBold"
+                                           FontSize="16"
+                                           TextColor="#4ade80"/>
+                                </HorizontalStackLayout>
+
+                                <!-- Description -->
+                                <Label Text="Expert companion for RPGs, quests, and story-driven adventures. Your guide through any fantasy realm."
+                                       FontFamily="RajdhaniRegular"
+                                       FontSize="14"
+                                       TextColor="#aaaaaa"
+                                       LineBreakMode="WordWrap"
+                                       MaxLines="2"/>
+
+                                <!-- Features Grid -->
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="20" RowSpacing="8" Margin="0,8,0,0">
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="8">
+                                        <Border BackgroundColor="#1a2e1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="⚔️" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Quest guidance" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="8">
+                                        <Border BackgroundColor="#1a2e1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="🛡️" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Character builds" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="8">
+                                        <Border BackgroundColor="#1a2e1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="📜" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Lore insights" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="8">
+                                        <Border BackgroundColor="#1a2e1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="🎯" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Combat strategies" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Grid>
+
+                                <!-- Select Button -->
+                                <Border BackgroundColor="#22c55e"
+                                        StrokeThickness="0"
+                                        Padding="28,14"
+                                        HorizontalOptions="Start"
+                                        Margin="0,12,0,0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12"/>
+                                    </Border.StrokeShape>
+                                    <Border.Shadow>
+                                        <Shadow Brush="#22c55e" Offset="0,4" Radius="16" Opacity="0.4"/>
+                                    </Border.Shadow>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnGeneralSelectClicked"/>
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="SELECT DEREK"
+                                               FontFamily="OrbitronBold"
+                                               FontSize="14"
+                                               TextColor="#000f0f"
+                                               VerticalOptions="Center"/>
+                                        <Label Text="→"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               TextColor="#000f0f"
+                                               VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <!-- Leroy Card (Chess Master - Amber/Gold Theme) -->
+                    <Border x:Name="LeroyCard"
+                            IsVisible="False"
+                            BackgroundColor="#082227"
+                            Stroke="#3a2a1a"
+                            StrokeThickness="2"
+                            Padding="0"
+                            HorizontalOptions="Center"
+                            WidthRequest="900"
+                            HeightRequest="480">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="28"/>
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="#f59e0b"
+                                    Offset="0,6"
+                                    Radius="60"
+                                    Opacity="0.4"/>
+                        </Border.Shadow>
+
+                        <Grid ColumnDefinitions="400,*" Padding="0">
+                            <!-- Left: Portrait Image -->
+                            <Grid Grid.Column="0" BackgroundColor="#001417">
+                                <Image Source="leroy_chess_master_icon.png"
+                                       Aspect="AspectFill"
+                                       WidthRequest="400"
+                                       HeightRequest="480">
+                                    <Image.Clip>
+                                        <RoundRectangleGeometry Rect="0,0,400,480" CornerRadius="28,0,0,28"/>
+                                    </Image.Clip>
+                                </Image>
+                            </Grid>
+
+                            <!-- Right: Details -->
+                            <VerticalStackLayout Grid.Column="1" 
+                                                 Spacing="14" 
+                                                 Padding="36,30"
+                                                 VerticalOptions="Center">
+                                <!-- Agent Type Badge -->
+                                <Border BackgroundColor="#2e2a1a"
+                                        Stroke="#f59e0b"
+                                        StrokeThickness="1"
+                                        Padding="14,7"
+                                        HorizontalOptions="Start">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="6"/>
+                                    </Border.StrokeShape>
+                                    <Label Text="♟️ CHESS MASTER"
+                                           FontFamily="OrbitronBold"
+                                           FontSize="12"
+                                           TextColor="#f59e0b"
+                                           CharacterSpacing="2"/>
+                                </Border>
+
+                                <!-- Name -->
+                                <Label Text="LEROY"
+                                       FontFamily="OrbitronBold"
+                                       FontSize="48"
+                                       TextColor="#ffffff"
+                                       CharacterSpacing="2"/>
+
+                                <!-- Primary Game -->
+                                <HorizontalStackLayout Spacing="8">
+                                    <Label Text="♟️" FontSize="18" VerticalOptions="Center"/>
+                                    <Label Text="Chess Specialist"
+                                           FontFamily="RajdhaniSemiBold"
+                                           FontSize="16"
+                                           TextColor="#f59e0b"/>
+                                </HorizontalStackLayout>
+
+                                <!-- Description -->
+                                <Label Text="Grandmaster-level chess companion. Analyzes positions, suggests optimal moves, and helps you dominate."
+                                       FontFamily="RajdhaniRegular"
+                                       FontSize="14"
+                                       TextColor="#aaaaaa"
+                                       LineBreakMode="WordWrap"
+                                       MaxLines="2"/>
+
+                                <!-- Features Grid -->
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="20" RowSpacing="8" Margin="0,8,0,0">
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="8">
+                                        <Border BackgroundColor="#2e2a1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="🎯" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Position analysis" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="8">
+                                        <Border BackgroundColor="#2e2a1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="🧠" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Move suggestions" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="8">
+                                        <Border BackgroundColor="#2e2a1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="📊" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Game review" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Grid.Row="1" Grid.Column="1" Spacing="8">
+                                        <Border BackgroundColor="#2e2a1a" WidthRequest="28" HeightRequest="28" StrokeThickness="0">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                            <Label Text="🏆" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                        </Border>
+                                        <Label Text="Rating tips" FontFamily="RajdhaniSemiBold" FontSize="13" TextColor="#888888" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Grid>
+
+                                <!-- Select Button -->
+                                <Border BackgroundColor="#f59e0b"
+                                        StrokeThickness="0"
+                                        Padding="28,14"
+                                        HorizontalOptions="Start"
+                                        Margin="0,12,0,0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12"/>
+                                    </Border.StrokeShape>
+                                    <Border.Shadow>
+                                        <Shadow Brush="#f59e0b" Offset="0,4" Radius="16" Opacity="0.4"/>
+                                    </Border.Shadow>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnChessSelectClicked"/>
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="SELECT LEROY"
+                                               FontFamily="OrbitronBold"
+                                               FontSize="14"
+                                               TextColor="#000f0f"
+                                               VerticalOptions="Center"/>
+                                        <Label Text="→"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               TextColor="#000f0f"
+                                               VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                    
+                </Grid>
+
+                <!-- Right Chevron -->
+                <Border x:Name="RightChevronBorder"
+                        BackgroundColor="#051a1d" 
+                        Stroke="#1e5568" 
+                        StrokeThickness="1"
+                        WidthRequest="52" 
+                        HeightRequest="52"
+                        VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="26"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNextAgent"/>
+                    </Border.GestureRecognizers>
+                    <Label x:Name="RightChevronLabel" Text="▶" FontSize="22" TextColor="#ffffff" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+
+            </HorizontalStackLayout>
+
+            <!-- SELECT YOUR GAIMER text -->
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="12">
+                <Label Text="SELECT YOUR" 
+                       FontFamily="OrbitronBold"
+                       FontSize="22"
+                       TextColor="#ffffff"
+                       VerticalOptions="Center"/>
+                <Label Text="GAIMER" 
+                       FontFamily="OrbitronBold"
+                       FontSize="22"
+                       TextColor="#00d4ff"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- Footer: Copyright only -->
+        <Label Grid.Row="1"
+               HorizontalOptions="Center"
+               FontFamily="RajdhaniRegular"
+               FontSize="12"
+               TextColor="#555555"
+               Margin="0,0,0,20">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="© 2025 "/>
+                    <Span Text="5DOF AI Studio™" FontFamily="RajdhaniSemiBold"/>
+                    <Span Text=" — All Rights Reserved"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+
+    </Grid>
+</ContentPage>
