@@ -344,8 +344,6 @@ public sealed class GeminiLiveService : IGeminiService
 
     private long _messageReceiveCount;
     
-    private long _messageReceiveCount;
-    
     private async Task ReceiveLoopAsync(ClientWebSocket? ws, CancellationToken token)
     {
         if (ws is null) return;
@@ -640,4 +638,3 @@ public sealed class GeminiLiveService : IGeminiService
         try { cts?.Dispose(); } catch { /* best effort */ }
     }
 }
-
