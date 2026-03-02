@@ -6,14 +6,14 @@
              x:DataType="models:TimelineEvent">
 
     <Border x:Name="AlertBorder"
-            Padding="14,10"
-            Margin="0,4"
-            StrokeThickness="1"
+            Padding="21,15"
+            Margin="0,6"
+            StrokeThickness="1.5"
             Stroke="{StaticResource TextMuted}"
             BackgroundColor="Transparent">
 
         <Border.StrokeShape>
-            <RoundRectangle CornerRadius="10" />
+            <RoundRectangle CornerRadius="15" />
         </Border.StrokeShape>
 
         <Border.Triggers>
@@ -37,20 +37,20 @@
             </DataTrigger>
         </Border.Triggers>
 
-        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="15">
 
             <!-- Signal badge -->
             <Border Grid.Column="0"
                     BackgroundColor="{StaticResource BgSecondary}"
                     StrokeThickness="0"
-                    Padding="8,3"
+                    Padding="12,4.5"
                     VerticalOptions="Center">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="5" />
+                    <RoundRectangle CornerRadius="7.5" />
                 </Border.StrokeShape>
 
                 <Label Text="{Binding Brain.Signal, Converter={StaticResource SignalToUpperCase}}"
-                       FontSize="14"
+                       FontSize="21"
                        FontFamily="Rajdhani-SemiBold"
                        TextColor="{StaticResource TextMuted}" />
             </Border>
@@ -58,7 +58,7 @@
             <!-- Summary text -->
             <Label Grid.Column="1"
                    Text="{Binding Summary}"
-                   FontSize="18"
+                   FontSize="27"
                    FontFamily="Rajdhani-Regular"
                    TextColor="{StaticResource TextPrimary}"
                    VerticalOptions="Center"
@@ -67,7 +67,7 @@
             <!-- Eval delta (if present) -->
             <Label Grid.Column="2"
                    Text="{Binding Brain.EvalDelta, StringFormat='{0:+#;-#;0}cp'}"
-                   FontSize="16"
+                   FontSize="24"
                    FontFamily="Rajdhani-SemiBold"
                    TextColor="{StaticResource TextMuted}"
                    VerticalOptions="Center"

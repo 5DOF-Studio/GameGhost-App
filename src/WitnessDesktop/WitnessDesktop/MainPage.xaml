@@ -229,17 +229,17 @@
                     BackgroundColor="{StaticResource BgSecondary}"
                     Stroke="#1e5568"
                     StrokeThickness="1"
-                    Padding="20,16"
-                    MinimumHeightRequest="100"
-                    Margin="33,0,0,0">
+                    Padding="30,24"
+                    MinimumHeightRequest="150"
+                    Margin="49.5,0,0,0">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16"/>
+                    <RoundRectangle CornerRadius="24"/>
                 </Border.StrokeShape>
 
                 <Label Text="{Binding AiDisplayContent.Text, FallbackValue='Waiting for activity...'}"
                        FontFamily="RajdhaniRegular"
                        TextColor="{StaticResource TextSecondary}"
-                       FontSize="18"
+                       FontSize="27"
                        LineBreakMode="WordWrap"
                        MaxLines="3"
                        VerticalOptions="Center"/>
@@ -574,42 +574,42 @@
             <Border Grid.Column="2"
                     BackgroundColor="{StaticResource BgPrimary}"
                     Stroke="#1e5568"
-                    StrokeThickness="1"
+                    StrokeThickness="1.5"
                     Padding="0">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16"/>
+                    <RoundRectangle CornerRadius="24"/>
                 </Border.StrokeShape>
 
                 <Grid>
                     <!-- Plus Pattern Background Layer -->
-                    <controls:PlusPatternBackground 
-                        PlusColor="#fb3a5d"
-                        PatternBackgroundColor="Transparent"
-                        PlusSize="60"
-                        PlusOpacity="0.4"
-                        Fade="True"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Fill">
-                        <controls:PlusPatternBackground.Clip>
-                            <RoundRectangleGeometry Rect="0,0,10000,10000" CornerRadius="16"/>
-                        </controls:PlusPatternBackground.Clip>
-                    </controls:PlusPatternBackground>
+                        <controls:PlusPatternBackground 
+                            PlusColor="#fb3a5d"
+                            PatternBackgroundColor="Transparent"
+                            PlusSize="90"
+                            PlusOpacity="0.4"
+                            Fade="True"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill">
+                            <controls:PlusPatternBackground.Clip>
+                            <RoundRectangleGeometry Rect="0,0,10000,10000" CornerRadius="24"/>
+                            </controls:PlusPatternBackground.Clip>
+                        </controls:PlusPatternBackground>
 
                     <!-- Content Layer -->
                     <Grid RowDefinitions="*,Auto">
                         <!-- Timeline View (replaces flat chat feed) -->
-                        <views:TimelineView Grid.Row="0" Margin="16,12,16,4" />
+                        <views:TimelineView Grid.Row="0" Margin="24,18,24,6" />
 
                         <!-- Chat Input -->
                         <Border Grid.Row="1"
                                 BackgroundColor="{StaticResource BgSecondary}"
                                 Stroke="#1e5568"
-                                StrokeThickness="1"
-                                Margin="16,8,16,12"
-                                Padding="16,12"
-                                MinimumHeightRequest="100">
+                                StrokeThickness="1.5"
+                                Margin="24,12,24,18"
+                                Padding="24,18"
+                                MinimumHeightRequest="150">
                             <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="12"/>
+                                <RoundRectangle CornerRadius="18"/>
                             </Border.StrokeShape>
 
                             <Grid RowDefinitions="*,Auto">
@@ -619,24 +619,24 @@
                                         PlaceholderColor="{StaticResource TextMuted}"
                                         TextColor="{StaticResource TextPrimary}"
                                         FontFamily="RajdhaniRegular"
-                                        FontSize="20"
+                                        FontSize="30"
                                         BackgroundColor="Transparent"
                                         Keyboard="Chat"
                                         AutoSize="TextChanges"
-                                        MaximumHeightRequest="120"
+                                        MaximumHeightRequest="180"
                                         VerticalOptions="Start"/>
 
                                 <Border Grid.Row="1"
                                         BackgroundColor="{StaticResource AccentYellow}"
                                         StrokeThickness="0"
-                                        WidthRequest="36"
-                                        HeightRequest="36"
+                                        WidthRequest="54"
+                                        HeightRequest="54"
                                         HorizontalOptions="End"
                                         VerticalOptions="End"
                                         IsEnabled="{Binding CanSendTextMessage}"
                                         Opacity="0.3">
                                     <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
+                                        <RoundRectangle CornerRadius="12"/>
                                     </Border.StrokeShape>
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border" Binding="{Binding CanSendTextMessage}" Value="True">
@@ -647,7 +647,7 @@
                                         <TapGestureRecognizer Command="{Binding SendTextMessageCommand}"/>
                                     </Border.GestureRecognizers>
                                     <Label Text="➤"
-                                           FontSize="20"
+                                           FontSize="30"
                                            TextColor="{StaticResource BgPrimary}"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center"/>
