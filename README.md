@@ -1,4 +1,4 @@
-# gAImer Desktop
+# Gaimer
 
 **AI-powered gaming companion that watches your gameplay and provides real-time voice and text insights.**
 
@@ -15,7 +15,7 @@
 
 ## Overview
 
-gAImer Desktop is a .NET 8 MAUI application that acts as an AI co-pilot for gamers. It captures your screen in real-time, analyzes gameplay through a multi-layered brain pipeline, and delivers contextual insights via voice and text — all through a native floating overlay that works on top of fullscreen games.
+Gaimer is a .NET 8 MAUI application that acts as an AI co-pilot for gamers. It captures your screen in real-time, analyzes gameplay through a multi-layered brain pipeline, and delivers contextual insights via voice and text — all through a native floating overlay that works on top of fullscreen games.
 
 ### AI Agents
 
