@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ========================================
+         GAIMER DESIGN TOKENS
+         Ported from gaimer_design_spec.md
+         ======================================== -->
+
+    <!-- Agent Colors -->
+    <Color x:Key="AgentGeneral">#7F13EC</Color>
+    <Color x:Key="AgentGeneralGlow">#4D7F13EC</Color>
+    <Color x:Key="AgentChess">#F2A900</Color>
+    <Color x:Key="AgentChessGlow">#4DF2A900</Color>
+
+    <!-- Background Colors -->
+    <Color x:Key="BgPrimary">#130C1A</Color>
+    <Color x:Key="BgSecondary">#1D1630</Color>
+    <Color x:Key="BgCard">#241B38</Color>
+    <Color x:Key="BgCardHover">#30254A</Color>
+
+    <!-- Accent Colors -->
+    <Color x:Key="AccentCyan">#D5D4D9</Color>
+    <Color x:Key="AccentPurple">#7F13EC</Color>
+    <Color x:Key="AccentBlue">#4EA3FF</Color>
+    <Color x:Key="AccentGreen">#22c55e</Color>
+    <Color x:Key="AccentRed">#ef4444</Color>
+    <Color x:Key="AccentYellow">#F2A900</Color>
+
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimary">#F2EEF7</Color>
+    <Color x:Key="TextSecondary">#D5D4D9</Color>
+    <Color x:Key="TextMuted">#9A93AA</Color>
+
+    <!-- Status Colors -->
+    <Color x:Key="StatusOffline">#6b7280</Color>
+    <Color x:Key="StatusConnecting">#4EA3FF</Color>
+    <Color x:Key="StatusConnected">#22c55e</Color>
+    <Color x:Key="StatusError">#ef4444</Color>
+
+    <!-- Legacy/Base Colors (MAUI compatibility) -->
+    <Color x:Key="Primary">#7F13EC</Color>
+    <Color x:Key="PrimaryDark">#7c3aed</Color>
+    <Color x:Key="Secondary">#D5D4D9</Color>
+    <Color x:Key="Tertiary">#4EA3FF</Color>
+    <Color x:Key="White">#ffffff</Color>
+    <Color x:Key="Black">#000000</Color>
+
+    <!-- Gray Scale -->
+    <Color x:Key="Gray100">#f3f4f6</Color>
+    <Color x:Key="Gray200">#e5e7eb</Color>
+    <Color x:Key="Gray300">#d1d5db</Color>
+    <Color x:Key="Gray400">#9ca3af</Color>
+    <Color x:Key="Gray500">#6b7280</Color>
+    <Color x:Key="Gray600">#4b5563</Color>
+    <Color x:Key="Gray700">#374151</Color>
+    <Color x:Key="Gray800">#1f2937</Color>
+    <Color x:Key="Gray900">#111827</Color>
+    <Color x:Key="Gray950">#030712</Color>
+
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="BgPrimaryBrush" Color="{StaticResource BgPrimary}"/>
+    <SolidColorBrush x:Key="BgSecondaryBrush" Color="{StaticResource BgSecondary}"/>
+    <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCard}"/>
+    <SolidColorBrush x:Key="AccentCyanBrush" Color="{StaticResource AccentCyan}"/>
+    <SolidColorBrush x:Key="AccentPurpleBrush" Color="{StaticResource AccentPurple}"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
+
+</ResourceDictionary>

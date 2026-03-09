@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witness Desktop - UI Mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- ============================================
+         SCREEN 1: AGENT SELECTION
+         ============================================ -->
+    <div class="screen agent-selection-screen" id="agentSelectionScreen">
+        <div class="selection-container">
+            <!-- Header -->
+            <div class="selection-header">
+                <div class="selection-logo">
+                    <svg class="logo-icon-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                    </svg>
+                </div>
+                <h1 class="selection-title">Select Your <span class="highlight">Gaimer</span></h1>
+                <p class="selection-subtitle">
+                    <span class="app-name">gaimer</span> - Built on the Witness platform
+                </p>
+                <p class="selection-description">
+                    We're refining this version and optimizing for gaming experiences
+                </p>
+            </div>
+
+            <!-- Agent Cards -->
+            <div class="agent-cards">
+                <!-- General Purpose Gaimer -->
+                <div class="agent-card" data-agent="general">
+                    <div class="agent-icon-container">
+                        <div class="agent-icon general-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="2" y="6" width="20" height="12" rx="2"/>
+                                <circle cx="8" cy="12" r="2"/>
+                                <circle cx="16" cy="10" r="1"/>
+                                <circle cx="16" cy="14" r="1"/>
+                                <circle cx="14" cy="12" r="1"/>
+                                <circle cx="18" cy="12" r="1"/>
+                            </svg>
+                        </div>
+                        <div class="agent-glow general-glow"></div>
+                    </div>
+                    <h2 class="agent-name">General Purpose</h2>
+                    <p class="agent-type">GAIMER</p>
+                    <p class="agent-description">
+                        Your all-around gaming companion. Supports any game, any genre. 
+                        Perfect for streaming, strategy tips, and casual co-op vibes.
+                    </p>
+                    <ul class="agent-features">
+                        <li>🎮 All games supported</li>
+                        <li>🎙️ Voice chat enabled</li>
+                        <li>📺 Screen analysis</li>
+                        <li>💡 Strategy suggestions</li>
+                    </ul>
+                    <button class="agent-select-btn" onclick="selectAgent('general')">
+                        <span>Select General</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Chess Gaimer -->
+                <div class="agent-card" data-agent="chess">
+                    <div class="agent-icon-container">
+                        <div class="agent-icon chess-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2L9 6h6l-3-4z"/>
+                                <path d="M9 6v2c0 1-1 2-2 3v2h10v-2c-1-1-2-2-2-3V6"/>
+                                <rect x="6" y="13" width="12" height="3" rx="1"/>
+                                <path d="M5 16h14l-1 6H6l-1-6z"/>
+                            </svg>
+                        </div>
+                        <div class="agent-glow chess-glow"></div>
+                    </div>
+                    <h2 class="agent-name">Chess</h2>
+                    <p class="agent-type">GAIMER</p>
+                    <p class="agent-description">
+                        Specialized chess AI companion. Analyzes positions, suggests moves, 
+                        and helps you improve your game with grandmaster-level insights.
+                    </p>
+                    <ul class="agent-features">
+                        <li>♟️ Position analysis</li>
+                        <li>🧠 Move suggestions</li>
+                        <li>📊 Game review</li>
+                        <li>🏆 Rating improvement tips</li>
+                    </ul>
+                    <button class="agent-select-btn chess-btn" onclick="selectAgent('chess')">
+                        <span>Select Chess</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="selection-footer">
+                <span class="version-tag">v1.0.0 Beta</span>
+                <span class="divider">•</span>
+                <span>Powered by Gemini Live API</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         SCREEN 2: MAIN DASHBOARD
+         ============================================ -->
+    <div class="screen dashboard-screen" id="dashboardScreen" style="display: none;">
+        <div class="app-container">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <div class="logo">
+                        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        <span class="logo-text">WITNESS</span>
+                    </div>
+                    
+                    <!-- Agent Badge -->
+                    <div class="agent-badge" id="agentBadge">
+                        <span class="agent-badge-icon" id="agentBadgeIcon">🎮</span>
+                        <span class="agent-badge-text" id="agentBadgeText">General Gaimer</span>
+                        <button class="change-agent-btn" onclick="showAgentSelection()" title="Change Agent">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 4v6h6"/>
+                                <path d="M23 20v-6h-6"/>
+                                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="connection-badge" id="connectionBadge">
+                        <span class="status-dot"></span>
+                        <span class="status-text">OFFLINE</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="icon-btn" title="Settings">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Content Row: Preview + Game Selector side by side -->
+                <div class="content-row">
+                    <!-- Window Preview (Left) -->
+                    <div class="preview-container" id="previewContainer">
+                        <!-- Empty State -->
+                        <div class="preview-empty" id="previewEmpty">
+                            <div class="empty-icon" id="emptyIcon">📺</div>
+                            <div class="empty-text">No Game Selected</div>
+                            <div class="empty-subtext" id="emptySubtext">Choose a game from the dropdown above</div>
+                        </div>
+                        
+                        <!-- Active Preview -->
+                        <div class="preview-active" id="previewActive" style="display: none;">
+                            <img src="" alt="Window Preview" class="preview-image" id="previewImage">
+                            <div class="preview-hud">
+                                <div class="hud-badge">
+                                    <span class="hud-dot"></span>
+                                    <span>LIVE</span>
+                                </div>
+                                <span class="hud-target" id="hudTarget">Game</span>
+                            </div>
+                            <div class="preview-fps">1 FPS</div>
+                            <!-- Agent indicator on preview -->
+                            <div class="preview-agent-badge" id="previewAgentBadge">
+                                <span id="previewAgentIcon">🎮</span>
+                                <span id="previewAgentName">General</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Selector - Collapsible Dropdown (Right) -->
+                    <div class="right-panel game-selector" id="gameSelector">
+                        <div class="panel-header" onclick="toggleGameSelector()">
+                            <div class="panel-header-left">
+                                <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                                <div class="panel-title">
+                                    <span class="panel-icon">🎮</span>
+                                    <span>CHOOSE GAME</span>
+                                </div>
+                                <div class="selected-game-preview" id="selectedGamePreview" style="display: none;">
+                                    <span id="selectedGameIcon">🎮</span>
+                                    <span id="selectedGameName">None</span>
+                                </div>
+                            </div>
+                            <button class="icon-btn-small" onclick="event.stopPropagation(); refreshGames()" title="Refresh">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M23 4v6h-6"/>
+                                    <path d="M1 20v-6h6"/>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Game List -->
+                        <div class="app-list" id="appList">
+                            <!-- Games will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio Section with Visualizer -->
+                    <div class="visualizer-container audio-section">
+                        <div class="visualizer-header">
+                            <div class="visualizer-left">
+                                <div class="visualizer-label">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mic-icon">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                        <line x1="12" y1="19" x2="12" y2="23"/>
+                                        <line x1="8" y1="23" x2="16" y2="23"/>
+                                    </svg>
+                                    <span>AUDIO</span>
+                                </div>
+                                <div class="volume-levels">
+                                    <span class="volume-label">IN: <span id="inputLevel">0%</span></span>
+                                    <span class="volume-label">OUT: <span id="outputLevel">0%</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <canvas id="visualizerCanvas" class="visualizer-canvas"></canvas>
+                        
+                        <!-- Sliding Info Panel (Main View) -->
+                        <div class="sliding-panel main-sliding-panel" id="mainSlidingPanel">
+                            <div class="sliding-panel-header">
+                                <div class="sliding-panel-content">
+                                    <span class="sliding-panel-title" id="mainSlidingPanelTitle">AI Insight</span>
+                                    <p class="sliding-panel-text" id="mainSlidingPanelText">Content will appear here...</p>
+                                    <img class="sliding-panel-image" id="mainSlidingPanelImage" style="display: none;" alt="Panel image">
+                                </div>
+                                <button class="sliding-panel-dismiss" onclick="hideMainSlidingPanel()" title="Dismiss">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"/>
+                                        <line x1="6" y1="6" x2="18" y2="18"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="sliding-panel-progress" id="mainSlidingPanelProgress"></div>
+                        </div>
+                    </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-info">
+                    <span class="footer-agent" id="footerAgent">General Gaimer</span>
+                    <span class="footer-divider">|</span>
+                    <span class="footer-version">v1.0.0</span>
+                    <span class="footer-divider">|</span>
+                    <span>Gemini Live API</span>
+                </div>
+                <button class="footer-connect-btn" id="connectBtn" onclick="toggleConnection()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="power-icon">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                        <line x1="12" y1="2" x2="12" y2="12"/>
+                    </svg>
+                    <span id="connectBtnText">CONNECT</span>
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MINIMAL CONNECTED VIEW (hidden by default)
+         ============================================ -->
+    <div class="minimal-view" id="minimalView" style="display: none;">
+        <!-- Top Row: Profile + Agent/Game Info + Audio Label + Levels + Expand -->
+        <div class="minimal-top-row">
+            <!-- Agent Profile -->
+            <div class="agent-profile" id="minimalAgentProfile">
+                <div class="agent-profile-glow"></div>
+                <span id="minimalAgentIcon">🎮</span>
+            </div>
+            
+            <!-- Agent & Game Info -->
+            <div class="minimal-info">
+                <span class="minimal-agent-name" id="minimalAgentName">General Gaimer</span>
+                <div class="minimal-game-info">
+                    <span class="game-icon" id="minimalGameIcon">♟️</span>
+                    <span class="minimal-game-name" id="minimalGameName">Chess.com</span>
+                </div>
+            </div>
+            
+            <!-- Audio Label + Levels (right side) -->
+            <div class="minimal-audio-right">
+                <div class="minimal-audio-label">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mic-icon">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    </svg>
+                    <span>AUDIO</span>
+                </div>
+                <div class="minimal-volume-levels">
+                    <span class="volume-label">IN: <span id="minimalInputLevel">0%</span></span>
+                    <span class="volume-label">OUT: <span id="minimalOutputLevel">0%</span></span>
+                </div>
+            </div>
+            
+            <!-- Expand to Main View Button -->
+            <button class="minimal-expand-btn" onclick="expandToMainView()" title="Expand to full view">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 3 21 3 21 9"/>
+                    <polyline points="9 21 3 21 3 15"/>
+                    <line x1="21" y1="3" x2="14" y2="10"/>
+                    <line x1="3" y1="21" x2="10" y2="14"/>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Audio Section -->
+        <div class="minimal-audio">
+            <!-- Visualizer -->
+            <canvas id="minimalVisualizerCanvas" class="minimal-visualizer"></canvas>
+            
+            <!-- Disconnect button - Below bars, trailing edge -->
+            <div class="audio-bottom-row">
+                <div class="minimal-status">
+                    <span class="minimal-status-dot"></span>
+                    <span>LIVE</span>
+                </div>
+                <button class="minimal-disconnect" onclick="toggleConnection()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="power-icon">
+                        <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                        <line x1="12" y1="2" x2="12" y2="12"/>
+                    </svg>
+                    <span>DISCONNECT</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Sliding Info Panel - Full width -->
+        <div class="sliding-panel" id="slidingPanel">
+            <div class="sliding-panel-header">
+                <div class="sliding-panel-content">
+                    <span class="sliding-panel-title" id="slidingPanelTitle">AI Insight</span>
+                    <p class="sliding-panel-text" id="slidingPanelText">Content will appear here...</p>
+                    <img class="sliding-panel-image" id="slidingPanelImage" style="display: none;" alt="Panel image">
+                </div>
+                <button class="sliding-panel-dismiss" onclick="hideSlidingPanel()" title="Dismiss">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="sliding-panel-progress" id="slidingPanelProgress"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

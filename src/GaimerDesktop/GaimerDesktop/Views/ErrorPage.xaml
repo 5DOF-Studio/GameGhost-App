@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GaimerDesktop.Views.ErrorPage"
+             BackgroundColor="#0a0610"
+             Title="Error"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto" BackgroundColor="#0a0610">
+
+        <!-- Empty State: Centered Content -->
+        <VerticalStackLayout Grid.Row="0"
+                             Spacing="20"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Padding="40"
+                             MaximumWidthRequest="420">
+
+            <!-- Dashed Border Container (Empty State Pattern) -->
+            <Border BackgroundColor="#0d0a16"
+                    Stroke="#2d1a4e"
+                    StrokeThickness="1.5"
+                    StrokeDashArray="6,4"
+                    Padding="40,48"
+                    HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="24" HorizontalOptions="Center">
+
+                    <!-- Avatar / Icon -->
+                    <Grid HorizontalOptions="Center">
+                        <!-- Outer glow ring -->
+                        <Border BackgroundColor="#1a0a2e"
+                                Stroke="#7c3aed40"
+                                StrokeThickness="2"
+                                WidthRequest="88"
+                                HeightRequest="88"
+                                HorizontalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="44"/>
+                            </Border.StrokeShape>
+
+                            <!-- Inner icon circle -->
+                            <Border BackgroundColor="#12101e"
+                                    Stroke="#2d1a4e"
+                                    StrokeThickness="1"
+                                    WidthRequest="72"
+                                    HeightRequest="72"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="36"/>
+                                </Border.StrokeShape>
+                                <Label Text="&#x26A0;"
+                                       FontSize="32"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                        </Border>
+                    </Grid>
+
+                    <!-- Error Code Badge -->
+                    <Border BackgroundColor="#1a1525"
+                            Padding="14,6"
+                            HorizontalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="6"/>
+                        </Border.StrokeShape>
+                        <Label x:Name="ErrorCodeLabel"
+                               Text="ERROR 404"
+                               FontFamily="OrbitronBold"
+                               FontSize="11"
+                               TextColor="#7c3aed"
+                               CharacterSpacing="2"
+                               HorizontalOptions="Center"/>
+                    </Border>
+
+                    <!-- Title -->
+                    <Label x:Name="TitleLabel"
+                           Text="Oops! Black screen of 404!"
+                           FontFamily="OrbitronBold"
+                           FontSize="20"
+                           TextColor="#f2eef7"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           CharacterSpacing="1"/>
+
+                    <!-- Description -->
+                    <Label x:Name="DescriptionLabel"
+                           Text="Something went wrong. The page you're looking for doesn't exist or an unexpected error occurred."
+                           FontFamily="RajdhaniRegular"
+                           FontSize="15"
+                           TextColor="#888888"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap"
+                           MaximumWidthRequest="320"/>
+
+                    <!-- Error Detail (optional, hidden by default) -->
+                    <Border x:Name="ErrorDetailBorder"
+                            BackgroundColor="#0a0610"
+                            Stroke="#2d1a4e"
+                            StrokeThickness="0.5"
+                            Padding="12,8"
+                            IsVisible="False"
+                            HorizontalOptions="Center"
+                            MaximumWidthRequest="320">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="6"/>
+                        </Border.StrokeShape>
+                        <Label x:Name="ErrorDetailLabel"
+                               FontFamily="RajdhaniRegular"
+                               FontSize="12"
+                               TextColor="#555555"
+                               HorizontalTextAlignment="Center"
+                               LineBreakMode="WordWrap"/>
+                    </Border>
+
+                    <!-- CTA Button -->
+                    <Border BackgroundColor="#7c3aed"
+                            Padding="28,12"
+                            HorizontalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8"/>
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnReturnHomeTapped"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="RETURN HOME"
+                               FontFamily="OrbitronBold"
+                               FontSize="13"
+                               TextColor="#ffffff"
+                               CharacterSpacing="2"
+                               HorizontalOptions="Center"/>
+                    </Border>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+
+        <!-- Footer -->
+        <Label Grid.Row="1"
+               HorizontalOptions="Center"
+               FontFamily="RajdhaniRegular"
+               FontSize="12"
+               TextColor="#555555"
+               Margin="0,0,0,20">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="(c) 2026 "/>
+                    <Span Text="5DOF AI Studio" FontFamily="RajdhaniSemiBold"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+
+    </Grid>
+</ContentPage>

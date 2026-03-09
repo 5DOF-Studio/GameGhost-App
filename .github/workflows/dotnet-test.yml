@@ -1,0 +1,29 @@
+name: .NET Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SkiaSharp native dependencies
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig1
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build test project
+        run: dotnet build src/GaimerDesktop/GaimerDesktop.Tests/GaimerDesktop.Tests.csproj -f net8.0 -p:TargetFrameworks=net8.0
+
+      - name: Run tests
+        run: dotnet test src/GaimerDesktop/GaimerDesktop.Tests/GaimerDesktop.Tests.csproj -f net8.0 --no-build --verbosity normal

@@ -1,0 +1,10 @@
+<Project>
+  <!-- Override Mono runtime component manifest targets — not needed for test libraries. -->
+  <Target Name="_MonoReadAvailableComponentsManifest" />
+  <Target Name="_MonoComputeAvailableComponentDefinitions" />
+  <Target Name="_MonoSelectRuntimeComponents" />
+
+  <!-- Override IL Linker for test library — MacCatalyst enforces PublishTrimmed=true
+       but the linker fails on non-self-contained libraries. Skip it entirely. -->
+  <Target Name="ILLink" />
+</Project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="GaimerDesktop.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:GaimerDesktop.Views"
+    xmlns:local="clr-namespace:GaimerDesktop"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False"
+    Shell.BackgroundColor="{StaticResource BgPrimary}"
+    Title="Gaimer">
+
+    <!-- Production flow -->
+    <TabBar x:Name="ProductionTab">
+        <ShellContent
+            Title="Onboarding"
+            ContentTemplate="{DataTemplate views:OnboardingPage}"
+            Route="Onboarding" />
+    </TabBar>
+
+    <!-- Dev launcher (toggled via code-behind #if DEBUG) -->
+    <TabBar x:Name="DevTab">
+        <ShellContent
+            Title="Dev Launcher"
+            ContentTemplate="{DataTemplate views:DevLauncherPage}"
+            Route="DevLauncher" />
+    </TabBar>
+
+</Shell>

@@ -1,0 +1,29 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:GaimerDesktop"
+             xmlns:utils="clr-namespace:GaimerDesktop.Utilities"
+             x:Class="GaimerDesktop.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Value Converters -->
+            <utils:IsNotNullConverter x:Key="IsNotNullConverter"/>
+            <utils:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+            <utils:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
+            <utils:AudioBarHeightConverter x:Key="AudioBarHeightConverter"/>
+            <utils:BoolToSettingsColorConverter x:Key="BoolToSettingsColor"/>
+            <utils:BoolToSettingsTextColorConverter x:Key="BoolToSettingsTextColor"/>
+
+            <!-- Timeline Converters -->
+            <utils:RoleToUserVisibilityConverter x:Key="RoleToUserVisibility"/>
+            <utils:RoleToAssistantVisibilityConverter x:Key="RoleToAssistantVisibility"/>
+            <utils:SignalToUpperCaseConverter x:Key="SignalToUpperCase"/>
+            <utils:NotNullToBoolConverter x:Key="NotNullToBool"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

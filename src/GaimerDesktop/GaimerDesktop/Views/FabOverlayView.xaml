@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GaimerDesktop.ViewModels"
+             x:Class="GaimerDesktop.Views.FabOverlayView"
+             x:DataType="vm:MainViewModel">
+
+    <!-- FAB BUTTON — ghost mode toggle (110pt) -->
+    <Grid WidthRequest="110" HeightRequest="110">
+
+        <!-- Outer glow ring (green when connected) -->
+        <Border WidthRequest="110"
+                HeightRequest="110"
+                BackgroundColor="Transparent"
+                StrokeThickness="2"
+                Stroke="#22c55e"
+                IsVisible="{Binding IsFabEnabled}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="55"/>
+            </Border.StrokeShape>
+            <Border.Shadow>
+                <Shadow Brush="#22c55e"
+                        Offset="0,0"
+                        Radius="14"
+                        Opacity="0.6"/>
+            </Border.Shadow>
+        </Border>
+
+        <!-- Muted ring (disconnected idle state — subtle, looks truly off) -->
+        <Border WidthRequest="110"
+                HeightRequest="110"
+                BackgroundColor="Transparent"
+                StrokeThickness="2"
+                Stroke="#3a3d42"
+                IsVisible="{Binding IsFabEnabled, Converter={StaticResource InvertedBoolConverter}}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="55"/>
+            </Border.StrokeShape>
+        </Border>
+
+        <!-- Inner circle: metallic gray (matches toggle knobs), dark when connected -->
+        <Border WidthRequest="100"
+                HeightRequest="100"
+                StrokeThickness="0"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="50"/>
+            </Border.StrokeShape>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#8a8a98" Offset="0.0"/>
+                    <GradientStop Color="#5a5a68" Offset="0.3"/>
+                    <GradientStop Color="#4a4a58" Offset="0.7"/>
+                    <GradientStop Color="#3a3a48" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.Triggers>
+                <DataTrigger TargetType="Border" Binding="{Binding IsFabEnabled}" Value="True">
+                    <Setter Property="BackgroundColor" Value="{StaticResource BgCard}"/>
+                </DataTrigger>
+            </Border.Triggers>
+
+            <Grid>
+                <!-- Agent portrait (shown when connected — replaces text labels) -->
+                <Image Source="{Binding SelectedAgent.PortraitImage, FallbackValue='default_agent.png'}"
+                       WidthRequest="100"
+                       HeightRequest="100"
+                       Aspect="AspectFill"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       IsVisible="{Binding IsFabEnabled}">
+                    <Image.Clip>
+                        <EllipseGeometry Center="50,50" RadiusX="50" RadiusY="50"/>
+                    </Image.Clip>
+                </Image>
+
+                <!-- "Ghost Mode" label (disconnected — off state) -->
+                <VerticalStackLayout HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     Spacing="0"
+                                     IsVisible="{Binding IsFabEnabled, Converter={StaticResource InvertedBoolConverter}}">
+                    <Label Text="GHOST"
+                           FontSize="16"
+                           FontFamily="OrbitronBold"
+                           TextColor="Black"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="MODE"
+                           FontSize="16"
+                           FontFamily="OrbitronBold"
+                           TextColor="Black"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Tap target covers full area -->
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding ToggleFabCommand}"/>
+        </Grid.GestureRecognizers>
+
+        <!-- Off-game: full opacity but not interactive. In-game: full opacity and interactive. -->
+        <Grid.Triggers>
+            <DataTrigger TargetType="Grid" Binding="{Binding IsFabEnabled}" Value="False">
+                <Setter Property="Opacity" Value="1.0"/>
+                <Setter Property="InputTransparent" Value="True"/>
+            </DataTrigger>
+            <DataTrigger TargetType="Grid" Binding="{Binding IsFabEnabled}" Value="True">
+                <Setter Property="Opacity" Value="1.0"/>
+                <Setter Property="InputTransparent" Value="False"/>
+            </DataTrigger>
+        </Grid.Triggers>
+    </Grid>
+</ContentView>

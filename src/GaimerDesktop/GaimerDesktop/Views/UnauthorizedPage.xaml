@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GaimerDesktop.Views.UnauthorizedPage"
+             BackgroundColor="#0a0610"
+             Title="Access Denied">
+
+    <Grid RowDefinitions="*,Auto" BackgroundColor="#0a0610">
+
+        <VerticalStackLayout Grid.Row="0"
+                             Spacing="24"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Padding="40">
+
+            <!-- Logo -->
+            <Image Source="gaimer_logo.png"
+                   HeightRequest="100"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center"/>
+
+            <!-- Lock Icon -->
+            <Border BackgroundColor="#1a0a0a"
+                    Stroke="#ff4444"
+                    StrokeThickness="2"
+                    WidthRequest="80"
+                    HeightRequest="80"
+                    HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="40"/>
+                </Border.StrokeShape>
+                <Label Text="&#x1F512;"
+                       FontSize="36"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Border>
+
+            <!-- Title -->
+            <Label Text="ACCESS DENIED"
+                   FontFamily="OrbitronBold"
+                   FontSize="32"
+                   TextColor="#ff4444"
+                   HorizontalOptions="Center"
+                   CharacterSpacing="3"/>
+
+            <!-- Subtitle -->
+            <Label Text="This device is not authorized for GAIMER access."
+                   FontFamily="RajdhaniSemiBold"
+                   FontSize="18"
+                   TextColor="#aaaaaa"
+                   HorizontalOptions="Center"/>
+
+            <!-- Divider -->
+            <BoxView HeightRequest="1"
+                     BackgroundColor="#2a1a1a"
+                     HorizontalOptions="FillAndExpand"
+                     Margin="60,8"/>
+
+            <!-- Instructions -->
+            <Label FontFamily="RajdhaniRegular"
+                   FontSize="15"
+                   TextColor="#777777"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="WordWrap">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="GAIMER is currently in invite-only alpha.&#10;"/>
+                        <Span Text="Contact " TextColor="#888888"/>
+                        <Span Text="hello@5dof.ai" TextColor="#00d4ff" FontFamily="RajdhaniSemiBold"/>
+                        <Span Text=" to request access."/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <!-- Device ID display -->
+            <VerticalStackLayout Spacing="4" HorizontalOptions="Center" Margin="0,12,0,0">
+                <Label Text="DEVICE ID"
+                       FontFamily="OrbitronBold"
+                       FontSize="10"
+                       TextColor="#555555"
+                       HorizontalOptions="Center"
+                       CharacterSpacing="2"/>
+                <Label x:Name="DeviceIdLabel"
+                       Text="loading..."
+                       FontFamily="RajdhaniRegular"
+                       FontSize="12"
+                       TextColor="#444444"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- Footer -->
+        <Label Grid.Row="1"
+               HorizontalOptions="Center"
+               FontFamily="RajdhaniRegular"
+               FontSize="12"
+               TextColor="#555555"
+               Margin="0,0,0,20">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="(c) 2026 "/>
+                    <Span Text="5DOF AI Studio" FontFamily="RajdhaniSemiBold"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+
+    </Grid>
+</ContentPage>

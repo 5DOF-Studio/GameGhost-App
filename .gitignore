@@ -95,4 +95,13 @@ run_maccatalyst.log
 
 # Native helper build artifacts (regenerable via build-xcframework.sh)
 .build-xcframework/
+.build/
+*.xcframework/
+
+# AI coding tools (local settings, caches)
+.claude/
+.agents/
+.axon/
+.codex/
+.opencode/
 

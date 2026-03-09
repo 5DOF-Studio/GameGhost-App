@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GaimerDesktop.ViewModels"
+             x:Class="GaimerDesktop.Views.OnboardingPage"
+             x:DataType="vm:OnboardingViewModel"
+             BackgroundColor="#080b10"
+             Shell.NavBarIsVisible="False"
+             Title="Gaimer">
+
+    <Grid RowDefinitions="*,Auto" BackgroundColor="#080b10">
+
+        <!-- Main Content: Card + Selectors vertically stacked -->
+        <VerticalStackLayout Grid.Row="0"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="16">
+
+            <!-- "Select a Gaimer" label above card -->
+            <Label Text="SELECT A GAIMER"
+                   IsVisible="{Binding IsAgentBrowseState}"
+                   FontFamily="Krophed"
+                   FontSize="18"
+                   TextColor="#f0f0f0"
+                   CharacterSpacing="2"
+                   HorizontalOptions="Center"/>
+
+            <!-- Two-panel card -->
+            <Border BackgroundColor="#1a1d21"
+                    Stroke="#2a2d32"
+                    StrokeThickness="1"
+                    WidthRequest="960"
+                    HeightRequest="560">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="20"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="#0a4a6a" Offset="0,6" Radius="50" Opacity="0.20"/>
+                </Border.Shadow>
+
+                <Grid ColumnDefinitions="*,*">
+
+                    <!-- ═══════════════════════════════════════════════ -->
+                    <!-- LEFT PANEL                                     -->
+                    <!-- ═══════════════════════════════════════════════ -->
+                    <Grid Grid.Column="0" BackgroundColor="#0e1117">
+
+                        <!-- SignIn State: Logo -->
+                        <VerticalStackLayout IsVisible="{Binding IsSignInState}"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center"
+                                             Spacing="16">
+                            <Image Source="gaimer_logo.png"
+                                   HeightRequest="208"
+                                   Aspect="AspectFit"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+
+                        <!-- Agent Image (Browse/Downloading/Ready states) -->
+                        <Image x:Name="AgentPortrait"
+                               IsVisible="{Binding ShowAgentImage}"
+                               Aspect="AspectFill"
+                               WidthRequest="480"
+                               HeightRequest="560">
+                            <Image.Clip>
+                                <RoundRectangleGeometry Rect="0,0,480,560" CornerRadius="20,0,0,20"/>
+                            </Image.Clip>
+                        </Image>
+
+                        <!-- Coming Soon overlay on left panel image -->
+                        <Border x:Name="ComingSoonLeftOverlay"
+                                IsVisible="False"
+                                BackgroundColor="#080b1088"
+                                StrokeThickness="0"
+                                HorizontalOptions="Fill"
+                                VerticalOptions="Fill">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="20,0,0,20"/>
+                            </Border.StrokeShape>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- ═══════════════════════════════════════════════ -->
+                    <!-- RIGHT PANEL                                    -->
+                    <!-- ═══════════════════════════════════════════════ -->
+                    <Grid Grid.Column="1" BackgroundColor="#1a1d21">
+
+                        <!-- ─── SignIn Form ──────────────────────── -->
+                        <VerticalStackLayout IsVisible="{Binding IsSignInState}"
+                                             Spacing="18"
+                                             Padding="44,0"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="Fill">
+
+                            <Label Text="Got an invite?"
+                                   FontFamily="Krophed"
+                                   FontSize="28"
+                                   TextColor="#f8f8f8"
+                                   CharacterSpacing="1"/>
+
+                            <Label Text="Sign in to meet your AI gaming companion."
+                                   FontFamily="RajdhaniRegular"
+                                   FontSize="16"
+                                   TextColor="#b0b5be"/>
+
+                            <!-- Username -->
+                            <VerticalStackLayout Spacing="6" Margin="0,10,0,0">
+                                <Label Text="USERNAME"
+                                       FontFamily="OrbitronBold"
+                                       FontSize="10"
+                                       TextColor="#7a7f88"
+                                       CharacterSpacing="2"/>
+                                <Border BackgroundColor="#12151a"
+                                        Stroke="#3a3d42"
+                                        StrokeThickness="1"
+                                        Padding="14,0"
+                                        HeightRequest="44">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8"/>
+                                    </Border.StrokeShape>
+                                    <Entry x:Name="UsernameEntry"
+                                           Text="{Binding Username}"
+                                           Placeholder="Your display name"
+                                           PlaceholderColor="#4a4f58"
+                                           TextColor="#e0e0e0"
+                                           FontFamily="RajdhaniSemiBold"
+                                           FontSize="16"
+                                           BackgroundColor="Transparent"
+                                           Keyboard="Text"/>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Email -->
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="EMAIL"
+                                       FontFamily="OrbitronBold"
+                                       FontSize="10"
+                                       TextColor="#7a7f88"
+                                       CharacterSpacing="2"/>
+                                <Border BackgroundColor="#12151a"
+                                        Stroke="#3a3d42"
+                                        StrokeThickness="1"
+                                        Padding="14,0"
+                                        HeightRequest="44">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8"/>
+                                    </Border.StrokeShape>
+                                    <Entry x:Name="EmailEntry"
+                                           Text="{Binding Email}"
+                                           Placeholder="you@example.com"
+                                           PlaceholderColor="#4a4f58"
+                                           TextColor="#e0e0e0"
+                                           FontFamily="RajdhaniSemiBold"
+                                           FontSize="16"
+                                           BackgroundColor="Transparent"
+                                           Keyboard="Email"/>
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Error message -->
+                            <Label Text="{Binding SignInError}"
+                                   IsVisible="{Binding SignInError, Converter={StaticResource NotNullToBool}}"
+                                   FontFamily="RajdhaniSemiBold"
+                                   FontSize="14"
+                                   TextColor="#ef4444"
+                                   MaxLines="2"/>
+
+                            <!-- Log In button -->
+                            <Grid HeightRequest="48" Margin="0,6,0,0">
+                                <Border BackgroundColor="#e8e8e8"
+                                        StrokeThickness="0"
+                                        Padding="0"
+                                        HeightRequest="48"
+                                        HorizontalOptions="Fill"
+                                        IsVisible="{Binding IsSigningIn, Converter={StaticResource InvertedBoolConverter}}">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8"/>
+                                    </Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnSignInClicked"/>
+                                    </Border.GestureRecognizers>
+                                    <Label Text="LOG IN"
+                                           FontFamily="OrbitronBold"
+                                           FontSize="14"
+                                           TextColor="#0e1117"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           CharacterSpacing="2"/>
+                                </Border>
+                                <ActivityIndicator IsRunning="{Binding IsSigningIn}"
+                                                   IsVisible="{Binding IsSigningIn}"
+                                                   Color="#e0e0e0"
+                                                   HeightRequest="30"
+                                                   WidthRequest="30"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"/>
+                            </Grid>
+
+                        </VerticalStackLayout>
+
+                        <!-- ─── Agent Details (Browse - Available) ─── -->
+                        <ScrollView x:Name="AgentDetailsPanel"
+                                    IsVisible="False"
+                                    Padding="36,28"
+                                    VerticalOptions="Fill">
+                            <VerticalStackLayout Spacing="12"
+                                                 VerticalOptions="Center">
+
+                                <!-- Specialist Badge Image (top trailing) -->
+                                <Image x:Name="AgentBadgeImage"
+                                       Source="chess_badge.png"
+                                       HeightRequest="48"
+                                       WidthRequest="48"
+                                       Aspect="AspectFit"
+                                       HorizontalOptions="End"
+                                       Opacity="0.85"/>
+
+                                <!-- Agent Name -->
+                                <Label x:Name="AgentNameLabel"
+                                       FontFamily="Krophed"
+                                       FontSize="42"
+                                       TextColor="#f0f0f0"
+                                       CharacterSpacing="2"/>
+
+                                <!-- Specialization -->
+                                <Label x:Name="AgentSpecLabel"
+                                       FontFamily="RajdhaniSemiBold"
+                                       FontSize="17"
+                                       TextColor="#b0b5be"/>
+
+                                <!-- Description -->
+                                <Label x:Name="AgentDescLabel"
+                                       FontFamily="RajdhaniRegular"
+                                       FontSize="15"
+                                       TextColor="#8a8f98"
+                                       LineBreakMode="WordWrap"
+                                       MaxLines="2"/>
+
+                                <!-- Tools Section -->
+                                <VerticalStackLayout x:Name="ToolsSection" Spacing="8" Margin="0,6,0,0">
+                                    <Label Text="TOOLS"
+                                           FontFamily="OrbitronBold"
+                                           FontSize="10"
+                                           TextColor="#5a5f68"
+                                           CharacterSpacing="2"/>
+                                    <FlexLayout x:Name="ToolsLayout"
+                                                Wrap="Wrap"
+                                                JustifyContent="Start"
+                                                AlignItems="Center"/>
+                                </VerticalStackLayout>
+
+                                <!-- Specs Row -->
+                                <Grid x:Name="SpecsGrid"
+                                      ColumnDefinitions="*,*"
+                                      RowSpacing="4"
+                                      ColumnSpacing="16"
+                                      Margin="0,6,0,0">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                        <Label Text="CAPTURE RATE"
+                                               FontFamily="OrbitronBold"
+                                               FontSize="10"
+                                               TextColor="#5a5f68"
+                                               CharacterSpacing="1"/>
+                                        <Label x:Name="CaptureRateLabel"
+                                               FontFamily="RajdhaniSemiBold"
+                                               FontSize="14"
+                                               TextColor="#b0b5be"/>
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                        <Label Text="MIN REQUIREMENTS"
+                                               FontFamily="OrbitronBold"
+                                               FontSize="10"
+                                               TextColor="#5a5f68"
+                                               CharacterSpacing="1"/>
+                                        <Label x:Name="RequirementsLabel"
+                                               FontFamily="RajdhaniRegular"
+                                               FontSize="13"
+                                               TextColor="#8a8f98"
+                                               LineBreakMode="WordWrap"
+                                               MaxLines="3"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <!-- Download Button -->
+                                <Border BackgroundColor="#e8e8e8"
+                                        StrokeThickness="0"
+                                        Padding="28,14"
+                                        HorizontalOptions="Start"
+                                        Margin="0,10,0,0">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10"/>
+                                    </Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnDownloadClicked"/>
+                                    </Border.GestureRecognizers>
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="DOWNLOAD"
+                                               FontFamily="OrbitronBold"
+                                               FontSize="13"
+                                               TextColor="#0e1117"
+                                               VerticalOptions="Center"
+                                               CharacterSpacing="1"/>
+                                        <Label Text="&#x2193;"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#0e1117"
+                                               VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
+
+                            </VerticalStackLayout>
+                        </ScrollView>
+
+                        <!-- ─── Agent Details (Browse - Coming Soon) ── -->
+                        <VerticalStackLayout x:Name="ComingSoonPanel"
+                                             IsVisible="False"
+                                             Spacing="14"
+                                             Padding="36,28"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="Fill">
+
+                            <Label x:Name="ComingSoonNameLabel"
+                                   FontFamily="Krophed"
+                                   FontSize="42"
+                                   TextColor="#f0f0f0"
+                                   CharacterSpacing="2"/>
+
+                            <Label x:Name="ComingSoonSpecLabel"
+                                   FontFamily="RajdhaniSemiBold"
+                                   FontSize="17"
+                                   TextColor="#b0b5be"/>
+
+                            <Label x:Name="ComingSoonDescLabel"
+                                   FontFamily="RajdhaniRegular"
+                                   FontSize="15"
+                                   TextColor="#8a8f98"
+                                   LineBreakMode="WordWrap"
+                                   MaxLines="2"
+                                   Margin="0,4,0,0"/>
+
+                            <Border BackgroundColor="#12151a"
+                                    Stroke="#2a2d32"
+                                    StrokeThickness="1"
+                                    Padding="28,16"
+                                    HorizontalOptions="Start"
+                                    Margin="0,20,0,0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <Label Text="COMING SOON"
+                                       FontFamily="OrbitronBold"
+                                       FontSize="15"
+                                       TextColor="#5a5f68"
+                                       CharacterSpacing="3"/>
+                            </Border>
+
+                        </VerticalStackLayout>
+
+                        <!-- ─── Downloading State ────────────────── -->
+                        <VerticalStackLayout IsVisible="{Binding IsDownloadingState}"
+                                             Spacing="18"
+                                             Padding="44,0"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="Fill">
+
+                            <Label Text="INSTALLING"
+                                   FontFamily="Krophed"
+                                   FontSize="28"
+                                   TextColor="#f8f8f8"
+                                   CharacterSpacing="2"/>
+
+                            <Label x:Name="DownloadAgentNameLabel"
+                                   FontFamily="OrbitronBold"
+                                   FontSize="13"
+                                   TextColor="#8a8f98"
+                                   CharacterSpacing="1"/>
+
+                            <Label Text="{Binding DownloadStatusText}"
+                                   FontFamily="RajdhaniSemiBold"
+                                   FontSize="16"
+                                   TextColor="#8a8f98"/>
+
+                            <Grid HeightRequest="32" Margin="0,8,0,0">
+                                <ProgressBar Progress="{Binding DownloadProgress}"
+                                             ProgressColor="#e0e0e0"
+                                             BackgroundColor="#12151a"
+                                             HeightRequest="6"
+                                             VerticalOptions="Center"/>
+                                <Label Text="{Binding DownloadProgress, StringFormat='{0:P0}'}"
+                                       FontFamily="RajdhaniSemiBold"
+                                       FontSize="14"
+                                       TextColor="#b0b5be"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Start"/>
+                            </Grid>
+
+                        </VerticalStackLayout>
+
+                        <!-- ─── Ready State ──────────────────────── -->
+                        <VerticalStackLayout IsVisible="{Binding IsReadyState}"
+                                             Spacing="18"
+                                             Padding="44,0"
+                                             VerticalOptions="Center"
+                                             HorizontalOptions="Fill">
+
+                            <Label x:Name="ReadyAgentNameLabel"
+                                   FontFamily="Krophed"
+                                   FontSize="38"
+                                   TextColor="#f0f0f0"
+                                   CharacterSpacing="2"/>
+
+                            <Label Text="Ready to play."
+                                   FontFamily="RajdhaniSemiBold"
+                                   FontSize="17"
+                                   TextColor="#8a8f98"/>
+
+                            <Label x:Name="ReadySpecLabel"
+                                   FontFamily="RajdhaniSemiBold"
+                                   FontSize="15"
+                                   TextColor="#b0b5be"/>
+
+                            <Border x:Name="ConnectButton"
+                                    BackgroundColor="#e8e8e8"
+                                    StrokeThickness="0"
+                                    Padding="36,16"
+                                    HorizontalOptions="Start"
+                                    Margin="0,10,0,0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnConnectClicked"/>
+                                </Border.GestureRecognizers>
+                                <Grid>
+                                    <!-- Default: CONNECT label -->
+                                    <HorizontalStackLayout x:Name="ConnectDefaultContent"
+                                                           Spacing="10">
+                                        <Label Text="CONNECT"
+                                               FontFamily="OrbitronBold"
+                                               FontSize="14"
+                                               TextColor="#0e1117"
+                                               VerticalOptions="Center"
+                                               CharacterSpacing="2"/>
+                                        <Label Text="&#x2192;"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               TextColor="#0e1117"
+                                               VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                    <!-- Flipped: CONNECTING... label -->
+                                    <Label x:Name="ConnectingLabel"
+                                           Text="CONNECTING..."
+                                           FontFamily="OrbitronBold"
+                                           FontSize="14"
+                                           TextColor="#e8e8e8"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"
+                                           CharacterSpacing="2"
+                                           IsVisible="False"/>
+                                </Grid>
+                            </Border>
+
+                        </VerticalStackLayout>
+
+                    </Grid>
+
+                </Grid>
+            </Border>
+
+            <!-- Agent Selectors: Outside card, centered, close together -->
+            <HorizontalStackLayout IsVisible="{Binding ShowChevrons}"
+                                   HorizontalOptions="Center"
+                                   Spacing="24">
+                <!-- Left triangle -->
+                <Border BackgroundColor="#1a1d21"
+                        Stroke="#2a2d32"
+                        StrokeThickness="1"
+                        WidthRequest="42"
+                        HeightRequest="42">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnPreviousAgent"/>
+                    </Border.GestureRecognizers>
+                    <Label x:Name="LeftChevronLabel"
+                           Text="&#x25C0;"
+                           FontSize="16"
+                           TextColor="#e0e0e0"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Border>
+
+                <!-- Right triangle -->
+                <Border BackgroundColor="#1a1d21"
+                        Stroke="#2a2d32"
+                        StrokeThickness="1"
+                        WidthRequest="42"
+                        HeightRequest="42">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnNextAgent"/>
+                    </Border.GestureRecognizers>
+                    <Label x:Name="RightChevronLabel"
+                           Text="&#x25B6;"
+                           FontSize="16"
+                           TextColor="#e0e0e0"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Border>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- Footer -->
+        <Label Grid.Row="1"
+               HorizontalOptions="Center"
+               FontFamily="RajdhaniRegular"
+               FontSize="12"
+               TextColor="#4a4f58"
+               Margin="0,0,0,20">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="(c) 2026 "/>
+                    <Span Text="5DOF AI Studio" FontFamily="RajdhaniSemiBold"/>
+                    <Span Text=" -- All Rights Reserved"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+
+    </Grid>
+</ContentPage>

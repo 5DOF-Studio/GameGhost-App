@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:GaimerDesktop.ViewModels"
+             xmlns:models="clr-namespace:GaimerDesktop.Models"
+             xmlns:utils="clr-namespace:GaimerDesktop.Utilities"
+             xmlns:controls="clr-namespace:GaimerDesktop.Controls"
+             xmlns:views="clr-namespace:GaimerDesktop.Views"
+             x:Class="GaimerDesktop.MainPage"
+             x:DataType="vm:MainViewModel"
+             BackgroundColor="#0e1117"
+             Title="Gaimer Dashboard">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Desktop-Optimized Color Palette (Gun Metal) -->
+            <Color x:Key="BgPrimary">#0e1117</Color>
+            <Color x:Key="BgSecondary">#1a1d21</Color>
+            <Color x:Key="BgCard">#1e2228</Color>
+            <Color x:Key="BgCardHover">#282d34</Color>
+            <Color x:Key="AccentPurple">#4ea3ff</Color>
+            <Color x:Key="AccentPurpleDark">#1a5a8a</Color>
+            <Color x:Key="AccentCyan">#d5d4d9</Color>
+            <Color x:Key="AccentBlue">#4ea3ff</Color>
+            <Color x:Key="AccentGreen">#10b981</Color>
+            <Color x:Key="AccentRed">#ef4444</Color>
+            <Color x:Key="AccentYellow">#f2a900</Color>
+            <Color x:Key="TextPrimary">#f2eef7</Color>
+            <Color x:Key="TextSecondary">#d5d4d9</Color>
+            <Color x:Key="TextMuted">#b8b2c4</Color>
+            <Color x:Key="BorderSubtle">#d5d4d91a</Color>
+            <utils:DeliveryStateDisplayConverter x:Key="DeliveryStateDisplayConverter"/>
+            <utils:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
+
+            <DataTemplate x:Key="ChatMessageTemplate" x:DataType="models:ChatMessage">
+                <VerticalStackLayout Spacing="4" Margin="0,0,0,16">
+                    <!-- Message Header (Type + Timestamp + DeliveryState) -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="4,0">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="8">
+                            <Label Text="{Binding Type}" 
+                                   FontFamily="RajdhaniSemiBold"
+                                   FontSize="16"
+                                   TextColor="{StaticResource AccentCyan}"
+                                   CharacterSpacing="1">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Type}" Value="Warning">
+                                        <Setter Property="TextColor" Value="{StaticResource AccentRed}"/>
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Type}" Value="User">
+                                        <Setter Property="TextColor" Value="{StaticResource TextMuted}"/>
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Type}" Value="System">
+                                        <Setter Property="TextColor" Value="{StaticResource AccentCyan}"/>
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </HorizontalStackLayout>
+                        <Label Grid.Column="1" 
+                               Text="{Binding Timestamp, StringFormat='{0:HH:mm}'}"
+                               FontFamily="RajdhaniRegular"
+                               FontSize="16"
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="End"/>
+                        <Label Grid.Column="2"
+                               Text="{Binding DeliveryState, Converter={StaticResource DeliveryStateDisplayConverter}}"
+                               FontFamily="RajdhaniRegular"
+                               FontSize="16"
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="End"
+                               IsVisible="False">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding Type}" Value="User">
+                                    <Setter Property="IsVisible" Value="True"/>
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </Grid>
+
+                    <!-- Message Bubble -->
+                    <Border BackgroundColor="{StaticResource BgCard}"
+                            Stroke="Transparent"
+                            StrokeThickness="0"
+                            Padding="16">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8"/>
+                        </Border.StrokeShape>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding Type}" Value="Warning">
+                                <Setter Property="Stroke" Value="Transparent"/>
+                                <Setter Property="StrokeThickness" Value="0"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding Type}" Value="User">
+                                <Setter Property="BackgroundColor" Value="#0e1117"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding Type}" Value="System">
+                                <Setter Property="BackgroundColor" Value="#12151a"/>
+                                <Setter Property="Stroke" Value="Transparent"/>
+                                <Setter Property="StrokeThickness" Value="0"/>
+                            </DataTrigger>
+                        </Border.Triggers>
+
+                        <VerticalStackLayout Spacing="12">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Label Grid.Column="0" 
+                                       Text="⚠️" 
+                                       FontSize="18" 
+                                       Margin="0,0,12,0"
+                                       VerticalOptions="Start"
+                                       IsVisible="False">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Type}" Value="Warning">
+                                            <Setter Property="IsVisible" Value="True"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                                <Label Grid.Column="1"
+                                       Text="{Binding Text}"
+                                       FontFamily="RajdhaniSemiBold"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       FontSize="20"
+                                       LineBreakMode="WordWrap">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Type}" Value="User">
+                                            <Setter Property="FontAttributes" Value="Italic"/>
+                                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Type}" Value="System">
+                                            <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+                                            <Setter Property="FontSize" Value="18"/>
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+
+                            <Image Source="{Binding ImageSource}"
+                                   IsVisible="{Binding ImageSource, Converter={StaticResource IsNotNullConverter}}"
+                                   Aspect="AspectFit"
+                                   MaximumHeightRequest="300"
+                                   HorizontalOptions="Start"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+    <!-- Loading spinner (visible until ViewModel is bound and ready) -->
+    <Grid IsVisible="{Binding IsPageReady, Converter={StaticResource InvertedBoolConverter}, FallbackValue=True}"
+          BackgroundColor="#0e1117"
+          ZIndex="10">
+        <ActivityIndicator IsRunning="True"
+                           Color="#ffffff"
+                           WidthRequest="48"
+                           HeightRequest="48"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+    </Grid>
+
+    <Grid IsVisible="{Binding IsPageReady}">
+    <!-- Layer 1: All MainPage content -->
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="280,*,Auto" Padding="16,8,16,8" RowSpacing="4" ColumnSpacing="16">
+
+        <!-- ========== LEFT SIDEBAR: Spans Row 0 + Row 1 ========== -->
+        <VerticalStackLayout Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Spacing="6">
+
+            <!-- Camera icon + Streaming status -->
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Image Grid.Column="0"
+                       Source="camera.png"
+                       WidthRequest="36"
+                       HeightRequest="36"
+                       VerticalOptions="Center"/>
+                <HorizontalStackLayout Grid.Column="2" Spacing="6" VerticalOptions="Center">
+                    <Ellipse WidthRequest="8" HeightRequest="8" VerticalOptions="Center">
+                        <Ellipse.Triggers>
+                            <DataTrigger TargetType="Ellipse" Binding="{Binding IsConnected}" Value="False">
+                                <Setter Property="Fill" Value="#666666"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Ellipse" Binding="{Binding IsConnected}" Value="True">
+                                <Setter Property="Fill" Value="#00ff00"/>
+                            </DataTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+                    <Label Text="Not Streaming"
+                           FontFamily="RajdhaniRegular"
+                           FontSize="13"
+                           TextColor="{StaticResource TextMuted}"
+                           VerticalOptions="Center">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsConnected}" Value="True">
+                                <Setter Property="Text" Value="Streaming"/>
+                                <Setter Property="TextColor" Value="#00ff00"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </HorizontalStackLayout>
+            </Grid>
+
+            <!-- Preview box -->
+            <Border BackgroundColor="#000000"
+                    Stroke="#2a2d32"
+                    StrokeThickness="1.5"
+                    MinimumHeightRequest="160">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsConnected}" Value="True">
+                        <Setter Property="Stroke" Value="#ef4444"/>
+                        <Setter Property="StrokeThickness" Value="2"/>
+                    </DataTrigger>
+                </Border.Triggers>
+                <Grid>
+                    <Image Source="focus.png"
+                           WidthRequest="48"
+                           HeightRequest="48"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Opacity="0.5"
+                           IsVisible="{Binding HasPreviewImage, Converter={StaticResource InvertedBoolConverter}}"/>
+                    <Image Source="{Binding PreviewImageSource}"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Fill"
+                           VerticalOptions="Fill"
+                           IsVisible="{Binding HasPreviewImage}"/>
+                </Grid>
+            </Border>
+
+            <!-- Source label -->
+            <Grid ColumnDefinitions="Auto,*">
+                <Label Grid.Column="0"
+                       Text="Source"
+                       FontFamily="RajdhaniRegular"
+                       TextColor="{StaticResource TextMuted}"
+                       FontSize="14"/>
+                <Label Grid.Column="1"
+                       Text="{Binding SelectedTarget.ProcessName, FallbackValue='None'}"
+                       FontFamily="RajdhaniSemiBold"
+                       TextColor="{StaticResource TextSecondary}"
+                       FontSize="14"
+                       HorizontalOptions="End"
+                       LineBreakMode="TailTruncation"/>
+            </Grid>
+
+            <!-- Connectors Header -->
+            <HorizontalStackLayout Spacing="10" Margin="0,8,0,8">
+                <Image Source="connectors.png"
+                       WidthRequest="32"
+                       HeightRequest="32"
+                       VerticalOptions="Center"/>
+                <Label Text="Connectors"
+                       FontFamily="RajdhaniSemiBold"
+                       TextColor="{StaticResource TextPrimary}"
+                       FontSize="20"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+            <!-- Chess Connector Pill -->
+            <Border BackgroundColor="{StaticResource BgSecondary}"
+                    Stroke="#2a2d32"
+                    StrokeThickness="1"
+                    Padding="12"
+                    Margin="0,4,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ShowWindowPickerCommand}"/>
+                </Border.GestureRecognizers>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsConnected}" Value="True">
+                        <Setter Property="Stroke" Value="#00cc66"/>
+                        <Setter Property="BackgroundColor" Value="#1a00cc66"/>
+                    </DataTrigger>
+                </Border.Triggers>
+
+                <Grid ColumnDefinitions="32,*,Auto" ColumnSpacing="10">
+                    <!-- Chess Icon -->
+                    <Image Grid.Column="0"
+                           Source="chess.png"
+                           WidthRequest="28"
+                           HeightRequest="28"
+                           VerticalOptions="Center"/>
+
+                    <!-- Label -->
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Chess"
+                               FontFamily="RajdhaniSemiBold"
+                               TextColor="{StaticResource TextPrimary}"
+                               FontSize="16"/>
+                        <Label Text="Not Connected"
+                               FontFamily="RajdhaniRegular"
+                               TextColor="{StaticResource TextMuted}"
+                               FontSize="13">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsConnected}" Value="True">
+                                    <Setter Property="Text" Value="Connected"/>
+                                    <Setter Property="TextColor" Value="#00cc66"/>
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </VerticalStackLayout>
+
+                    <!-- Connect Toggle -->
+                    <controls:HorizontalIndustrialToggle
+                        Grid.Column="2"
+                        IsToggled="{Binding IsConnected, Mode=OneWay}"
+                        IsInteractive="False"
+                        InputTransparent="True"
+                        LedOnColor="#22c55e"
+                        LedOffColor="#1a2a1e"
+                        VerticalOptions="Center"/>
+                </Grid>
+            </Border>
+
+        </VerticalStackLayout>
+
+        <!-- ========== TOP: Live Message (Row 0, Col 1) ========== -->
+        <Border Grid.Row="0" Grid.Column="1"
+                BackgroundColor="Transparent"
+                Stroke="#2a2d32"
+                StrokeThickness="1"
+                Padding="30,18"
+                HeightRequest="110"
+                VerticalOptions="Start">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="24"/>
+            </Border.StrokeShape>
+
+            <Label Text="{Binding AiDisplayContent.Text, FallbackValue='Waiting for activity...'}"
+                   FontFamily="RajdhaniRegular"
+                   TextColor="{StaticResource TextSecondary}"
+                   FontSize="27"
+                   LineBreakMode="WordWrap"
+                   MaxLines="3"
+                   VerticalOptions="Center"/>
+        </Border>
+
+        <!-- ========== TOP: Disconnect + Settings (Row 0, Col 2) ========== -->
+        <VerticalStackLayout Grid.Row="0" Grid.Column="2"
+                             Spacing="10"
+                             VerticalOptions="Start"
+                             HorizontalOptions="Center"
+                             Margin="12,0,0,0">
+
+            <!-- Power Button: 3-state — gray(off/mock), green(live), red(connected) -->
+            <Border WidthRequest="56"
+                    HeightRequest="56"
+                    StrokeThickness="2"
+                    Stroke="#3a3d42"
+                    InputTransparent="False">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="28"/>
+                </Border.StrokeShape>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#5a5a68" Offset="0.0"/>
+                        <GradientStop Color="#3a3a48" Offset="0.5"/>
+                        <GradientStop Color="#2a2a38" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsLive}" Value="True">
+                        <Setter Property="Stroke" Value="#22c55e"/>
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsConnected}" Value="True">
+                        <Setter Property="Stroke" Value="#ef4444"/>
+                    </DataTrigger>
+                </Border.Triggers>
+                <Border.Shadow>
+                    <Shadow Brush="Transparent" Offset="0,0" Radius="0" Opacity="0"/>
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ShowWindowPickerCommand}"/>
+                </Border.GestureRecognizers>
+
+                <Grid>
+                    <!-- Power symbol: Unicode ⏻ -->
+                    <Label Text="&#x23FB;"
+                           FontSize="26"
+                           TextColor="#6b7280"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsLive}" Value="True">
+                                <Setter Property="TextColor" Value="#22c55e"/>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsConnected}" Value="True">
+                                <Setter Property="TextColor" Value="#ef4444"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+
+                    <!-- Glow overlay: hidden by default, green when live, red when connected -->
+                    <Border WidthRequest="56"
+                            HeightRequest="56"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0"
+                            InputTransparent="True"
+                            IsVisible="{Binding IsLive}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="28"/>
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="#22c55e" Offset="0,0" Radius="12" Opacity="0.5"/>
+                        </Border.Shadow>
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsConnected}" Value="True">
+                                <Setter Property="Shadow">
+                                    <Setter.Value>
+                                        <Shadow Brush="#ef4444" Offset="0,0" Radius="12" Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Border.Triggers>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Settings Button (hamburger icon, no glow) -->
+            <Border WidthRequest="56"
+                    HeightRequest="56"
+                    StrokeThickness="2"
+                    Stroke="#3a3d42">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="28"/>
+                </Border.StrokeShape>
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#5a5a68" Offset="0.0"/>
+                        <GradientStop Color="#3a3a48" Offset="0.5"/>
+                        <GradientStop Color="#2a2a38" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding NavigateToSettingsCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="&#x2630;"
+                       FontSize="26"
+                       TextColor="#1a1d21"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Border>
+        </VerticalStackLayout>
+
+        <!-- ========== MAIN CHAT CARD (Row 1, Col 1+2) ========== -->
+        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                BackgroundColor="{StaticResource BgPrimary}"
+                Stroke="#2a2d32"
+                StrokeThickness="1.5"
+                Padding="0"
+                Margin="10">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="24"/>
+                </Border.StrokeShape>
+
+                <Grid>
+                    <!-- Plus Pattern Background Layer -->
+                    <controls:PlusPatternBackground
+                        PlusColor="#fb3a5d"
+                        PatternBackgroundColor="Transparent"
+                        PlusSize="50"
+                        PlusOpacity="0.4"
+                        Fade="True"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill">
+                        <controls:PlusPatternBackground.Clip>
+                            <RoundRectangleGeometry Rect="0,0,10000,10000" CornerRadius="24"/>
+                        </controls:PlusPatternBackground.Clip>
+                    </controls:PlusPatternBackground>
+
+                    <!-- Content Layer -->
+                    <Grid RowDefinitions="*,Auto">
+                        <!-- Timeline View (replaces flat chat feed) -->
+                        <views:TimelineView Grid.Row="0" Margin="24,18,24,6" />
+
+                        <!-- Chat Input -->
+                        <Border Grid.Row="1"
+                                BackgroundColor="{StaticResource BgSecondary}"
+                                Stroke="#2a2d32"
+                                StrokeThickness="1"
+                                Margin="24,10,24,14"
+                                Padding="20,14"
+                                MinimumHeightRequest="120">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="15"/>
+                            </Border.StrokeShape>
+
+                            <Grid RowDefinitions="*,Auto">
+                                <Editor Grid.Row="0"
+                                        x:Name="ChatEditor"
+                                        Text="{Binding MessageDraftText}"
+                                        Placeholder="{Binding ChatInputPlaceholder}"
+                                        PlaceholderColor="{StaticResource TextMuted}"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontFamily="RajdhaniRegular"
+                                        FontSize="24"
+                                        BackgroundColor="Transparent"
+                                        Keyboard="Chat"
+                                        AutoSize="TextChanges"
+                                        MaximumHeightRequest="144"
+                                        VerticalOptions="Start"/>
+
+                                <Border Grid.Row="1"
+                                        StrokeThickness="0"
+                                        WidthRequest="44"
+                                        HeightRequest="44"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="End"
+                                        IsEnabled="{Binding CanSendTextMessage}"
+                                        Opacity="0.3">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#8a8a98" Offset="0.0"/>
+                                            <GradientStop Color="#5a5a68" Offset="0.3"/>
+                                            <GradientStop Color="#4a4a58" Offset="0.7"/>
+                                            <GradientStop Color="#3a3a48" Offset="1.0"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="10"/>
+                                    </Border.StrokeShape>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding CanSendTextMessage}" Value="True">
+                                            <Setter Property="Opacity" Value="1.0"/>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SendTextMessageCommand}"/>
+                                    </Border.GestureRecognizers>
+                                    <Label Text="➤"
+                                           FontSize="24"
+                                           TextColor="Black"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Border>
+
+        <!-- ========== BOTTOM BAR (USER PROFILE + PANEL + GHOST BUTTON) ========== -->
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" ColumnDefinitions="340,*,Auto" ColumnSpacing="0">
+
+            <!-- LEFT: User Profile (picture + info + VAD) -->
+            <HorizontalStackLayout Grid.Column="0" Spacing="14" Margin="33,0,0,0">
+                <!-- User Profile Circle (matches ghost button style) -->
+                <Grid WidthRequest="110" HeightRequest="110">
+                    <!-- Muted ring -->
+                    <Border WidthRequest="110"
+                            HeightRequest="110"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="2"
+                            Stroke="#3a3d42">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="55"/>
+                        </Border.StrokeShape>
+                    </Border>
+                    <!-- Inner circle: metallic gradient -->
+                    <Border WidthRequest="100"
+                            HeightRequest="100"
+                            StrokeThickness="0"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="50"/>
+                        </Border.StrokeShape>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#8a8a98" Offset="0.0"/>
+                                <GradientStop Color="#5a5a68" Offset="0.3"/>
+                                <GradientStop Color="#4a4a58" Offset="0.7"/>
+                                <GradientStop Color="#3a3a48" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="👤"
+                               FontSize="44"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- User Info: Name / Status / VAD -->
+                <VerticalStackLayout Spacing="6" VerticalOptions="Center">
+                    <Label Text="{Binding SelectedAgent.UserId, FallbackValue='Guest', TargetNullValue='Guest'}"
+                           FontFamily="RajdhaniSemiBold"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="22"
+                           LineBreakMode="TailTruncation"/>
+                    <Label Text="Mic Ready"
+                           FontFamily="RajdhaniRegular"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="15"/>
+                    <HorizontalStackLayout Spacing="6" Margin="0,2,0,0">
+                        <Image Source="microphone.png"
+                               WidthRequest="20"
+                               HeightRequest="20"
+                               VerticalOptions="Center"/>
+                        <controls:AudioLevelMeter x:Name="PlayerAudioMeter"
+                                                   Level="{Binding InputVolume}"
+                                                   LedCount="12"
+                                                   IsConnected="{Binding IsConnected}"
+                                                   VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+
+            <!-- CENTER: Audio Control Panel -->
+            <views:AudioControlPanelView x:Name="AudioPanel"
+                                          Grid.Column="1"
+                                          VerticalOptions="Center"
+                                          HorizontalOptions="Center"
+                                          Margin="33,0,0,0"/>
+
+            <!-- RIGHT: Agent Info + VAD (inverted) + Ghost Mode FAB -->
+            <HorizontalStackLayout Grid.Column="2" Spacing="14" VerticalOptions="Center" HorizontalOptions="End">
+                <!-- Agent Name + Inverted VAD (bars go left ← icon on right) -->
+                <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                    <Label Text="{Binding SelectedAgent.Name, FallbackValue='Shade'}"
+                           FontFamily="RajdhaniSemiBold"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="18"
+                           HorizontalTextAlignment="End"
+                           LineBreakMode="TailTruncation"/>
+                    <Label Text="{Binding SelectedAgent.Id, FallbackValue='Adventurer'}"
+                           FontFamily="RajdhaniRegular"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="13"
+                           HorizontalTextAlignment="End"
+                           LineBreakMode="TailTruncation"/>
+                    <!-- Inverted VAD: bars ← icon (FlowDirection RightToLeft) -->
+                    <HorizontalStackLayout Spacing="6" HorizontalOptions="End" FlowDirection="RightToLeft">
+                        <Image Source="speaker_high.png"
+                               WidthRequest="18"
+                               HeightRequest="18"
+                               ScaleX="-1"
+                               VerticalOptions="Center"/>
+                        <controls:AudioLevelMeter x:Name="AgentAudioMeter"
+                                                   Level="{Binding OutputVolume}"
+                                                   LedCount="10"
+                                                   IsConnected="{Binding IsConnected}"
+                                                   VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Ghost Mode FAB -->
+                <views:FabOverlayView x:Name="FabOverlay"
+                                      VerticalOptions="Center"
+                                      HorizontalOptions="End"
+                                      Margin="0,0,33,0"
+                                      WidthRequest="110"
+                                      HeightRequest="110"/>
+            </HorizontalStackLayout>
+        </Grid>
+    </Grid>
+
+    <!-- Layer 2: Window Picker overlay (dim backdrop + floating card) -->
+    <BoxView Color="#0e1117" Opacity="0.7"
+             IsVisible="{Binding IsWindowPickerOpen}"
+             InputTransparent="False">
+        <BoxView.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding CloseWindowPickerCommand}"/>
+        </BoxView.GestureRecognizers>
+    </BoxView>
+
+    <Border BackgroundColor="{StaticResource BgSecondary}"
+            Stroke="#2a2d32"
+            StrokeThickness="1"
+            Padding="16"
+            IsVisible="{Binding IsWindowPickerOpen}"
+            WidthRequest="360"
+            MaximumHeightRequest="400"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            InputTransparent="False">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="16"/>
+        </Border.StrokeShape>
+        <Border.Shadow>
+            <Shadow Brush="#000000" Offset="0,4" Radius="24" Opacity="0.5"/>
+        </Border.Shadow>
+
+        <Grid RowDefinitions="Auto,*" RowSpacing="12">
+            <!-- Header -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0"
+                       Text="Select a window to watch"
+                       FontFamily="RajdhaniSemiBold"
+                       TextColor="{StaticResource TextPrimary}"
+                       FontSize="18"
+                       VerticalOptions="Center"/>
+                <Border Grid.Column="1"
+                        BackgroundColor="Transparent"
+                        Stroke="#2a2d32"
+                        StrokeThickness="1"
+                        WidthRequest="28"
+                        HeightRequest="28">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="6"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CloseWindowPickerCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="✕"
+                           FontSize="14"
+                           TextColor="{StaticResource TextMuted}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Border>
+            </Grid>
+
+            <!-- Window List -->
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding CaptureTargets}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:CaptureTarget">
+                        <Border BackgroundColor="{StaticResource BgCard}"
+                                Stroke="#2a2d32"
+                                StrokeThickness="1"
+                                Padding="12"
+                                Margin="0,0,0,6">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=SelectTargetAndConnectCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="44,*" ColumnSpacing="12">
+                                <!-- Thumbnail -->
+                                <Border Grid.Column="0"
+                                        BackgroundColor="#12151a"
+                                        StrokeThickness="0"
+                                        WidthRequest="40"
+                                        HeightRequest="40">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="8"/>
+                                    </Border.StrokeShape>
+                                    <Image WidthRequest="40"
+                                           HeightRequest="40"
+                                           Aspect="AspectFill"
+                                           Source="{Binding Thumbnail, Converter={StaticResource ByteArrayToImageSourceConverter}}"/>
+                                </Border>
+
+                                <!-- Window Info -->
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding ProcessName}"
+                                           FontFamily="RajdhaniSemiBold"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           FontSize="16"
+                                           LineBreakMode="TailTruncation"/>
+                                    <Label Text="{Binding WindowTitle}"
+                                           FontFamily="RajdhaniRegular"
+                                           TextColor="{StaticResource TextMuted}"
+                                           FontSize="13"
+                                           LineBreakMode="TailTruncation"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <Label Text="No windows found"
+                           FontFamily="RajdhaniRegular"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           Margin="0,20"/>
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </Grid>
+    </Border>
+
+    <!-- Layer 3: Dim overlay (visible when FAB is active, tapping dismisses) -->
+    <BoxView Color="#0e1117" Opacity="0.7"
+             IsVisible="{Binding IsFabActive}"
+             InputTransparent="{Binding IsFabActive, Converter={StaticResource InvertedBoolConverter}}">
+        <BoxView.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding ToggleFabCommand}"/>
+        </BoxView.GestureRecognizers>
+    </BoxView>
+
+    </Grid>
+    </Grid>
+</ContentPage>

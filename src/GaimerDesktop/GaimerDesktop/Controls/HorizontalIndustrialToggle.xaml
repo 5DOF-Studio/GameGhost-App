@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GaimerDesktop.Controls.HorizontalIndustrialToggle"
+             WidthRequest="96"
+             HeightRequest="44">
+
+    <!-- Housing + LED Bar (horizontal layout) -->
+    <Grid ColumnDefinitions="*,16" ColumnSpacing="4">
+
+        <!-- Col 0: Switch Housing -->
+        <Border Grid.Column="0"
+                BackgroundColor="#1a1d21"
+                Padding="6,5"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                WidthRequest="72"
+                HeightRequest="38">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+            <Border.Stroke>
+                <SolidColorBrush Color="#2a2d32"/>
+            </Border.Stroke>
+
+            <!-- Rail (inset track) -->
+            <Border BackgroundColor="#0e1117"
+                    Padding="2,1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="60"
+                    HeightRequest="28">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="6"/>
+                </Border.StrokeShape>
+                <Border.Stroke>
+                    <SolidColorBrush Color="#1a1d21"/>
+                </Border.Stroke>
+
+                <!-- Handle Container (positions handle via TranslationX) -->
+                <Grid>
+                    <Border x:Name="Handle"
+                            WidthRequest="28"
+                            HeightRequest="26"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center"
+                            TranslationX="0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="5"/>
+                        </Border.StrokeShape>
+                        <Border.Stroke>
+                            <SolidColorBrush Color="#4a4a58"/>
+                        </Border.Stroke>
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#8a8a98" Offset="0.0"/>
+                                <GradientStop Color="#5a5a68" Offset="0.3"/>
+                                <GradientStop Color="#4a4a58" Offset="0.7"/>
+                                <GradientStop Color="#3a3a48" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+
+                        <!-- Grip Lines (vertical for horizontal switch) -->
+                        <HorizontalStackLayout Spacing="3"
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="Center">
+                            <BoxView WidthRequest="1.5" HeightRequest="14"
+                                     Color="#6a6a78"
+                                     VerticalOptions="Center"/>
+                            <BoxView WidthRequest="1.5" HeightRequest="14"
+                                     Color="#6a6a78"
+                                     VerticalOptions="Center"/>
+                            <BoxView WidthRequest="1.5" HeightRequest="14"
+                                     Color="#6a6a78"
+                                     VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Col 1: LED Bar (vertical strip on right side) -->
+        <Border x:Name="LedBar"
+                Grid.Column="1"
+                WidthRequest="6"
+                HeightRequest="24"
+                BackgroundColor="#3d1515"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="3"/>
+            </Border.StrokeShape>
+            <Border.Stroke>
+                <SolidColorBrush Color="Transparent"/>
+            </Border.Stroke>
+            <Border.Shadow>
+                <Shadow x:Name="LedGlow"
+                        Brush="Transparent"
+                        Offset="0,0"
+                        Radius="0"
+                        Opacity="0"/>
+            </Border.Shadow>
+        </Border>
+    </Grid>
+</ContentView>
