@@ -23,6 +23,7 @@
 
 		<!-- Display name -->
 		<ApplicationTitle>Gaimer</ApplicationTitle>
+		<AssemblyName>Gaimer</AssemblyName>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.5dof.gaimer</ApplicationId>
