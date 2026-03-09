@@ -42,7 +42,7 @@ Progress: ███████████████████████�
 
 ## Test Summary
 - Total tests: 519/519 passing
-- CI: GitHub Actions green on develop (dotnet-test.yml)
+- CI: GitHub Actions (dotnet-test.yml) on 5DOF-Studio/GameGhost-App
 - SkiaSharp.NativeAssets.Linux.NoDependencies added to test csproj for CI
 - Both ViewModels (MainViewModel + AgentSelectionViewModel) compile under net8.0
 - Builds: net8.0 (library) + net8.0-maccatalyst (platform) both clean
@@ -68,7 +68,7 @@ Progress: ███████████████████████�
 ## Deployment Status
 - **macOS**: Notarized and stapled by Apple (submission c773e4ea). Distribution zip: 39MB. Ready to host on website.
 - **Windows**: Not yet built. Ghost Mode Windows impl pending. Needs Windows machine or CI.
-- **Repo location**: Moved from `~/Documents/5DOF Projects/gAImer/gAImer_desktop` to `~/Developer/gAImer_desktop` (iCloud File Provider fix)
+- **Repo location**: `~/Developer/GameGhost-App` (isolated copy from IkeGister/Gaimer-app, published as 5DOF-Studio/GameGhost-App)
 - **Native xcframeworks**: Not in git — copied from old repo location. Must be rebuilt or committed for fresh clones.
 
 ## Session Continuity

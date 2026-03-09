@@ -1,8 +1,13 @@
-# Project: gaimer-desktop
+# Project: GameGhost-App
+
+> Isolated copy of IkeGister/Gaimer-app, published as 5DOF-Studio/GameGhost-App.
+> Repo location: `~/Developer/GameGhost-App` (main branch).
 
 ## Quick Reference
 - Solution: `GaimerDesktop.sln`
 - Project dir: `src/GaimerDesktop/GaimerDesktop/`
+- Tests: `src/GaimerDesktop/GaimerDesktop.Tests/`
+- Remote: `https://github.com/5DOF-Studio/GameGhost-App.git`
 
 ### Build
 ```bash
@@ -84,7 +89,7 @@ src/GaimerDesktop/GaimerDesktop/
 
 ## Build Notes
 - macOS: `-p:EnableCodeSigning=false` required for dev builds
-- macOS: `dotnet run` and direct binary execution both fail from ~/Documents due to File Provider extended attributes. Use the ditto + ad-hoc sign workaround above.
+- macOS: `dotnet run` and direct binary execution may fail due to File Provider extended attributes. Use the ditto + sign workaround above.
 - Ignore UIBackgroundModes warning on macOS
 - macOS Catalyst may restore prior window size (known platform behavior)
 
@@ -153,5 +158,5 @@ Capture → Brain ONLY → Channel<BrainResult> → Router → Timeline / Voice 
 - Phase 08 (Polish): Complete — 5/5 plans. Settings bento grid, error page, audio feature guards, app icon, capture rate unified, onboarding chevron fix, CI workflow live. 511/511 tests passing.
 - Live Testing Sprint: Brain pipeline verified end-to-end (Mar 7, 2026). Capture → Brain (anthropic/claude-sonnet-4) → Timeline → Voice (Gemini Live) ran stable 10+ min against Apple Chess.app. 5 bugs fixed: model ID, MIME type auto-detect, ghost panel positioning (arm64 stret fix), clock timestamps, error surfacing. 519/519 tests passing.
 - Deployment: macOS Release build notarized by Apple (Mar 9, 2026). `scripts/build-release-mac.sh` automates publish → sign → notarize → staple → zip. Output: 39MB distributable zip.
-- Repo moved to `~/Developer/gAImer_desktop` (iCloud File Provider fix — build 90s→4s)
+- Repo: `~/Developer/GameGhost-App` (isolated copy from IkeGister/Gaimer-app, published as 5DOF-Studio/GameGhost-App)
 - Next: Upload to website, Windows build, ghost mode dragging, brain improvements, Phase 07 (Persistence), Phase 12 (Audio Intelligence Pipeline)

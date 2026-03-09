@@ -4,7 +4,7 @@
 
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)
 ![MAUI](https://img.shields.io/badge/MAUI-MacCatalyst%20%7C%20Windows-blue)
-[![.NET Tests](https://github.com/IkeGister/Gaimer-app/actions/workflows/dotnet-test.yml/badge.svg?branch=develop)](https://github.com/IkeGister/Gaimer-app/actions/workflows/dotnet-test.yml)
+[![.NET Tests](https://github.com/5DOF-Studio/GameGhost-App/actions/workflows/dotnet-test.yml/badge.svg?branch=main)](https://github.com/5DOF-Studio/GameGhost-App/actions/workflows/dotnet-test.yml)
 ![Tests](https://img.shields.io/badge/tests-519%20passing-brightgreen)
 ![Version](https://img.shields.io/badge/version-1.0.0--beta-orange)
 ![Phase](https://img.shields.io/badge/phase-11%2F12-yellow)
