@@ -1,307 +1,214 @@
-// GaimerGhostMode.swift
-// C-callable exports for the ghost mode overlay panel.
 //
-// Exports 14 @_cdecl functions consumed by .NET MAUI via DllImport/P/Invoke:
-//   - ghost_panel_create/destroy/show/hide
-//   - ghost_panel_set_agent_image/fab_active/fab_connected
-//   - ghost_panel_show_card/dismiss_card
-//   - ghost_panel_set_fab_tap_callback/card_dismiss_callback
-//   - ghost_panel_set_position/set_size
+//  GhostFabExports.swift
+//  GhostFab-AppKit
 //
-// CRITICAL: Uses DispatchQueue.main.async (NOT @MainActor) for all UI operations
-// to avoid deadlock when C# blocks with Task.Wait(). Lesson from Phase 03.
+//  All 19 @_cdecl exports for C# P/Invoke interop.
+//  Visibility, placement, and host-window restoration use ghostFabRunOnMainSync
+//  so the Mar 24, 2026 ordering fixes are preserved during the Codex port.
+//  String parameters converted immediately before dispatching to main queue,
+//  because the pointer may be freed by .NET after the @_cdecl function returns.
 //
-// CRITICAL: String parameters (UnsafePointer<CChar>) are converted to Swift String
-// immediately before dispatching to main queue, because the pointer may be freed
-// by .NET after the @_cdecl function returns.
 
-import Foundation
 import AppKit
-
-// MARK: - Singleton State
-
-/// Shared panel instance (created by ghost_panel_create, destroyed by ghost_panel_destroy).
-var sharedPanel: GhostPanel?
-
-/// Shared observable state driving the SwiftUI views.
-var sharedState: GhostPanelState?
-
-/// Stored C function pointer callbacks (pinned by GCHandle on the C# side).
-var fabTapCallback: (@convention(c) () -> Void)?
-var cardDismissCallback: (@convention(c) () -> Void)?
+import Foundation
 
 // MARK: - Panel Lifecycle
 
-/// Creates the ghost panel and sets up the SwiftUI content view.
-/// Call once at app startup. Returns true on success.
-///
-/// Uses DispatchQueue.main.sync since this is called once at init from a background thread.
-/// The C# side should NOT call this from the main thread.
+/// Export 1: Creates the ghost panel singleton. Returns true on success.
+/// Uses runOnMainSync because it must return a Bool to C#.
 @_cdecl("ghost_panel_create")
 public func ghostPanelCreate() -> Bool {
-    NSLog("[GaimerGhostMode] ghost_panel_create called (mainThread=%d)", Thread.isMainThread ? 1 : 0)
-
-    // Must run on main thread for AppKit, but DispatchQueue.main.sync deadlocks
-    // if we're already on the main thread. Use the helper to handle both cases.
-    var success = false
-    runOnMainSync {
-        if sharedPanel != nil {
-            NSLog("[GaimerGhostMode] Panel already exists, returning true")
-            success = true
-            return
-        }
-
-        let state = GhostPanelState()
-        let contentView = GhostPanelContentView(state: state)
-
-        // Default panel size -- covers a reasonable area for FAB + cards
-        let screenFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 400, height: 600)
-        let panelFrame = NSRect(
-            x: screenFrame.maxX - 340,
-            y: screenFrame.minY,
-            width: 340,
-            height: screenFrame.height
-        )
-
-        let panel = GhostPanel(
-            contentRect: panelFrame,
-            styleMask: [.borderless, .nonactivatingPanel],
-            backing: .buffered,
-            defer: false
-        )
-        panel.setupContent(contentView)
-
-        sharedPanel = panel
-        sharedState = state
-        success = true
-
-        NSLog("[GaimerGhostMode] Panel created: frame=%@", NSStringFromRect(panelFrame))
-    }
-
-    return success
+    sharedGhostFabSDK.createPanel()
 }
 
-/// Executes a closure synchronously on the main thread.
-/// If already on the main thread, runs directly to avoid deadlock.
-private func runOnMainSync(_ block: () -> Void) {
-    if Thread.isMainThread {
-        block()
-    } else {
-        DispatchQueue.main.sync(execute: block)
-    }
-}
-
-/// Destroys the ghost panel and releases all references.
+/// Export 2: Destroys the ghost panel and clears all stored state.
 @_cdecl("ghost_panel_destroy")
 public func ghostPanelDestroy() {
-    NSLog("[GaimerGhostMode] ghost_panel_destroy called")
-
-    DispatchQueue.main.async {
-        sharedPanel?.orderOut(nil)
-        sharedPanel?.close()
-        sharedPanel = nil
-        sharedState = nil
-        fabTapCallback = nil
-        cardDismissCallback = nil
-        NSLog("[GaimerGhostMode] Panel destroyed")
-    }
+    sharedGhostFabSDK.destroyPanel()
 }
 
-/// Shows the ghost panel (brings to front).
+// MARK: - Visibility
+
+/// Export 3: Shows the ghost panel (orderFrontRegardless).
 @_cdecl("ghost_panel_show")
 public func ghostPanelShow() {
-    NSLog("[GaimerGhostMode] ghost_panel_show called")
-
-    DispatchQueue.main.async {
-        sharedPanel?.orderFront(nil)
-    }
+    sharedGhostFabSDK.showPanel()
 }
 
-/// Hides the ghost panel.
+/// Export 4: Hides the ghost panel (orderOut).
 @_cdecl("ghost_panel_hide")
 public func ghostPanelHide() {
-    NSLog("[GaimerGhostMode] ghost_panel_hide called")
-
-    DispatchQueue.main.async {
-        sharedPanel?.orderOut(nil)
-    }
+    sharedGhostFabSDK.hidePanel()
 }
 
-// MARK: - FAB State
-
-/// Sets the agent portrait image path displayed on the FAB.
-@_cdecl("ghost_panel_set_agent_image")
-public func ghostPanelSetAgentImage(pathPtr: UnsafePointer<CChar>) {
-    // Convert string immediately before dispatching (pointer freed by .NET after return)
-    let path = String(cString: pathPtr)
-    NSLog("[GaimerGhostMode] ghost_panel_set_agent_image: %@", path)
-
-    DispatchQueue.main.async {
-        sharedState?.agentImagePath = path
-    }
+/// Export 5: Hides the MAUI/Catalyst host window using scored UINSWindow selection.
+/// Stores both the window reference and windowNumber for robust restore.
+@_cdecl("ghost_panel_hide_host_window")
+public func ghostPanelHideHostWindow() {
+    sharedGhostFabSDK.hideHostWindow()
 }
 
-/// Sets whether the FAB is in active (ghost mode engaged) state.
-@_cdecl("ghost_panel_set_fab_active")
-public func ghostPanelSetFabActive(active: Bool) {
-    NSLog("[GaimerGhostMode] ghost_panel_set_fab_active: %d", active ? 1 : 0)
-
-    DispatchQueue.main.async {
-        sharedState?.isFabActive = active
-    }
+/// Export 19: Restores the hidden MAUI/Catalyst host window using the stored
+/// window reference, windowNumber fallback, then scored UINSWindow selection.
+@_cdecl("ghost_panel_show_host_window")
+public func ghostPanelShowHostWindow() {
+    sharedGhostFabSDK.showHostWindow()
 }
 
-/// Sets whether the FAB shows connected state (yellow glow).
-@_cdecl("ghost_panel_set_fab_connected")
-public func ghostPanelSetFabConnected(connected: Bool) {
-    NSLog("[GaimerGhostMode] ghost_panel_set_fab_connected: %d", connected ? 1 : 0)
+// MARK: - Content Management
 
-    DispatchQueue.main.async {
-        sharedState?.isFabConnected = connected
-    }
-}
-
-// MARK: - Card State
-
-/// Shows an event card with the given variant and content.
-/// Variants: 1=Voice, 2=Text, 3=TextWithImage
+/// Export 6: Shows a card with variant-based content routing.
+/// Variant: 0=None(dismiss), 1=Voice(text), 2=Text, 3=TextWithImage.
+/// All string pointers converted BEFORE async block (.NET frees buffer after return).
 @_cdecl("ghost_panel_show_card")
 public func ghostPanelShowCard(
     variant: Int32,
     titlePtr: UnsafePointer<CChar>?,
     textPtr: UnsafePointer<CChar>?,
-    imagePathPtr: UnsafePointer<CChar>?
+    imagePathPtr: UnsafePointer<CChar>?,
+    isAlert: Bool,
+    isVoiceDelivered: Bool
 ) {
-    // Convert all strings immediately before dispatching
+    // Convert strings BEFORE async block (pointer freed by .NET after return)
     let title: String? = titlePtr.map { String(cString: $0) }
     let text: String? = textPtr.map { String(cString: $0) }
     let imagePath: String? = imagePathPtr.map { String(cString: $0) }
-
-    NSLog("[GaimerGhostMode] ghost_panel_show_card: variant=%d, title=%@, text=%@",
-          variant, title ?? "(nil)", text ?? "(nil)")
+    // Codex no longer renders the legacy "voice delivered" phone badge.
+    // Keep the parameter for C# ABI compatibility even though presentation ignores it.
+    let _ = isVoiceDelivered
 
     DispatchQueue.main.async {
-        sharedState?.cardTitle = title
-        sharedState?.cardText = text
-        sharedState?.cardImagePath = imagePath
-        sharedState?.cardVariant = variant
+        switch variant {
+        case 0:
+            sharedGhostFabSDK.dismissCard()
+        case 1, 2:
+            sharedGhostFabSDK.showTextCard(
+                title: title,
+                message: text ?? "",
+                isAlert: isAlert
+            )
+        case 3:
+            if let path = imagePath, let image = NSImage(contentsOfFile: path) {
+                sharedGhostFabSDK.showImageCard(
+                    title: title,
+                    image: image,
+                    fixedHeight: 200,
+                    isAlert: isAlert
+                )
+            } else {
+                sharedGhostFabSDK.showTextCard(
+                    title: title,
+                    message: text ?? "",
+                    isAlert: isAlert
+                )
+            }
+        default:
+            break
+        }
     }
 }
 
-/// Dismisses the currently displayed event card.
+/// Export 7: Dismisses the current card (cancels auto-dismiss, fires callback).
 @_cdecl("ghost_panel_dismiss_card")
 public func ghostPanelDismissCard() {
-    NSLog("[GaimerGhostMode] ghost_panel_dismiss_card called")
-
     DispatchQueue.main.async {
-        sharedState?.cardVariant = 0
+        sharedGhostFabSDK.dismissCard()
     }
 }
 
-// MARK: - Callbacks
-
-/// Registers a C function pointer to be called when the user taps the FAB.
-/// The C# side must pin this delegate with GCHandle.Alloc.
-@_cdecl("ghost_panel_set_fab_tap_callback")
-public func ghostPanelSetFabTapCallback(callback: @convention(c) () -> Void) {
-    NSLog("[GaimerGhostMode] ghost_panel_set_fab_tap_callback registered")
-
-    // Store the raw function pointer
-    fabTapCallback = callback
-
+/// Export 8: Sets the agent portrait image from a file path.
+/// Path string converted BEFORE async block.
+@_cdecl("ghost_panel_set_agent_image")
+public func ghostPanelSetAgentImage(pathPtr: UnsafePointer<CChar>) {
+    let path = String(cString: pathPtr)  // Convert BEFORE async
     DispatchQueue.main.async {
-        sharedState?.onFabTap = {
-            // Invoke the C function pointer (called from main thread)
-            fabTapCallback?()
-        }
+        sharedGhostFabSDK.setAgentImage(NSImage(contentsOfFile: path))
     }
 }
 
-/// Registers a C function pointer to be called when a card is dismissed.
-/// The C# side must pin this delegate with GCHandle.Alloc.
-@_cdecl("ghost_panel_set_card_dismiss_callback")
-public func ghostPanelSetCardDismissCallback(callback: @convention(c) () -> Void) {
-    NSLog("[GaimerGhostMode] ghost_panel_set_card_dismiss_callback registered")
-
-    // Store the raw function pointer
-    cardDismissCallback = callback
-
+/// Export 9: Sets FAB active state (ring appearance change).
+@_cdecl("ghost_panel_set_fab_active")
+public func ghostPanelSetFabActive(active: Bool) {
     DispatchQueue.main.async {
-        sharedState?.onCardDismiss = {
-            // Invoke the C function pointer (called from main thread)
-            cardDismissCallback?()
-        }
+        sharedGhostFabSDK.setFabActive(active)
+    }
+}
+
+/// Export 10: Sets FAB connected state (ring border tint).
+@_cdecl("ghost_panel_set_fab_connected")
+public func ghostPanelSetFabConnected(connected: Bool) {
+    DispatchQueue.main.async {
+        sharedGhostFabSDK.setFabConnected(connected)
     }
 }
 
 // MARK: - Positioning
 
-/// Sets the panel's origin position (bottom-left corner in screen coordinates).
+/// Export 11: Moves the panel origin to the given screen coordinate.
 @_cdecl("ghost_panel_set_position")
 public func ghostPanelSetPosition(x: Double, y: Double) {
-    NSLog("[GaimerGhostMode] ghost_panel_set_position: (%f, %f)", x, y)
-
-    DispatchQueue.main.async {
-        sharedPanel?.setFrameOrigin(NSPoint(x: x, y: y))
-    }
+    sharedGhostFabSDK.setPosition(CGPoint(x: x, y: y))
 }
 
-/// Sets the panel's content size.
+/// Export 12: Resizes the panel to the given dimensions.
 @_cdecl("ghost_panel_set_size")
 public func ghostPanelSetSize(width: Double, height: Double) {
-    NSLog("[GaimerGhostMode] ghost_panel_set_size: (%f x %f)", width, height)
+    sharedGhostFabSDK.setSize(CGSize(width: width, height: height))
+}
 
+// MARK: - Audio
+
+/// Export 13: Sets all 4 audio toggle button states at once.
+@_cdecl("ghost_panel_set_audio_state")
+public func ghostPanelSetAudioState(
+    voiceChatActive: Bool,
+    voiceCommandActive: Bool,
+    gameAudioActive: Bool,
+    audioInActive: Bool
+) {
+    sharedGhostFabSDK.setAudioState(
+        GhostFabAudioState(
+            voiceChat: voiceChatActive,
+            voiceCommand: voiceCommandActive,
+            gameAudio: gameAudioActive,
+            audioIn: audioInActive
+        )
+    )
+}
+
+/// Export 14: Updates the VAD meter level (0.0-1.0).
+/// No NSLog -- called at ~15fps during voice chat.
+@_cdecl("ghost_panel_set_vad_level")
+public func ghostPanelSetVadLevel(level: Float) {
     DispatchQueue.main.async {
-        sharedPanel?.setContentSize(NSSize(width: width, height: height))
+        sharedGhostFabSDK.setVadLevel(CGFloat(level))
     }
 }
 
-// MARK: - Host Window Management
+// MARK: - Callback Setters
 
-/// Stored reference to the host (MAUI) NSWindow so we can restore it.
-var hiddenHostWindow: NSWindow?
-
-/// Hides the main app (MAUI/Catalyst) NSWindow at the AppKit level.
-/// UIWindow.Hidden only hides the UIKit layer but leaves the NSWindow chrome
-/// (title bar + empty content area) visible. This function hides the entire NSWindow.
-@_cdecl("ghost_panel_hide_host_window")
-public func ghostPanelHideHostWindow() {
-    NSLog("[GaimerGhostMode] ghost_panel_hide_host_window called")
-
-    DispatchQueue.main.async {
-        // Find the main app window (not our ghost panel)
-        for window in NSApplication.shared.windows {
-            if window !== sharedPanel && window.isVisible && window.title.contains("Gaimer") || (window !== sharedPanel && window.isVisible && window.className.contains("UINSWindow")) {
-                NSLog("[GaimerGhostMode] Hiding host window: %@ (class=%@)", window.title, window.className)
-                hiddenHostWindow = window
-                window.orderOut(nil)
-                return
-            }
-        }
-        NSLog("[GaimerGhostMode] No host window found to hide")
-    }
+/// Export 15: Sets the FAB tap callback. Stored at module level for lifetime safety.
+@_cdecl("ghost_panel_set_fab_tap_callback")
+public func ghostPanelSetFabTapCallback(callback: @convention(c) () -> Void) {
+    sharedGhostFabSDK.setFabTapCallback(callback)
 }
 
-/// Restores the previously hidden host window.
-@_cdecl("ghost_panel_show_host_window")
-public func ghostPanelShowHostWindow() {
-    NSLog("[GaimerGhostMode] ghost_panel_show_host_window called")
+/// Export 16: Sets the card dismiss callback. Stored at module level for lifetime safety.
+@_cdecl("ghost_panel_set_card_dismiss_callback")
+public func ghostPanelSetCardDismissCallback(callback: @convention(c) () -> Void) {
+    sharedGhostFabSDK.setCardDismissCallback(callback)
+}
 
-    DispatchQueue.main.async {
-        if let window = hiddenHostWindow {
-            NSLog("[GaimerGhostMode] Restoring host window: %@", window.title)
-            window.makeKeyAndOrderFront(nil)
-            hiddenHostWindow = nil
-        } else {
-            // Fallback: find any UINSWindow and show it
-            for window in NSApplication.shared.windows {
-                if window !== sharedPanel && window.className.contains("UINSWindow") {
-                    NSLog("[GaimerGhostMode] Restoring fallback host window: %@", window.title)
-                    window.makeKeyAndOrderFront(nil)
-                    return
-                }
-            }
-            NSLog("[GaimerGhostMode] No host window to restore")
-        }
-    }
+/// Export 17: Sets the gear tap callback. Stored at module level for lifetime safety.
+/// Note: Codex design has no gear button -- stored for API compatibility.
+@_cdecl("ghost_panel_set_gear_tap_callback")
+public func ghostPanelSetGearTapCallback(callback: @convention(c) () -> Void) {
+    sharedGhostFabSDK.setGearTapCallback(callback)
+}
+
+/// Export 18: Sets the audio toggle callback. Stored at module level for lifetime safety.
+/// Callback receives (index: Int32, isOn: Bool) for each toggle event.
+@_cdecl("ghost_panel_set_audio_toggle_callback")
+public func ghostPanelSetAudioToggleCallback(callback: @convention(c) (Int32, Bool) -> Void) {
+    sharedGhostFabSDK.setAudioToggleCallback(callback)
 }

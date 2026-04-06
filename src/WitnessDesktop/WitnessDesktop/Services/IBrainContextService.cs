@@ -29,6 +29,17 @@ public interface IBrainContextService
         CancellationToken ct = default);
 
     /// <summary>
+    /// Ingest a brain event into the L1 immediate window.
+    /// Called by BrainEventRouter each time a BrainResult is routed.
+    /// </summary>
+    Task IngestEventAsync(BrainEvent evt, CancellationToken ct = default);
+
+    /// <summary>
+    /// Flush all L1 events. Call when starting a new game.
+    /// </summary>
+    void FlushEvents();
+
+    /// <summary>
     /// Formats an envelope as a text block to prepend to user messages when the provider
     /// does not support explicit context payload. Interim path per GMR-009/GMR-010.
     /// </summary>

@@ -13,6 +13,7 @@ Game Ghost is a .NET MAUI desktop application extracted from the Gaimer implemen
 
 - `GameGhost.sln`
 - `src/WitnessDesktop/WitnessDesktop/` (main MAUI app project)
+- `src/WitnessDesktop/WitnessDesktop.Tests/` (unit/integration tests)
 - `src/WitnessDesktop/NativeHelpers/` (native capture/overlay helpers)
 
 ## Build (Mac Catalyst)

@@ -250,32 +250,42 @@ public sealed class AudioService : IAudioService
 
     public Task StopRecordingAsync()
     {
+        AVAudioEngine? engineToTeardown;
+        bool shouldStopEngine;
+
         lock (_gate)
         {
             if (!IsRecording) return Task.CompletedTask;
 
+            IsRecording = false;
+            _onAudioCaptured = null;
+            InputVolume = 0f;
+            RaiseVolumeChanged_NoLock();
+            shouldStopEngine = !IsPlaying;
+            engineToTeardown = _engine;
+        }
+
+        // CRITICAL: RemoveTapOnBus and Stop MUST run OUTSIDE the lock.
+        // RemoveTapOnBus waits for any in-flight tap callback to complete,
+        // and the tap callback acquires _gate — holding _gate here deadlocks.
+        if (engineToTeardown != null)
+        {
             try
             {
-                _engine?.InputNode.RemoveTapOnBus(0);
+                engineToTeardown.InputNode.RemoveTapOnBus(0);
             }
             catch (Exception ex)
             {
                 ErrorOccurred?.Invoke(this, new AudioErrorEventArgs("Failed to remove microphone tap cleanly.", ex, isFatal: false));
             }
 
-            IsRecording = false;
-            _onAudioCaptured = null;
-            InputVolume = 0f;
-            RaiseVolumeChanged_NoLock();
-
-            // Stop the engine only if we're not actively playing.
-            if (!IsPlaying)
+            if (shouldStopEngine)
             {
-                try { _engine?.Stop(); } catch { /* best effort */ }
+                try { engineToTeardown.Stop(); } catch { /* best effort */ }
             }
-
-            return Task.CompletedTask;
         }
+
+        return Task.CompletedTask;
     }
 
     public Task PlayAudioAsync(byte[] pcmData)
@@ -441,6 +451,12 @@ public sealed class AudioService : IAudioService
 
     public void Dispose()
     {
+        AVAudioEngine? engineToDispose;
+        AVAudioPlayerNode? playerToDispose;
+        AVAudioConverter? converterToDispose;
+        NSObject? observerToDispose;
+        bool shouldDeactivateSession;
+
         lock (_gate)
         {
             if (_disposed) return;
@@ -448,38 +464,38 @@ public sealed class AudioService : IAudioService
 
             StopPlayback_NoLock();
 
-            try { _engine?.InputNode.RemoveTapOnBus(0); } catch { /* best effort */ }
-            try { _engine?.Stop(); } catch { /* best effort */ }
-            _engine?.Dispose();
-            _engine = null;
-
-            _playerNode?.Dispose();
-            _playerNode = null;
-
-            _micConverter?.Dispose();
-            _micConverter = null;
-
-            // Remove interruption observer
-            if (_interruptionObserver != null)
-            {
-                _interruptionObserver.Dispose();
-                _interruptionObserver = null;
-            }
-
-            // Deactivate audio session
-            if (_audioSessionConfigured)
-            {
-                try
-                {
-                    var audioSession = AVAudioSession.SharedInstance();
-                    audioSession.SetActive(false, out _);
-                    Console.WriteLine("[Audio][MacCatalyst] AVAudioSession deactivated");
-                }
-                catch { /* best effort */ }
-                _audioSessionConfigured = false;
-            }
-
+            IsRecording = false;
             _onAudioCaptured = null;
+
+            engineToDispose = _engine;
+            _engine = null;
+            playerToDispose = _playerNode;
+            _playerNode = null;
+            converterToDispose = _micConverter;
+            _micConverter = null;
+            observerToDispose = _interruptionObserver;
+            _interruptionObserver = null;
+            shouldDeactivateSession = _audioSessionConfigured;
+            _audioSessionConfigured = false;
+        }
+
+        // Native teardown OUTSIDE the lock to avoid deadlock with tap callback.
+        try { engineToDispose?.InputNode.RemoveTapOnBus(0); } catch { /* best effort */ }
+        try { engineToDispose?.Stop(); } catch { /* best effort */ }
+        engineToDispose?.Dispose();
+        playerToDispose?.Dispose();
+        converterToDispose?.Dispose();
+        observerToDispose?.Dispose();
+
+        if (shouldDeactivateSession)
+        {
+            try
+            {
+                var audioSession = AVAudioSession.SharedInstance();
+                audioSession.SetActive(false, out _);
+                Console.WriteLine("[Audio][MacCatalyst] AVAudioSession deactivated");
+            }
+            catch { /* best effort */ }
         }
     }
 
@@ -504,6 +520,7 @@ public sealed class AudioService : IAudioService
             // We just need to access the InputNode to force its creation:
             var inputNode = _engine.InputNode;
             Console.WriteLine($"[Audio][MacCatalyst] InputNode accessed. Format: {inputNode.GetBusOutputFormat(0).SampleRate}Hz");
+
             // IMPORTANT: Set up the player node NOW, before the engine starts.
             // If we try to attach/connect nodes after the engine is running, we get
             // kAudioUnitErr_FormatNotSupported (-10868) errors due to format conflicts.
@@ -785,3 +802,5 @@ public sealed class AudioService : IAudioService
         if (_disposed) throw new ObjectDisposedException(nameof(AudioService));
     }
 }
+
+

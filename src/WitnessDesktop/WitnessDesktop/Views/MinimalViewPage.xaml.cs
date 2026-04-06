@@ -48,15 +48,14 @@ public partial class MinimalViewPage : ContentPage
         StopDismissTimer();
     }
     
-    private async void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainViewModel.SlidingPanelContent) || 
             e.PropertyName == nameof(MainViewModel.HasPanelContent))
         {
             if (_viewModel != null)
             {
-                // Must run on UI thread since PropertyChanged may fire from background thread
-                await MainThread.InvokeOnMainThreadAsync(() =>
+                MainThread.BeginInvokeOnMainThread(() =>
                 {
                     if (_viewModel.HasPanelContent)
                     {

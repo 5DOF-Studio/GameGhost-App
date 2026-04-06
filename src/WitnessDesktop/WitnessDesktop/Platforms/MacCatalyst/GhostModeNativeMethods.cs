@@ -4,7 +4,8 @@ namespace WitnessDesktop.Platforms.MacCatalyst;
 
 /// <summary>
 /// P/Invoke declarations for GaimerGhostMode native Swift helper.
-/// All 14 ghost_panel_* functions exported via @_cdecl from the xcframework.
+/// The compatibility bridge currently relies on 19 ghost_panel_* exports,
+/// including both host-window visibility functions, from the mounted xcframework.
 /// The DllImportResolver in NativeMethods.cs handles library resolution for
 /// both GaimerScreenCapture and GaimerGhostMode from a single registration.
 /// </summary>
@@ -24,12 +25,19 @@ internal static class GhostModeNativeMethods
     }
 
     /// <summary>
-    /// Callback delegate for FAB tap and card dismiss events.
+    /// Callback delegate for FAB tap, card dismiss, and gear tap events.
     /// Must be pinned with GCHandle.Alloc to prevent GC collection
     /// while native code holds the function pointer.
     /// </summary>
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void GhostModeCallback();
+
+    /// <summary>
+    /// Callback delegate for audio toggle changes.
+    /// Parameters: toggleIndex (0=VOICE CHAT, 1=VOICE COMMAND, 2=GAME AUDIO, 3=AUDIO IN), newValue.
+    /// </summary>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void AudioToggleCallback(int toggleIndex, [MarshalAs(UnmanagedType.U1)] bool newValue);
 
     // --- Panel lifecycle ---
 
@@ -77,7 +85,9 @@ internal static class GhostModeNativeMethods
         int variant,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string? title,
         [MarshalAs(UnmanagedType.LPUTF8Str)] string? text,
-        [MarshalAs(UnmanagedType.LPUTF8Str)] string? imagePath);
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string? imagePath,
+        [MarshalAs(UnmanagedType.U1)] bool isAlert,
+        [MarshalAs(UnmanagedType.U1)] bool isVoiceDelivered);
 
     /// <summary>Dismisses the currently visible event card.</summary>
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
@@ -102,6 +112,33 @@ internal static class GhostModeNativeMethods
     /// <summary>Sets the size of the ghost mode panel.</summary>
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void ghost_panel_set_size(double width, double height);
+
+    // --- Audio controls ---
+
+    /// <summary>Registers a callback invoked when the user taps the gear icon.</summary>
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void ghost_panel_set_gear_tap_callback(GhostModeCallback callback);
+
+    /// <summary>Registers a callback invoked when an audio toggle changes.</summary>
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void ghost_panel_set_audio_toggle_callback(AudioToggleCallback callback);
+
+    /// <summary>Syncs audio toggle states from C# to the native unified card tool section.</summary>
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void ghost_panel_set_audio_state(
+        [MarshalAs(UnmanagedType.U1)] bool voiceChatActive,
+        [MarshalAs(UnmanagedType.U1)] bool voiceCommandActive,
+        [MarshalAs(UnmanagedType.U1)] bool gameAudioActive,
+        [MarshalAs(UnmanagedType.U1)] bool audioInActive);
+
+    /// <summary>Updates VAD (voice activity) level for ghost mode card visualization.</summary>
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void ghost_panel_set_vad_level(float level);
+
+    /// <summary>Sets the exchange state for VAD animation mode (D-AI-9).
+    /// Maps ExchangeState enum ordinal to native animation mode.</summary>
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void ghost_panel_set_exchange_state(int state);
 
     // --- Host window management ---
 

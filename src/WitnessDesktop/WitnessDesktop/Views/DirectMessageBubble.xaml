@@ -11,33 +11,35 @@
         <Border IsVisible="{Binding Role, Converter={StaticResource RoleToUserVisibility}}"
                 BackgroundColor="{StaticResource BgCardHover}"
                 StrokeThickness="0"
-                Padding="21,15">
+                Padding="21,15"
+                HorizontalOptions="Start"
+                MaximumWidthRequest="480">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="21,21,21,6" />
             </Border.StrokeShape>
 
-            <Label Text="{Binding Summary}"
-                   FontSize="27"
+            <Label Text="{Binding FullContent}"
+                   FontSize="22"
                    FontFamily="Rajdhani-Regular"
                    TextColor="{StaticResource TextPrimary}"
                    LineBreakMode="WordWrap" />
         </Border>
 
-        <!-- Brain response (full text, no truncation) -->
+        <!-- Brain response with icon -->
         <Grid IsVisible="{Binding Role, Converter={StaticResource RoleToAssistantVisibility}}"
               ColumnDefinitions="30,*"
               Padding="0,3,0,0">
 
-            <Label Grid.Column="0"
-                   Text=">"
-                   FontSize="24"
-                   TextColor="{StaticResource TextMuted}"
+            <Image Grid.Column="0"
+                   Source="{Binding Icon}"
+                   WidthRequest="24"
+                   HeightRequest="24"
                    VerticalOptions="Start"
                    Margin="0,6,0,0" />
 
             <Label Grid.Column="1"
                    Text="{Binding FullContent}"
-                   FontSize="27"
+                   FontSize="22"
                    FontFamily="Rajdhani-Regular"
                    TextColor="{StaticResource TextPrimary}"
                    LineBreakMode="WordWrap" />

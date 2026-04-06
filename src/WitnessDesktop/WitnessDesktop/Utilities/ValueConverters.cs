@@ -118,3 +118,33 @@ public class DeliveryStateDisplayConverter : IValueConverter
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotImplementedException();
 }
+
+/// <summary>
+/// Converts bool to background color for settings segmented buttons.
+/// True = selected (purple), False = unselected (dark).
+/// </summary>
+public class BoolToSettingsColorConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is true ? Color.FromArgb("#2d1a4e") : Color.FromArgb("#14101f");
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
+}
+
+/// <summary>
+/// Converts bool to text color for settings segmented buttons.
+/// True = selected (cyan), False = unselected (gray).
+/// </summary>
+public class BoolToSettingsTextColorConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return value is true ? Color.FromArgb("#00d4ff") : Color.FromArgb("#888888");
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
+}

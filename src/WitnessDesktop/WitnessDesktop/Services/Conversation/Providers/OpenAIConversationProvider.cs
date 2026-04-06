@@ -28,25 +28,34 @@ public sealed class OpenAIConversationProvider : IConversationProvider
     private readonly OpenAIRealtimeService _openAiService;
     private bool _disposed;
 
-    public OpenAIConversationProvider(IConfiguration configuration)
+    public OpenAIConversationProvider(IConfiguration configuration, string voice = "ash")
     {
-        _openAiService = new OpenAIRealtimeService(configuration);
+        _openAiService = new OpenAIRealtimeService(configuration, voice);
 
-        // Wire up event forwarding
-        _openAiService.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
+        // Wire up event forwarding (also update local State)
+        _openAiService.ConnectionStateChanged += (s, e) => { State = e; ConnectionStateChanged?.Invoke(this, e); };
         _openAiService.AudioReceived += (s, e) => AudioReceived?.Invoke(this, e);
-        _openAiService.TextReceived += (s, e) => TextReceived?.Invoke(this, e);
+        _openAiService.TextReceived += (_, text) =>
+        {
+            // Fire MessageReceived only — it's the structured path.
+            // Firing both TextReceived + MessageReceived caused double display in MainViewModel.
+            MessageReceived?.Invoke(this, CreateAssistantMessage(text));
+        };
         _openAiService.Interrupted += (s, e) => Interrupted?.Invoke(this, e);
         _openAiService.ErrorOccurred += (s, e) => ErrorOccurred?.Invoke(this, e);
+        _openAiService.InputTranscriptionReceived += (_, transcript) =>
+            UserTranscriptReceived?.Invoke(this, transcript);
     }
 
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
     public event EventHandler<byte[]>? AudioReceived;
     public event EventHandler<string>? TextReceived;
+    public event EventHandler<ChatMessage>? MessageReceived;
     public event EventHandler? Interrupted;
     public event EventHandler<string>? ErrorOccurred;
+    public event EventHandler<string>? UserTranscriptReceived;
 
-    public ConnectionState State => _openAiService.State;
+    public ConnectionState State { get; private set; } = ConnectionState.Disconnected;
     public bool IsConnected => _openAiService.IsConnected;
     
     /// <summary>
@@ -60,8 +69,11 @@ public sealed class OpenAIConversationProvider : IConversationProvider
 
     public async Task DisconnectAsync()
     {
+        State = ConnectionState.Disconnecting;
         ConnectionStateChanged?.Invoke(this, ConnectionState.Disconnecting);
         await _openAiService.DisconnectAsync();
+        State = ConnectionState.Disconnected;
+        ConnectionStateChanged?.Invoke(this, ConnectionState.Disconnected);
     }
     
     /// <summary>
@@ -93,10 +105,13 @@ public sealed class OpenAIConversationProvider : IConversationProvider
     }
 
     public Task SendTextAsync(string text, CancellationToken cancellationToken = default) =>
-        _openAiService.SendTextAsync(text, cancellationToken);
+        _openAiService.SendTextAsync(text, requestResponse: true, cancellationToken: cancellationToken);
 
     public Task SendContextualUpdateAsync(string contextText, CancellationToken ct = default) =>
-        _openAiService.SendTextAsync($"[CONTEXT UPDATE] {contextText}", ct);
+        _openAiService.SendTextAsync($"[CONTEXT UPDATE] {contextText}", requestResponse: false, cancellationToken: ct);
+
+    public Task UpdateInstructionsAsync(string instructions) =>
+        _openAiService.UpdateInstructionsAsync(instructions);
 
     public void Dispose()
     {
@@ -104,5 +119,12 @@ public sealed class OpenAIConversationProvider : IConversationProvider
         _disposed = true;
         _openAiService.Dispose();
     }
-}
 
+    private ChatMessage CreateAssistantMessage(string text) => new()
+    {
+        Role = MessageRole.Assistant,
+        Intent = MessageIntent.GeneralChat,
+        Content = text,
+        Source = ProviderName
+    };
+}

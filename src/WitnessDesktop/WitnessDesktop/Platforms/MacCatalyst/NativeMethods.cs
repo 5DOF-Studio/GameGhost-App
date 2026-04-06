@@ -14,6 +14,7 @@ internal static class NativeMethods
     private const string CoreFoundationLib = "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation";
     private const string SckLibName = "GaimerScreenCapture";
     private const string GhostModeLibName = "GaimerGhostMode";
+    private const string SpeechLibName = "GaimerSpeech";
 
     /// <summary>
     /// Register a DllImport resolver so .NET can find custom xcframeworks
@@ -34,6 +35,9 @@ internal static class NativeMethods
 
         if (libraryName == GhostModeLibName)
             return ResolveFramework("GaimerGhostMode");
+
+        if (libraryName == SpeechLibName)
+            return ResolveFramework("GaimerSpeech");
 
         return IntPtr.Zero; // Let default resolution handle other libraries
     }
@@ -206,6 +210,60 @@ internal static class NativeMethods
     internal static extern void sck_capture_window(
         uint windowID, int width, int height,
         SckCaptureCallback callback);
+
+    // --- ScreenCaptureKit recording (GaimerScreenCapture.xcframework) ---
+
+    /// <summary>
+    /// Callback delegate for sck_stop_recording. Fires on a background thread
+    /// when the recording file is finalized and safe to read.
+    /// Pin via GCHandle.Alloc for the duration of the native call.
+    /// </summary>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void SckRecordingStoppedCallback();
+
+    /// <summary>
+    /// Start continuous recording of a window to an HEVC MP4 file.
+    /// Returns true if recording started successfully.
+    /// </summary>
+    [DllImport("GaimerScreenCapture", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.U1)]
+    internal static extern bool sck_start_recording(
+        uint windowID,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string outputPath,
+        int width,
+        int height);
+
+    /// <summary>
+    /// Stop recording. Calls the callback when the file is finalized.
+    /// The callback fires on a background thread — use TaskCompletionSource on C# side.
+    /// </summary>
+    [DllImport("GaimerScreenCapture", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void sck_stop_recording(SckRecordingStoppedCallback completion);
+
+    /// <summary>
+    /// Returns recording status: 0=idle, 1=recording, 2=error.
+    /// </summary>
+    [DllImport("GaimerScreenCapture", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int sck_recording_status();
+
+    // --- ScreenCaptureKit segment rotation (GaimerScreenCapture.xcframework) ---
+
+    /// <summary>
+    /// Callback delegate for sck_rotate_segment. Fires on a background thread
+    /// when the OLD segment file is finalized and safe to read.
+    /// Pin via GCHandle.Alloc for the duration of the native call.
+    /// </summary>
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void SckRotationCompletedCallback();
+
+    /// <summary>
+    /// Rotate to a new segment file. The current segment is finalized asynchronously.
+    /// The callback fires when the old file is safe to read.
+    /// </summary>
+    [DllImport("GaimerScreenCapture", CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void sck_rotate_segment(
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string newOutputPath,
+        SckRotationCompletedCallback completion);
 }
 
 /// <summary>Options for CGWindowListCopyWindowInfo / CGWindowListCreateImage.</summary>

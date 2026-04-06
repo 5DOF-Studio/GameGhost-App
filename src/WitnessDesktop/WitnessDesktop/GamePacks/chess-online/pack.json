@@ -1,0 +1,47 @@
+{
+  "id": "chess-online",
+  "name": "Chess (Online)",
+  "version": "1.0.0",
+  "genre": "chess",
+
+  "observationSchema": {
+    "schemaName": "chess_analysis",
+    "fields": [
+      { "key": "visual_description", "type": "string", "required": true, "route": "diagnostic", "description": "Literal description of what you see on the board" },
+      { "key": "position_assessment", "type": "string", "required": true, "route": "visual", "description": "Who is better and why" },
+      { "key": "threats", "type": "string?", "required": false, "route": "visual", "description": "Key threat or opportunity" },
+      { "key": "suggested_action", "type": "string?", "required": false, "route": "visual", "description": "Recommended action" },
+      { "key": "fen", "type": "string?", "required": false, "route": "temporal", "description": "FEN string or null if UNREADABLE" },
+      { "key": "last_move", "type": "string?", "required": false, "route": "temporal", "description": "The move just played, or null if unclear" },
+      { "key": "confidence", "type": "enum", "values": ["CERTAIN", "LIKELY", "UNCERTAIN", "GUESSING"], "required": true, "route": "metadata", "description": "Overall confidence level" }
+    ]
+  },
+
+  "eventMapping": [
+    { "field": "threats", "eventType": "Danger" },
+    { "field": "position_assessment", "eventType": "Assessment" },
+    { "field": "suggested_action", "eventType": "SageAdvice" }
+  ],
+
+  "topStripField": "position_assessment",
+  "userPromptTemplate": "Current game: chess. Position #{moveNumber}.",
+  "brainInstructions": "brain-instructions.md",
+
+  "voiceClassification": {
+    "gameStateSensitive": [
+      "\\b(?:what(?:'s| is) (?:on |happening|the position|the board|my position|going on)|am i winning|am i losing|who(?:'s| is) (?:winning|ahead|better)|what (?:piece|pawn|knight|bishop|rook|queen|king)|where(?:'s| is) (?:my|the|his|her)|what (?:changed|moved|happened)|what(?:'s| is) the (?:eval|score|advantage)|should i (?:take|capture|move|play|castle|push)|best move|what do you (?:see|think about (?:this|the) position)|how(?:'s| is) (?:my|the) position|can (?:i|they) (?:fork|pin|checkmate|castle)|is (?:there|that) a (?:threat|fork|pin|check))\\b"
+    ],
+    "generalKnowledge": [
+      "\\b(?:what(?:'s| is) (?:a|an|the) (?:sicilian|french|caro.kann|king(?:'s)? indian|queen(?:'s)? gambit|london|italian|ruy lopez|english|dutch|pirc|scandinavian|alekhine)|how (?:does|do) (?:you|i) (?:play|counter|defend)|what(?:'s| is) the (?:idea|theory|plan) (?:behind|of|in)|explain|teach me|what are (?:the )?(?:principles|rules|basics)|tell me about|history of|who (?:invented|created|played))\\b"
+    ]
+  },
+
+  "groundingLanguage": {
+    "refreshDisplay": "checking the board…",
+    "staleDisplay": "board info may be outdated",
+    "unavailableDisplay": "no current board info",
+    "refreshCorrection": "[SYSTEM: You do not have current board information. Do NOT describe specific piece positions or board state. Say you are checking the board and will update shortly.]",
+    "staleCorrection": "[SYSTEM: Your board information may be outdated. Express uncertainty about specific positions. Use phrases like 'from what I last saw' or 'I'm not fully certain about the current position'.]",
+    "unavailableCorrection": "[SYSTEM: No board information is available. Do NOT make claims about the board state. If asked about positions, honestly say you cannot see the board right now.]"
+  }
+}

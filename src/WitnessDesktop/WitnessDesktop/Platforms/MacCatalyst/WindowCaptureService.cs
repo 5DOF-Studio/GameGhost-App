@@ -38,7 +38,9 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
     private static readonly NSString _nsKeyHeight = new("Height");
 
     private const int MinWindowDimension = 200;
-    private const int CaptureIntervalMs = 30000; // Default: 1 frame per 30 seconds
+    private const int DefaultCaptureIntervalMs = 5000; // Default: 1 frame per 5 seconds
+    private const int ChangeDetectionPollIntervalMs = 5000;
+    private int _captureIntervalMs = DefaultCaptureIntervalMs;
     private int _captureCount;
 
     /// <summary>Cached at class load -- SCK availability does not change at runtime.</summary>
@@ -46,6 +48,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
 
     private readonly object _gate = new();
     private Timer? _captureTimer;
+    private CaptureEmissionGate _emissionGate = new();
     private bool _disposed;
 
     public event EventHandler<byte[]>? FrameCaptured;
@@ -128,7 +131,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
         return Task.FromResult<IReadOnlyList<CaptureTarget>>(targets);
     }
 
-    public Task StartCaptureAsync(CaptureTarget target)
+    public Task StartCaptureAsync(CaptureTarget target, int captureIntervalMs = 5000)
     {
         lock (_gate)
         {
@@ -137,6 +140,8 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
 
             CurrentTarget = target;
             IsCapturing = true;
+            _captureIntervalMs = captureIntervalMs;
+            _emissionGate = new CaptureEmissionGate();
 
             // One-shot timer pattern: re-arm at end of each tick to prevent overlap
             _captureTimer = new Timer(OnCaptureTimerTick, null, 0, Timeout.Infinite);
@@ -151,6 +156,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
         {
             IsCapturing = false;
             CurrentTarget = null;
+            _emissionGate.Reset();
             _captureTimer?.Dispose();
             _captureTimer = null;
         }
@@ -166,6 +172,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
             _disposed = true;
             IsCapturing = false;
             CurrentTarget = null;
+            _emissionGate.Reset();
             _captureTimer?.Dispose();
             _captureTimer = null;
         }
@@ -205,31 +212,27 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
             byte[] frameData;
             if (_sckAvailable)
             {
-                Console.WriteLine($"[Capture] Attempting SCK capture for windowId={target.Handle} ({target.ProcessName}: {target.WindowTitle}) bounds={target.BoundsWidth}x{target.BoundsHeight}");
                 frameData = CaptureWithScreenCaptureKit(target);
                 if (frameData.Length == 0)
                 {
-                    Console.WriteLine("[Capture] SCK returned empty — falling back to CGDisplayCreateImage (CANNOT capture GPU/Metal content)");
+                    Console.WriteLine("[Capture] SCK returned empty — falling back to CGDisplayCreateImage");
                     frameData = CaptureDisplayAndCrop(target);
-                    Console.WriteLine($"[Capture] CGDisplayCreateImage fallback returned {frameData.Length} bytes");
-                }
-                else
-                {
-                    Console.WriteLine($"[Capture] SCK capture SUCCESS — {frameData.Length} bytes");
                 }
             }
             else
             {
-                Console.WriteLine($"[Capture] Using CGDisplayCreateImage (SCK not available) for windowId={target.Handle}");
                 frameData = CaptureDisplayAndCrop(target);
-                Console.WriteLine($"[Capture] CGDisplayCreateImage returned {frameData.Length} bytes");
             }
 
             if (frameData.Length > 0)
             {
-                _captureCount++;
-                FrameCaptured?.Invoke(this, frameData);
-                LogMemoryFootprint($"After capture #{_captureCount} ({frameData.Length / 1024}KB frame)");
+                if (_emissionGate.ShouldEmit(frameData))
+                {
+                    _captureCount++;
+                    FrameCaptured?.Invoke(this, frameData);
+                    if (_captureCount % 10 == 0)
+                        LogMemoryFootprint($"After capture #{_captureCount} ({frameData.Length / 1024}KB frame)");
+                }
             }
         }
         catch (Exception ex)
@@ -242,7 +245,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
             lock (_gate)
             {
                 if (IsCapturing && !_disposed)
-                    _captureTimer?.Change(CaptureIntervalMs, Timeout.Infinite);
+                    _captureTimer?.Change(Math.Min(_captureIntervalMs, ChangeDetectionPollIntervalMs), Timeout.Infinite);
             }
         }
     }
@@ -287,8 +290,6 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
         width = Math.Max(width * 2, 100);
         height = Math.Max(height * 2, 100);
 
-        Console.WriteLine($"[Capture] SCK: requesting {width}x{height} for windowId={windowId}");
-
         var tcs = new TaskCompletionSource<byte[]>(TaskCreationOptions.RunContinuationsAsynchronously);
         var timedOut = false;
 
@@ -298,12 +299,10 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
 
             if (dataPtr == IntPtr.Zero || length <= 0)
             {
-                Console.WriteLine("[Capture] SCK callback: received NULL/empty data (capture failed in Swift)");
                 tcs.TrySetResult(Array.Empty<byte>());
                 return;
             }
 
-            Console.WriteLine($"[Capture] SCK callback: received {length} bytes of PNG data");
             var buffer = new byte[length];
             System.Runtime.InteropServices.Marshal.Copy(dataPtr, buffer, 0, length);
             tcs.TrySetResult(buffer);

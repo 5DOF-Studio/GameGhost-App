@@ -8,4 +8,5 @@ public sealed class ContextAssemblyInputs
 {
     public IReadOnlyList<ChatMessage> RecentChat { get; init; } = [];
     public CaptureTarget? ActiveTarget { get; init; }
+    public IReadOnlyList<VoiceTranscriptTurn> RecentTranscript { get; init; } = [];
 }

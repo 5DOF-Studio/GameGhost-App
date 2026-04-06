@@ -14,7 +14,7 @@
                              HorizontalOptions="Center"
                              Spacing="4"
                              Margin="0,0,0,40">
-            <Label Text="GAME GHOST"
+            <Label Text="GAIMER"
                    FontFamily="OrbitronBold"
                    FontSize="36"
                    TextColor="{StaticResource TextPrimary}"
@@ -42,10 +42,10 @@
                     <RoundRectangle CornerRadius="16"/>
                 </Border.StrokeShape>
                 <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnGameGhostAppTapped"/>
+                    <TapGestureRecognizer Tapped="OnGaimerAppTapped"/>
                 </Border.GestureRecognizers>
                 <VerticalStackLayout Spacing="6">
-                    <Label Text="Game Ghost App"
+                    <Label Text="Game Ghost"
                            FontFamily="OrbitronBold"
                            FontSize="18"
                            TextColor="{StaticResource TextPrimary}"/>

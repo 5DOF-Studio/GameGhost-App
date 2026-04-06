@@ -14,6 +14,8 @@ public class MockGhostModeService : IGhostModeService
 #pragma warning disable CS0067 // Events declared but never fired (intentional for mock)
     public event EventHandler? FabTapped;
     public event EventHandler? CardDismissed;
+    public event EventHandler? GearTapped;
+    public event EventHandler<AudioToggleEventArgs>? AudioToggleChanged;
 #pragma warning restore CS0067
 
     public Task EnterGhostModeAsync()
@@ -38,9 +40,10 @@ public class MockGhostModeService : IGhostModeService
         Console.WriteLine($"[MockGhostModeService] SetFabState: active={active}, connected={connected} (no-op)");
     }
 
-    public void ShowCard(FabCardVariant variant, string? title, string? text, string? imagePath)
+    public void ShowCard(FabCardVariant variant, string? title, string? text, string? imagePath,
+                         bool isAlert = false, bool isVoiceDelivered = false)
     {
-        Console.WriteLine($"[MockGhostModeService] ShowCard: variant={variant}, title={title} (no-op)");
+        Console.WriteLine($"[MockGhostModeService] ShowCard: variant={variant}, title={title}, alert={isAlert}, voiceDelivered={isVoiceDelivered} (no-op)");
     }
 
     public void DismissCard()
@@ -48,4 +51,20 @@ public class MockGhostModeService : IGhostModeService
         Console.WriteLine("[MockGhostModeService] DismissCard (no-op)");
     }
 
+    public void SetPosition(double x, double y) { }
+
+    public void SetSize(double width, double height) { }
+
+    public void SetAudioState(bool voiceChatActive, bool voiceCommandActive,
+                              bool gameAudioActive, bool audioInActive)
+    {
+        Console.WriteLine($"[MockGhostModeService] SetAudioState: voiceChat={voiceChatActive}, voiceCommand={voiceCommandActive}, gameAudio={gameAudioActive}, audioIn={audioInActive} (no-op)");
+    }
+
+    public void SetVadLevel(float level)
+    {
+        // no-op for non-macOS
+    }
+
+    public void SetExchangeState(int state) { }
 }

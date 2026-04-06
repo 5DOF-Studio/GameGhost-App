@@ -6,27 +6,33 @@ namespace WitnessDesktop.Services.Conversation.Providers;
 /// <summary>
 /// Adapter that wraps <see cref="GeminiLiveService"/> to implement <see cref="IConversationProvider"/>.
 /// </summary>
-/// <remarks>
-/// This adapter exists to:
-/// <list type="bullet">
-/// <item>Protect the working <see cref="GeminiLiveService"/> from modifications.</item>
-/// <item>Provide a consistent interface for the conversation provider abstraction.</item>
-/// <item>Enable future enhancements without touching core Gemini logic.</item>
-/// </list>
-/// </remarks>
 public sealed class GeminiConversationProvider : IConversationProvider
 {
     private readonly GeminiLiveService _geminiService;
+    private readonly object _stateLock = new();
+    private volatile ConnectionState _state = ConnectionState.Disconnected;
     private bool _disposed;
 
-    public GeminiConversationProvider(IConfiguration configuration)
+    public GeminiConversationProvider(IConfiguration configuration, string voice = "Fenrir")
     {
-        _geminiService = new GeminiLiveService(configuration);
+        _geminiService = new GeminiLiveService(configuration, voice);
 
-        // Wire up event forwarding
-        _geminiService.ConnectionStateChanged += (s, e) => ConnectionStateChanged?.Invoke(this, e);
+        // Wire up event forwarding with thread-safe state dedup
+        _geminiService.ConnectionStateChanged += (s, e) =>
+        {
+            lock (_stateLock)
+            {
+                if (_state == e) return;
+                _state = e;
+            }
+            ConnectionStateChanged?.Invoke(this, e);
+        };
         _geminiService.AudioReceived += (s, e) => AudioReceived?.Invoke(this, e);
-        _geminiService.TextReceived += (s, e) => TextReceived?.Invoke(this, e);
+        _geminiService.TextReceived += (_, text) =>
+        {
+            TextReceived?.Invoke(this, text);
+            MessageReceived?.Invoke(this, CreateAssistantMessage(text));
+        };
         _geminiService.Interrupted += (s, e) => Interrupted?.Invoke(this, e);
         _geminiService.ErrorOccurred += (s, e) => ErrorOccurred?.Invoke(this, e);
     }
@@ -34,10 +40,12 @@ public sealed class GeminiConversationProvider : IConversationProvider
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
     public event EventHandler<byte[]>? AudioReceived;
     public event EventHandler<string>? TextReceived;
+    public event EventHandler<ChatMessage>? MessageReceived;
     public event EventHandler? Interrupted;
     public event EventHandler<string>? ErrorOccurred;
+    public event EventHandler<string>? UserTranscriptReceived;
 
-    public ConnectionState State => _geminiService.State;
+    public ConnectionState State => _state;
     public bool IsConnected => _geminiService.IsConnected;
     public bool SupportsVideo => true; // Gemini supports image/video input
     public string ProviderName => "Gemini Live";
@@ -46,9 +54,11 @@ public sealed class GeminiConversationProvider : IConversationProvider
 
     public async Task DisconnectAsync()
     {
-        ConnectionStateChanged?.Invoke(this, ConnectionState.Disconnecting);
+        // Let GeminiLiveService manage state transitions — it fires ConnectionStateChanged
+        // which our forwarding handler deduplicates. No need for adapter to fire its own events.
         await _geminiService.DisconnectAsync();
     }
+
     public Task SendAudioAsync(byte[] audioData) => _geminiService.SendAudioAsync(audioData);
     public Task SendImageAsync(byte[] imageData, string mimeType = "image/jpeg") => _geminiService.SendImageAsync(imageData, mimeType);
     public Task SendTextAsync(string text, CancellationToken cancellationToken = default) =>
@@ -63,5 +73,12 @@ public sealed class GeminiConversationProvider : IConversationProvider
         _disposed = true;
         _geminiService.Dispose();
     }
-}
 
+    private ChatMessage CreateAssistantMessage(string text) => new()
+    {
+        Role = MessageRole.Assistant,
+        Intent = MessageIntent.GeneralChat,
+        Content = text,
+        Source = ProviderName
+    };
+}

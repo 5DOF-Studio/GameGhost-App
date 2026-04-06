@@ -9,5 +9,7 @@ public class EventLine
     
     public string LineIcon => Events.FirstOrDefault()?.Icon ?? EventIconMap.GetIcon(OutputType);
     
+    public bool IsDirectChat => OutputType == EventOutputType.DirectMessage;
+
     public bool HasMultipleEvents => Events.Count > 1;
 }

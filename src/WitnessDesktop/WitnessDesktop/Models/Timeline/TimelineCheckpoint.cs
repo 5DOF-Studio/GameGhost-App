@@ -11,23 +11,25 @@ public class TimelineCheckpoint
     public string? ScreenshotRef { get; set; }
     public string? CaptureMethod { get; set; }
     public ObservableCollection<EventLine> EventLines { get; set; } = new();
-    
-    public string HeaderIcon => Context == SessionState.InGame ? "video_reel.png" : "history_clock.png";
+
+    /// <summary>True when this checkpoint is the global archive boundary marker, not a real capture/conversation checkpoint.</summary>
+    public bool IsArchiveBoundary { get; set; }
+
+    /// <summary>The UTC minute this bucket represents. All events within this minute share the bucket.</summary>
+    public DateTime BucketMinute { get; set; }
+
+    public string HeaderIcon => Context == SessionState.InGame ? "camera.png" : "history_clock.png";
 
     public string DisplayHeader
     {
         get
         {
-            if (Context == SessionState.InGame && GameTimeIn.HasValue)
-            {
-                return $"Capture — {GameTimeIn.Value:m\\:ss} in";
-            }
-            else
-            {
-                return $"{Timestamp:h:mm tt}";
-            }
+            if (IsArchiveBoundary)
+                return "Archived";
+
+            return $"{Timestamp.ToLocalTime():h:mm tt}";
         }
     }
 
-    public string ContextBadge => Context == SessionState.InGame ? "[in-game]" : "[out-game]";
+    public string ContextBadge => Timestamp.ToLocalTime().ToString("h:mm tt").ToLowerInvariant();
 }

@@ -17,6 +17,9 @@ let package = Package(
         .target(
             name: "GaimerGhostMode",
             path: "Sources/GaimerGhostMode",
+            resources: [
+                .process("Assets.xcassets")
+            ],
             linkerSettings: [
                 .linkedFramework("AppKit"),
                 .linkedFramework("CoreGraphics")

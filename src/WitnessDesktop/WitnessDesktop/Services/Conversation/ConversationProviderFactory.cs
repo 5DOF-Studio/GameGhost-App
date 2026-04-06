@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
+using WitnessDesktop.Models;
 using WitnessDesktop.Services.Conversation.Providers;
+using WitnessDesktop.Services.Local;
 
 namespace WitnessDesktop.Services.Conversation;
 
@@ -10,10 +12,12 @@ namespace WitnessDesktop.Services.Conversation;
 /// <para>
 /// Provider selection priority:
 /// <list type="number">
+/// <item>If <c>InferenceMode</c> is <c>LocalOnly</c>, use the local provider and do not allow cloud voice overrides.</item>
 /// <item>If <c>VOICE_PROVIDER</c> env var is set, use that provider explicitly.</item>
 /// <item>If <c>USE_MOCK_SERVICES=true</c>, use mock provider.</item>
-/// <item>If <c>GEMINI_APIKEY</c> (or variants) is present, use Gemini.</item>
-/// <item>If <c>OPENAI_APIKEY</c> is present, use OpenAI.</item>
+/// <item>If <c>ISettingsService.VoiceProvider</c> is set and matching API key exists, use that provider.</item>
+/// <item>Auto-detect: if <c>GEMINI_APIKEY</c> (or variants) is present, use Gemini.</item>
+/// <item>Auto-detect: if <c>OPENAI_APIKEY</c> is present, use OpenAI.</item>
 /// <item>Fall back to mock provider.</item>
 /// </list>
 /// </para>
@@ -25,10 +29,17 @@ namespace WitnessDesktop.Services.Conversation;
 public sealed class ConversationProviderFactory
 {
     private readonly IConfiguration _configuration;
+    private readonly ISettingsService? _settings;
+    private readonly ILocalAudioConversationClient? _localAudioClient;
 
-    public ConversationProviderFactory(IConfiguration configuration)
+    public ConversationProviderFactory(
+        IConfiguration configuration,
+        ISettingsService? settings = null,
+        ILocalAudioConversationClient? localAudioClient = null)
     {
         _configuration = configuration;
+        _settings = settings;
+        _localAudioClient = localAudioClient;
     }
 
     /// <summary>
@@ -36,9 +47,18 @@ public sealed class ConversationProviderFactory
     /// </summary>
     public IConversationProvider Create()
     {
+        var inferenceMode = _settings?.InferenceMode ?? InferenceMode.CloudOnly;
         var explicitProvider = _configuration["VOICE_PROVIDER"]?.ToLowerInvariant();
         var useMockServices = string.Equals(_configuration["USE_MOCK_SERVICES"], "true", StringComparison.OrdinalIgnoreCase) ||
                               string.Equals(_configuration["USE_MOCK_SERVICES"], "1", StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine($"[ConversationProviderFactory] Entry: VOICE_PROVIDER='{explicitProvider ?? "null"}', USE_MOCK_SERVICES={useMockServices}, InferenceMode={_settings?.InferenceMode}, localAudioClient={(_localAudioClient != null ? "present" : "null")}");
+
+        // LocalOnly is a hard routing rule: never allow cloud voice selection to override it.
+        if (inferenceMode == InferenceMode.LocalOnly && _localAudioClient is not null)
+        {
+            LogProviderSelection("LocalMiniCpmConversationProvider", "inference mode=LocalOnly");
+            return CreateLocalProvider();
+        }
 
         // Explicit provider selection via VOICE_PROVIDER env var
         if (!string.IsNullOrEmpty(explicitProvider))
@@ -47,8 +67,10 @@ public sealed class ConversationProviderFactory
             {
                 "gemini" => CreateGeminiProvider(),
                 "openai" => CreateOpenAiProvider(),
+                "local" => CreateLocalProvider(),
+                "minicpm" => CreateLocalProvider(),
                 "mock" => CreateMockProvider(),
-                _ => throw new InvalidOperationException($"Unknown VOICE_PROVIDER: {explicitProvider}. Valid values: gemini, openai, mock")
+                _ => throw new InvalidOperationException($"Unknown VOICE_PROVIDER: {explicitProvider}. Valid values: gemini, openai, local, minicpm, mock")
             };
         }
 
@@ -59,14 +81,38 @@ public sealed class ConversationProviderFactory
             return CreateMockProvider();
         }
 
-        // Auto-detect based on available API keys
+        Console.WriteLine($"[ConversationProviderFactory] InferenceMode={inferenceMode}, settings={(_settings != null ? "present" : "null")}, localAudioClient={(_localAudioClient != null ? "present" : "null")}");
+
+        var settingsProvider = _settings?.VoiceProvider?.ToLowerInvariant();
+        if (!string.IsNullOrEmpty(settingsProvider))
+        {
+            if (settingsProvider == "gemini" && !string.IsNullOrEmpty(GetGeminiApiKey()))
+            {
+                LogProviderSelection("GeminiConversationProvider", "settings voice_provider=gemini");
+                return CreateGeminiProvider();
+            }
+
+            if (settingsProvider == "openai" && !string.IsNullOrEmpty(GetOpenAiApiKey()))
+            {
+                LogProviderSelection("OpenAIConversationProvider", "settings voice_provider=openai");
+                return CreateOpenAiProvider();
+            }
+
+            if ((settingsProvider == "local" || settingsProvider == "minicpm") && _localAudioClient is not null)
+            {
+                LogProviderSelection("LocalMiniCpmConversationProvider", $"settings voice_provider={settingsProvider}");
+                return CreateLocalProvider();
+            }
+        }
+
+        // Auto-detect: prefer Gemini over OpenAI (OpenAI Realtime has empty response issues as of Mar 2026)
         var geminiKey = GetGeminiApiKey();
         if (!string.IsNullOrEmpty(geminiKey))
         {
             return CreateGeminiProvider();
         }
 
-        var openAiKey = _configuration["OPENAI_APIKEY"] ?? _configuration["OPENAI_API_KEY"];
+        var openAiKey = GetOpenAiApiKey();
         if (!string.IsNullOrEmpty(openAiKey))
         {
             return CreateOpenAiProvider();
@@ -85,8 +131,9 @@ public sealed class ConversationProviderFactory
             throw new InvalidOperationException("VOICE_PROVIDER=gemini but no Gemini API key found. Set GEMINI_APIKEY environment variable.");
         }
 
-        LogProviderSelection("GeminiConversationProvider", "GEMINI_APIKEY present");
-        return new GeminiConversationProvider(_configuration);
+        var voice = GetVoiceName("gemini");
+        LogProviderSelection("GeminiConversationProvider", $"GEMINI_APIKEY present, voice={voice}");
+        return new GeminiConversationProvider(_configuration, voice);
     }
 
     private IConversationProvider CreateOpenAiProvider()
@@ -97,8 +144,9 @@ public sealed class ConversationProviderFactory
             throw new InvalidOperationException("VOICE_PROVIDER=openai but no OpenAI API key found. Set OPENAI_APIKEY environment variable.");
         }
 
-        LogProviderSelection("OpenAIConversationProvider", "OPENAI_APIKEY present");
-        return new OpenAIConversationProvider(_configuration);
+        var voice = GetVoiceName("openai");
+        LogProviderSelection("OpenAIConversationProvider", $"OPENAI_APIKEY present, voice={voice}");
+        return new OpenAIConversationProvider(_configuration, voice);
     }
 
     private static IConversationProvider CreateMockProvider()
@@ -106,11 +154,20 @@ public sealed class ConversationProviderFactory
         return new MockConversationProvider();
     }
 
+    private IConversationProvider CreateLocalProvider()
+    {
+        if (_localAudioClient is null)
+        {
+            throw new InvalidOperationException("VOICE_PROVIDER=local but no local audio client is registered.");
+        }
+
+        LogProviderSelection("LocalMiniCpmConversationProvider", $"runtime={_localAudioClient.RuntimeName}");
+        return new LocalMiniCpmConversationProvider(_localAudioClient);
+    }
+
     private string? GetGeminiApiKey()
     {
         return _configuration["GeminiApiKey"] ??
-               _configuration["APIKEY"] ??      // from GEMINI_APIKEY prefix mapping
-               _configuration["API_KEY"] ??     // from GEMINI_API_KEY prefix mapping
                _configuration["GEMINI_APIKEY"] ??
                _configuration["GEMINI_API_KEY"];
     }
@@ -122,6 +179,12 @@ public sealed class ConversationProviderFactory
                _configuration["OpenAiApiKey"];
     }
 
+    private string GetVoiceName(string provider)
+    {
+        var gender = _settings?.VoiceGender ?? "male";
+        return VoiceConfig.GetVoiceName(provider, gender);
+    }
+
     private static void LogProviderSelection(string providerName, string reason)
     {
         var message = $"[ConversationProviderFactory] Selected {providerName} ({reason})";
@@ -129,4 +192,3 @@ public sealed class ConversationProviderFactory
         System.Diagnostics.Debug.WriteLine(message);
     }
 }
-

@@ -7,7 +7,7 @@ public partial class DevLauncherPage : ContentPage
         InitializeComponent();
     }
 
-    private async void OnGameGhostAppTapped(object? sender, TappedEventArgs e)
+    private async void OnGaimerAppTapped(object? sender, TappedEventArgs e)
     {
         await Shell.Current.GoToAsync("//AgentSelection");
     }

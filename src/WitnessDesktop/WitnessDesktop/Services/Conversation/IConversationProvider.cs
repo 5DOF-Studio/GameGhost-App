@@ -59,6 +59,12 @@ public interface IConversationProvider : IDisposable
     event EventHandler<string>? TextReceived;
 
     /// <summary>
+    /// Raised when a structured message is received from the AI.
+    /// Legacy consumers may continue using <see cref="TextReceived"/>.
+    /// </summary>
+    event EventHandler<ChatMessage>? MessageReceived;
+
+    /// <summary>
     /// Raised when the AI's response is interrupted (user spoke during playback).
     /// </summary>
     event EventHandler? Interrupted;
@@ -67,6 +73,13 @@ public interface IConversationProvider : IDisposable
     /// Raised when an error occurs. Message contains user-friendly description.
     /// </summary>
     event EventHandler<string>? ErrorOccurred;
+
+    /// <summary>
+    /// Raised when a finalized user speech transcript is available.
+    /// Fired after the provider's STT produces a complete utterance.
+    /// Not all providers support this (Gemini does not currently).
+    /// </summary>
+    event EventHandler<string>? UserTranscriptReceived;
 
     /// <summary>
     /// Connects to the AI provider with the specified agent's system instruction.
@@ -129,5 +142,11 @@ public interface IConversationProvider : IDisposable
     /// <param name="contextText">Formatted context string.</param>
     /// <param name="ct">Optional cancellation token.</param>
     Task SendContextualUpdateAsync(string contextText, CancellationToken ct = default);
-}
 
+    /// <summary>
+    /// Update the provider's system instructions at runtime (e.g., on game state change).
+    /// Used to inform the voice provider about InGame/OutGame context.
+    /// No-op on providers that don't support runtime instruction updates.
+    /// </summary>
+    Task UpdateInstructionsAsync(string instructions) => Task.CompletedTask;
+}

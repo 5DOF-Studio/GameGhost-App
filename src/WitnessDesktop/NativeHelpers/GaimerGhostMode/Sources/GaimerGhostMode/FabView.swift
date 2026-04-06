@@ -1,216 +1,325 @@
-// FabView.swift
-// Floating Action Button for the ghost mode overlay — pure AppKit.
 //
-// 56pt circular button with three visual states:
-//   Off-Game (not connected): Yellow background + "GHOST MODE" black text
-//   In-Game  (connected):     Agent portrait + yellow glow ring
-//   Active   (ghost mode on): Agent portrait + yellow glow ring (same as in-game)
+//  FabView.swift
+//  GhostFab-AppKit
 //
-// PURE APPKIT — no SwiftUI.
+//  Floating Action Button visual assembly: ring, core, portrait, and shadow.
+//  The FAB is the visual anchor of the ghost panel, displaying the agent's
+//  portrait image and indicating connection state through its ring gradient.
+//  Source of truth: DesignReference/GhostFabCodex/UI/Views/CodexRendererView.xaml
+//
 
 import AppKit
+import QuartzCore
 
-// MARK: - FabButtonView
+/// C-compatible void callback for FAB tap events.
+/// Matches the @convention(c) signature used by @_cdecl exports.
+public typealias VoidCallback = @convention(c) () -> Void
 
-class FabButtonView: NSView {
-    var onTap: (() -> Void)?
-    var onDrag: ((NSPoint) -> Void)?
+/// Renders the complete FAB circle assembly: shadow -> ring -> core -> portrait.
+/// Frame-based layout -- parent (GhostContentView) sets this view's frame directly.
+public class FabView: NSView {
 
-    private var dragStart: NSPoint?
-    private var isDragging = false
+    // MARK: - Subviews
 
-    private let darkBg = NSColor(red: 30/255, green: 30/255, blue: 46/255, alpha: 1) // #1E1E2E
-    private let glowYellow = NSColor(red: 1.0, green: 0.84, blue: 0.0, alpha: 1)
+    private var ghostShadow: NSView!
+    private var fabRing: NSView!
+    private var fabCore: NSView!
+    private var fabPortraitLayer: CALayer!
+    private var backlitGlow: CALayer!
 
-    private var agentImage: NSImage?
+    // MARK: - Gradient Layers (stored for layout updates)
+
+    private var shadowGradient: CAGradientLayer!
+    private var ringGradient: CAGradientLayer!
+    private var coreGradient: CAGradientLayer!
+
+    // MARK: - State
+
+    /// Stored callback fired when FAB is tapped. Set via ghost_panel_set_fab_tap_callback.
+    private var tapCallback: VoidCallback?
+
+    /// Whether the FAB is in active state (agent is processing/speaking).
     private var isActive: Bool = false
+
+    /// Whether the FAB is connected to the agent service.
     private var isConnected: Bool = false
 
-    private let backgroundLayer = CAShapeLayer()
-    private let imageLayer = CALayer()
-    private let iconLayer = CAShapeLayer()
-    private let glowRingLayer = CAShapeLayer()
-    private let labelLayer = CATextLayer()
+    private var isTrackingInteraction = false
+    private var isDragging = false
+    private var initialScreenPoint = CGPoint.zero
+    private var initialPanelOrigin = CGPoint.zero
 
-    init(agentImage: NSImage?, isActive: Bool, isConnected: Bool) {
-        self.agentImage = agentImage
-        self.isActive = isActive
-        self.isConnected = isConnected
-        super.init(frame: NSRect(x: 0, y: 0, width: 56, height: 56))
-        setupLayers()
-    }
+    // MARK: - Constants
 
-    required init?(coder: NSCoder) { fatalError() }
+    private let ringSize: CGFloat = 124
+    private let coreSize: CGFloat = GhostFabTokens.FabSize  // 110
+    private let portraitSize: CGFloat = GhostFabTokens.FabSize  // 110 — fills core completely
+    private let shadowSize: CGFloat = 140
+    private let glowSize: CGFloat = 118  // Between core (110) and ring (124)
+    private let dragThreshold: CGFloat = 6
 
-    override var isFlipped: Bool { false }
+    /// Stroke color shared by ring and core: white @ 25% alpha.
+    private let fabStrokeColor = NSColor(srgbRed: 1, green: 1, blue: 1, alpha: 0.25).cgColor
 
-    private func setupLayers() {
+    /// Bluish-white backlit color (matches GAIMER logo tint).
+    private let backlitColor = NSColor(srgbRed: 0.7, green: 0.82, blue: 1.0, alpha: 1.0)
+
+    // MARK: - Initialization
+
+    public override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
         wantsLayer = true
-        layer?.masksToBounds = false
-
-        let size: CGFloat = 56
-        let circularPath = CGPath(ellipseIn: NSRect(x: 0, y: 0, width: size, height: size), transform: nil)
-
-        // Background circle
-        backgroundLayer.path = circularPath
-        backgroundLayer.fillColor = darkBg.cgColor
-        layer?.addSublayer(backgroundLayer)
-
-        // Agent image (clipped to circle)
-        let imageInset: CGFloat = 4
-        let imageSize = size - imageInset * 2
-        imageLayer.frame = NSRect(x: imageInset, y: imageInset, width: imageSize, height: imageSize)
-        imageLayer.cornerRadius = imageSize / 2
-        imageLayer.masksToBounds = true
-        imageLayer.contentsGravity = .resizeAspectFill
-        layer?.addSublayer(imageLayer)
-
-        // Fallback icon (shown when no agent image and connected)
-        iconLayer.frame = NSRect(x: 0, y: 0, width: size, height: size)
-        iconLayer.isHidden = true
-        layer?.addSublayer(iconLayer)
-
-        // Glow ring
-        glowRingLayer.path = circularPath
-        glowRingLayer.fillColor = nil
-        glowRingLayer.strokeColor = glowYellow.cgColor
-        glowRingLayer.lineWidth = 2
-        layer?.addSublayer(glowRingLayer)
-
-        // "GHOST MODE" label (shown when not connected)
-        let textHeight: CGFloat = 28
-        labelLayer.string = "GHOST\nMODE"
-        labelLayer.fontSize = 10
-        labelLayer.font = NSFont.systemFont(ofSize: 10, weight: .heavy) as CTFont
-        labelLayer.foregroundColor = NSColor.black.cgColor
-        labelLayer.alignmentMode = .center
-        labelLayer.contentsScale = NSScreen.main?.backingScaleFactor ?? 2.0
-        labelLayer.isWrapped = true
-        labelLayer.truncationMode = .none
-        labelLayer.frame = NSRect(x: 2, y: (size - textHeight) / 2, width: size - 4, height: textHeight)
-        labelLayer.isHidden = true
-        layer?.addSublayer(labelLayer)
-
-        applyState()
+        layer?.masksToBounds = false  // Shadow extends beyond ring
+        setupSubviews()
     }
 
-    func update(agentImage: NSImage?, isActive: Bool, isConnected: Bool) {
-        self.agentImage = agentImage
-        self.isActive = isActive
-        self.isConnected = isConnected
-        applyState()
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
-    private func applyState() {
-        if !isConnected {
-            // Off-game: yellow circle + "GHOST MODE" black text
-            backgroundLayer.fillColor = glowYellow.cgColor
-            imageLayer.isHidden = true
-            iconLayer.isHidden = true
-            labelLayer.isHidden = false
-            glowRingLayer.isHidden = true
-            glowRingLayer.shadowOpacity = 0
-            alphaValue = 1.0
-        } else {
-            // In-game (connected) or active: dark bg + portrait + glow ring
-            backgroundLayer.fillColor = darkBg.cgColor
-            labelLayer.isHidden = true
+    // MARK: - Setup
 
-            if let img = agentImage {
-                imageLayer.isHidden = false
-                imageLayer.contents = img
-                iconLayer.isHidden = true
-            } else {
-                imageLayer.isHidden = true
-                iconLayer.isHidden = false
-                drawControllerIcon()
-            }
+    private func setupSubviews() {
+        // 1. GhostShadow -- 140pt radial gradient, hidden by default
+        ghostShadow = NSView()
+        ghostShadow.wantsLayer = true
+        guard let shadowLayer = ghostShadow.layer else { return }
+        shadowGradient = GhostFabTokens.makeGhostShadowGradient()
+        shadowLayer.addSublayer(shadowGradient)
+        shadowLayer.cornerRadius = shadowSize / 2  // 70
+        shadowLayer.masksToBounds = true
+        shadowLayer.opacity = 0  // Hidden in closed state
 
-            // Glow ring always visible when connected
-            glowRingLayer.isHidden = false
-            glowRingLayer.shadowColor = glowYellow.cgColor
-            glowRingLayer.shadowRadius = 12
-            glowRingLayer.shadowOpacity = 0.6
-            glowRingLayer.shadowOffset = .zero
+        // 2. FabRing -- 124pt circle with SteelRing gradient
+        fabRing = NSView()
+        fabRing.wantsLayer = true
+        guard let ringLayer = fabRing.layer else { return }
+        ringGradient = GhostFabTokens.makeSteelRingGradient()
+        ringLayer.addSublayer(ringGradient)
+        ringLayer.cornerRadius = ringSize / 2  // 62
+        ringLayer.masksToBounds = true
+        ringLayer.borderWidth = 2
+        ringLayer.borderColor = fabStrokeColor
 
-            alphaValue = 1.0
+        // 3. FabCore -- 110pt circle with GhostFill radial gradient
+        fabCore = NSView()
+        fabCore.wantsLayer = true
+        guard let coreLayer = fabCore.layer else { return }
+        coreGradient = GhostFabTokens.makeGhostFillGradient()
+        coreLayer.addSublayer(coreGradient)
+        coreLayer.cornerRadius = coreSize / 2  // 55
+        coreLayer.masksToBounds = true
+        coreLayer.borderWidth = 2
+        coreLayer.borderColor = fabStrokeColor
+
+        // 4. Backlit glow -- blurred colored circle behind portrait, off by default
+        backlitGlow = CALayer()
+        backlitGlow.backgroundColor = backlitColor.cgColor
+        backlitGlow.cornerRadius = glowSize / 2
+        backlitGlow.opacity = 0  // Hidden until active
+        if let blur = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius": 8.0]) {
+            backlitGlow.filters = [blur]
         }
+        layer?.addSublayer(backlitGlow)
+
+        // 5. FabPortrait -- CALayer for reliable circular clipping
+        fabPortraitLayer = CALayer()
+        fabPortraitLayer.contentsGravity = .resizeAspectFill
+        fabPortraitLayer.contentsScale = NSScreen.main?.backingScaleFactor ?? 2.0
+        fabPortraitLayer.cornerRadius = portraitSize / 2
+        fabPortraitLayer.masksToBounds = true
+        coreLayer.addSublayer(fabPortraitLayer)
+
+        // --- Add to view hierarchy (bottom to top) ---
+        addSubview(ghostShadow)   // Behind everything
+        addSubview(fabRing)       // Ring behind core
+        addSubview(fabCore)       // Core on top of ring
     }
 
-    private func drawControllerIcon() {
-        // Simple gamecontroller glyph — a rounded rect with two bumps
-        let size: CGFloat = 56
-        let cx = size / 2
-        let cy = size / 2
-        let path = CGMutablePath()
+    // MARK: - Layout
 
-        // Body
-        path.addRoundedRect(in: NSRect(x: cx - 10, y: cy - 6, width: 20, height: 12), cornerWidth: 4, cornerHeight: 4)
-        // Left grip
-        path.addRoundedRect(in: NSRect(x: cx - 14, y: cy - 3, width: 8, height: 6), cornerWidth: 2, cornerHeight: 2)
-        // Right grip
-        path.addRoundedRect(in: NSRect(x: cx + 6, y: cy - 3, width: 8, height: 6), cornerWidth: 2, cornerHeight: 2)
+    override public func layout() {
+        super.layout()
 
-        iconLayer.path = path
-        iconLayer.strokeColor = nil
-        iconLayer.fillColor = NSColor.white.cgColor
+        // Ring centered in FabView
+        let ringX = (bounds.width - ringSize) / 2
+        let ringY = (bounds.height - ringSize) / 2
+        fabRing.frame = NSRect(x: ringX, y: ringY, width: ringSize, height: ringSize)
+        ringGradient.frame = fabRing.bounds
+
+        // Core centered in FabView (same center as ring)
+        let coreX = (bounds.width - coreSize) / 2
+        let coreY = (bounds.height - coreSize) / 2
+        fabCore.frame = NSRect(x: coreX, y: coreY, width: coreSize, height: coreSize)
+        coreGradient.frame = fabCore.bounds
+
+        // Backlit glow centered (same center, slightly larger than core)
+        let glowX = (bounds.width - glowSize) / 2
+        let glowY = (bounds.height - glowSize) / 2
+        backlitGlow.frame = NSRect(x: glowX, y: glowY, width: glowSize, height: glowSize)
+
+        // Portrait layer centered inside core
+        let portraitX = (fabCore.bounds.width - portraitSize) / 2
+        let portraitY = (fabCore.bounds.height - portraitSize) / 2
+        fabPortraitLayer.frame = NSRect(x: portraitX, y: portraitY, width: portraitSize, height: portraitSize)
+        fabPortraitLayer.cornerRadius = portraitSize / 2
+
+        // Shadow centered on ring center
+        let shadowX = (bounds.width - shadowSize) / 2
+        let shadowY = (bounds.height - shadowSize) / 2
+        ghostShadow.frame = NSRect(x: shadowX, y: shadowY, width: shadowSize, height: shadowSize)
+        shadowGradient.frame = ghostShadow.bounds
     }
 
-    // MARK: - Mouse Handling (tap + drag)
+    // MARK: - Hit Testing
 
-    override func mouseDown(with event: NSEvent) {
-        dragStart = event.locationInWindow
-        isDragging = false
-        NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = 0.1
-            self.animator().alphaValue = 0.7
-        }
-    }
-
-    override func mouseDragged(with event: NSEvent) {
-        guard let start = dragStart else { return }
-        let current = event.locationInWindow
-        let dx = current.x - start.x
-        let dy = current.y - start.y
-        // Threshold: 4pt before we consider it a drag
-        if !isDragging && (dx * dx + dy * dy) > 16 {
-            isDragging = true
-        }
-        if isDragging {
-            // Report the new center position in superview coordinates
-            let newCenter = NSPoint(
-                x: frame.midX + (current.x - start.x),
-                y: frame.midY + (current.y - start.y)
-            )
-            dragStart = current
-            onDrag?(newCenter)
-        }
-    }
-
-    override func mouseUp(with event: NSEvent) {
-        NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = 0.1
-            self.animator().alphaValue = 1.0
-        }
-        if !isDragging {
-            let location = convert(event.locationInWindow, from: nil)
-            if bounds.contains(location) {
-                onTap?()
-            }
-        }
-        dragStart = nil
-        isDragging = false
-    }
-
-    override func hitTest(_ point: NSPoint) -> NSView? {
-        let local = convert(point, from: superview)
-        let center = NSPoint(x: bounds.midX, y: bounds.midY)
-        let dx = local.x - center.x
-        let dy = local.y - center.y
-        let radius = bounds.width / 2
-        if dx * dx + dy * dy <= radius * radius {
+    public override func hitTest(_ point: NSPoint) -> NSView? {
+        let localPoint = convert(point, from: superview)
+        if isPointInRing(localPoint) {
             return self
         }
-        return nil
+        return super.hitTest(point)
+    }
+
+    public override func mouseDown(with event: NSEvent) {
+        let clickPoint = convert(event.locationInWindow, from: nil)
+        guard isPointInRing(clickPoint) else {
+            super.mouseDown(with: event)
+            return
+        }
+
+        isTrackingInteraction = true
+        isDragging = false
+        initialScreenPoint = NSEvent.mouseLocation
+        initialPanelOrigin = window?.frame.origin ?? .zero
+    }
+
+    public override func mouseDragged(with event: NSEvent) {
+        guard isTrackingInteraction,
+              let panel = window as? GhostPanel else {
+            super.mouseDragged(with: event)
+            return
+        }
+
+        let currentPoint = NSEvent.mouseLocation
+        let dx = currentPoint.x - initialScreenPoint.x
+        let dy = currentPoint.y - initialScreenPoint.y
+
+        if !isDragging && hypot(dx, dy) < dragThreshold {
+            return
+        }
+
+        isDragging = true
+        panel.repositionForDrag(
+            proposedOrigin: CGPoint(
+                x: initialPanelOrigin.x + dx,
+                y: initialPanelOrigin.y + dy
+            )
+        )
+    }
+
+    public override func mouseUp(with event: NSEvent) {
+        guard isTrackingInteraction else {
+            super.mouseUp(with: event)
+            return
+        }
+
+        defer {
+            isTrackingInteraction = false
+            isDragging = false
+        }
+
+        if isDragging {
+            (window as? GhostPanel)?.persistCurrentPlacement()
+            return
+        }
+
+        let releasePoint = convert(event.locationInWindow, from: nil)
+        if isPointInRing(releasePoint) {
+            tapCallback?()
+        }
+    }
+
+    // MARK: - Public API
+
+    /// Sets the agent portrait image displayed in the FAB core.
+    public func setAgentImage(_ image: NSImage?) {
+        guard let image = image else {
+            fabPortraitLayer.contents = nil
+            return
+        }
+        var rect = NSRect(origin: .zero, size: image.size)
+        fabPortraitLayer.contents = image.cgImage(forProposedRect: &rect, context: nil, hints: nil)
+    }
+
+    /// Controls GhostShadow visibility (opacity 1 when spine open, 0 when closed).
+    /// Snaps immediately -- use `fadeShadowOut(completion:)` for animated fade.
+    public func setShadowVisible(_ visible: Bool) {
+        ghostShadow.layer?.opacity = visible ? 1.0 : 0.0
+    }
+
+    /// Fades the ghost shadow out with 200ms CubicIn animation (matches MAUI GhostShadow.FadeTo).
+    /// Uses the animator proxy inside an NSAnimationContext block so the opacity transition is smooth.
+    /// - Parameter completion: Called after fade animation completes
+    public func fadeShadowOut(completion: (() -> Void)? = nil) {
+        let cubicIn = CAMediaTimingFunction(controlPoints: 0.55, 0.055, 0.675, 0.19)
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.2
+            context.timingFunction = cubicIn
+            self.ghostShadow.animator().alphaValue = 0.0
+        }, completionHandler: {
+            self.ghostShadow.layer?.opacity = 0.0
+            completion?()
+        })
+    }
+
+    /// Sets the callback fired when the FAB is tapped.
+    public func setTapCallback(_ callback: VoidCallback?) {
+        self.tapCallback = callback
+    }
+
+    /// Updates the FAB active state.
+    /// When active: ring border color brightens (SteelLight at full alpha).
+    /// When inactive: ring returns to default FabCoreStrokeBrush (white@25%).
+    public func setActive(_ active: Bool) {
+        self.isActive = active
+        updateRingAppearance()
+    }
+
+    /// Updates the FAB connected state.
+    /// When connected: ring gets a subtle green tint on the border.
+    /// When disconnected: ring returns to default appearance.
+    public func setConnected(_ connected: Bool) {
+        self.isConnected = connected
+        updateRingAppearance()
+    }
+
+    // MARK: - Ring Appearance
+
+    private func updateRingAppearance() {
+        guard let ringLayer = fabRing.layer else { return }
+
+        if isActive {
+            ringLayer.borderColor = GhostFabTokens.SteelLight.cgColor
+            ringLayer.borderWidth = 2.5
+            backlitGlow.opacity = 0.85
+        } else if isConnected {
+            ringLayer.borderColor = GhostFabTokens.VoiceGreen.withAlphaComponent(0.6).cgColor
+            ringLayer.borderWidth = 2
+            backlitGlow.opacity = 0.4
+        } else {
+            ringLayer.borderColor = NSColor(srgbRed: 1, green: 1, blue: 1, alpha: 0.25).cgColor
+            ringLayer.borderWidth = 2
+            backlitGlow.opacity = 0
+        }
+    }
+
+    private func isPointInRing(_ point: CGPoint) -> Bool {
+        let ringRadius: CGFloat = 62
+        let center = CGPoint(x: bounds.midX, y: bounds.midY)
+        let dx = point.x - center.x
+        let dy = point.y - center.y
+        return sqrt(dx * dx + dy * dy) <= ringRadius
     }
 }

@@ -31,7 +31,7 @@
 
             <!-- Title -->
             <Label Grid.Column="1"
-                   Text="GAME GHOST WORKBENCH"
+                   Text="GAIMER WORKBENCH"
                    FontFamily="OrbitronBold"
                    FontSize="16"
                    TextColor="{StaticResource TextPrimary}"
@@ -105,7 +105,7 @@
 
             <!-- Component preview area -->
             <Grid>
-                <views:GameGhostHudView x:Name="HudView"
+                <views:GaimerHudView x:Name="HudView"
                                      VerticalOptions="End"
                                      HorizontalOptions="Center"
                                      MaximumWidthRequest="400"

@@ -9,12 +9,18 @@ public interface ITimelineFeed
     
     TimelineCheckpoint? CurrentCheckpoint { get; }
     
-    TimelineCheckpoint NewCapture(string screenshotRef, TimeSpan gameTime, string method);
+    void NewCapture(string screenshotRef, TimeSpan gameTime, string method);
     
     TimelineCheckpoint NewConversationCheckpoint();
     
     void AddEvent(TimelineEvent evt);
-    
+
+    /// <summary>
+    /// Inserts a grey "Archived" boundary marker into the current checkpoint.
+    /// Presentation seam for the future retention engine.
+    /// </summary>
+    void InsertArchiveBoundary();
+
     void Clear();
     
     event EventHandler<TimelineCheckpoint>? CheckpointCreated;

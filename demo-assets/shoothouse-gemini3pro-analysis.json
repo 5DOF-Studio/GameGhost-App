@@ -1,0 +1,4092 @@
+[
+  {
+    "start_time": "0:00",
+    "end_time": "0:03",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the pre-match lobby menu, waiting for the match to start. The selected game mode is Hardcore Cyber Attack on the map Shoot House.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:03",
+    "end_time": "0:06",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Still in the pre-match lobby. The player is reviewing daily challenges and lobby roster.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:06",
+    "end_time": "0:09",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Waiting in the lobby. The match is preparing to load.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:09",
+    "end_time": "0:12",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen continues to display player operator and stats.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:12",
+    "end_time": "0:15",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:15",
+    "end_time": "0:18",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:18",
+    "end_time": "0:21",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:21",
+    "end_time": "0:24",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:24",
+    "end_time": "0:27",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:27",
+    "end_time": "0:30",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. The match countdown is progressing.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:30",
+    "end_time": "0:33",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:33",
+    "end_time": "0:36",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:36",
+    "end_time": "0:39",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. No significant changes.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:39",
+    "end_time": "0:42",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Lobby screen. The match is about to start.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:42",
+    "end_time": "0:45",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "The lobby screen fades to black as the game transitions to the map loading screen.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:45",
+    "end_time": "0:48",
+    "phase": "loadout",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Map loading screen for Shoot House is displayed.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:48",
+    "end_time": "0:51",
+    "phase": "loadout",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Map loading screen continues.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:51",
+    "end_time": "0:54",
+    "phase": "loadout",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Loadout selection screen appears. Player is preparing to choose their class.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:54",
+    "end_time": "0:57",
+    "phase": "loadout",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player selects the 'NINJA VEST' loadout, equipping a scoped marksman rifle and a suppressed pistol.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "0:57",
+    "end_time": "1:00",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 49,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Round 1 begins. Player immediately aims down sights with their scoped marksman rifle, holding the long sightline down the middle lane from Alpha Gate to catch early crossers.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:00",
+    "end_time": "1:03",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 49,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player continues to hold the middle lane angle, waiting for enemy movement.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:04",
+    "end_time": "1:07",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 49,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Objective splash 'HARDCORE CYBER ATTACK' appears. Player maintains their hold on the middle lane, a common opening strategy on Shoot House.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:07",
+    "end_time": "1:10",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [
+      {
+        "killer": "[CH]WindowLick3r",
+        "victim": "[LKS]Plate_God02",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 49,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "First blood occurs elsewhere on the map via an enemy teamkill. Player remains focused on the middle lane.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:10",
+    "end_time": "1:13",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "[CH]WindowLick3r",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT ONE KILL",
+      "LONGSHOT 47.15M",
+      "DEFENSE"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player spots an enemy crossing the middle lane and secures a long-range kill, then immediately breaks ADS to sprint forward towards Forklift to gain ground.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:13",
+    "end_time": "1:16",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player advances to the Forklift area and quickly aims down sights again to re-check the middle lane for trailing enemies.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:16",
+    "end_time": "1:19",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "ads",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "[LKS]Plate_God02",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT ONE KILL"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player spots a second enemy in the middle lane and secures another kill, effectively locking down the central sightline.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:19",
+    "end_time": "1:22",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "tactical",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "The enemy team picks up the bomb. Player throws a frag grenade over the wall towards the enemy spawn to disrupt their push, then continues sprinting forward.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:22",
+    "end_time": "1:25",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "UNDERPASS"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 25,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player sprints through the Underpass, aggressively closing the distance to the center of the map to contest the bomb carrier.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:25",
+    "end_time": "1:28",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "CENTER"
+    },
+    "player_state": "ads",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "[LKS]Plate_God02",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT ONE KILL",
+      "HEADSHOT"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 25,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player spots an enemy on the elevated platform in the center and lands a precise headshot, clearing the path forward.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:28",
+    "end_time": "1:31",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 15,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player pushes up the right side of the map towards the Containers area, moving closer to the bomb's location.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:31",
+    "end_time": "1:34",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "ads",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "Anastasia",
+        "attribution": "teamkill"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT ONE KILL"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 15,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "danger",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player rounds the corner and accidentally shoots a teammate (Anastasia) due to the lack of HUD indicators in Hardcore mode. The enemy still has the bomb.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:34",
+    "end_time": "1:37",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 15,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player holds the angle near the containers, watching for enemies pushing from the right side, likely anticipating a flank.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:37",
+    "end_time": "1:40",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "dead",
+    "kill_feed": [
+      {
+        "killer": "[CH]WindowLick3r",
+        "victim": "Wakandan",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 15,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "danger",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player is shot and killed by an enemy from an unseen angle while holding the container sightline.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:40",
+    "end_time": "1:43",
+    "phase": "spectating",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is now spectating teammate Anastasia after being eliminated.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:43",
+    "end_time": "1:46",
+    "phase": "spectating",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "tactical",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Spectating Anastasia, who is currently reviving a downed teammate (Lulu1062) to restore team numbers.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:46",
+    "end_time": "1:49",
+    "phase": "spectating",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Spectating Anastasia holding a defensive angle near the containers after the revive.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:49",
+    "end_time": "1:52",
+    "phase": "spectating",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Spectating Anastasia moving slightly to adjust their angle while holding the position.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:52",
+    "end_time": "1:55",
+    "phase": "spectating",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Still spectating Anastasia. The round is nearing its conclusion.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:55",
+    "end_time": "1:58",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "objective",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Round ends. 'ROUND WIN' splash appears. The friendly team successfully won the round.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "1:58",
+    "end_time": "2:01",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard is displayed. The player has 2 net kills (3 enemy kills minus 1 teamkill) and 1 death.",
+    "scoreboard": {
+      "friendly_team": [
+        {
+          "name": "[LKS]Plate_God02",
+          "score": 525,
+          "kills": 3,
+          "deaths": 0
+        },
+        {
+          "name": "Anastasia",
+          "score": 325,
+          "kills": 1,
+          "deaths": 1
+        },
+        {
+          "name": "Wakandan",
+          "score": 250,
+          "kills": 2,
+          "deaths": 1
+        },
+        {
+          "name": "[CH]WindowLick3r",
+          "score": 100,
+          "kills": 1,
+          "deaths": 1
+        },
+        {
+          "name": "[PHATT]QuacktasticBong",
+          "score": 0,
+          "kills": 0,
+          "deaths": 1
+        },
+        {
+          "name": "[USER]Cursed Nites",
+          "score": 0,
+          "kills": 0,
+          "deaths": 1
+        }
+      ],
+      "enemy_team": [
+        {
+          "name": "Bluevy",
+          "score": 250,
+          "kills": 2,
+          "deaths": 0
+        },
+        {
+          "name": "[LKS]Plate_God02",
+          "score": 200,
+          "kills": 2,
+          "deaths": 1
+        },
+        {
+          "name": "Cursed Nites",
+          "score": 100,
+          "kills": 1,
+          "deaths": 1
+        },
+        {
+          "name": "WindowLick3r",
+          "score": 100,
+          "kills": 1,
+          "deaths": 1
+        },
+        {
+          "name": "QuacktasticBong",
+          "score": 0,
+          "kills": 0,
+          "deaths": 1
+        }
+      ]
+    },
+    "final_kill": null
+  },
+  {
+    "start_time": "2:01",
+    "end_time": "2:04",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard remains on screen.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:04",
+    "end_time": "2:07",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [
+      {
+        "killer": "Lulu1062",
+        "victim": "[CH]WindowLick3r",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final killcam begins, showing teammate Lulu1062's perspective as they secure the final kill with a Proximity Mine.",
+    "scoreboard": null,
+    "final_kill": {
+      "killer": "Lulu1062",
+      "victim": "[CH]WindowLick3r",
+      "weapon": "Proximity Mine",
+      "perks": [
+        "Demolition Vest"
+      ]
+    }
+  },
+  {
+    "start_time": "2:07",
+    "end_time": "2:10",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final killcam shows the proximity mine explosion that eliminated the last enemy.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:10",
+    "end_time": "2:13",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final killcam concludes, transitioning to the next round.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:13",
+    "end_time": "2:16",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 71,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Round 2 begins. The team is now on defense. Player immediately aims down sights down the middle lane from Alpha Gate, repeating their successful opening strategy from Round 1.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:16",
+    "end_time": "2:19",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 71,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player holds the angle briefly, then breaks ADS to start moving forward.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:19",
+    "end_time": "2:22",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 71,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player stops and aims down sights again as the objective splash appears, ensuring the lane is clear before advancing further.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:22",
+    "end_time": "2:25",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 88,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [
+      {
+        "killer": "[CH]WindowLick3r",
+        "victim": "[LKS]Plate_God02",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 71,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player continues to hold the middle lane. An enemy teamkill occurs in the kill feed, similar to the start of Round 1.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:25",
+    "end_time": "2:28",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "[CH]WindowLick3r",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT ONE KILL",
+      "LONGSHOT 51.58M",
+      "HEADSHOT"
+    ],
+    "objective": {
+      "type": "defend",
+      "distance_m": 71,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player spots an enemy crossing the middle lane and lands a long-range headshot, then immediately begins pushing forward towards Forklift.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:28",
+    "end_time": "2:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 45,
+      "direction": "NE",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 71,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player sprints towards the Forklift area, aggressively advancing their position to establish map control early in the round.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:30",
+    "end_time": "2:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 72,
+      "direction": "ENE",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 76,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia",
+      "Cursed Nites",
+      "PHATTG0atphukr"
+    ],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan is holding an angle at FORKLIFT, aiming down sights with a sniper rifle, waiting for enemy push.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:33",
+    "end_time": "2:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 111,
+      "direction": "ESE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 76,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan repositions from FORKLIFT to CONTAINERS, sprinting to get a better angle on the enemy approach.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:36",
+    "end_time": "2:39",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 118,
+      "direction": "ESE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 76,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan holds an angle at CONTAINERS, aiming down sights towards the red crate, anticipating enemy movement.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:39",
+    "end_time": "2:42",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 118,
+      "direction": "ESE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "ads",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "[KBS]Plato_God02",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT ONE KILL"
+    ],
+    "objective": {
+      "type": "defend",
+      "distance_m": 76,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan spots an enemy and secures a kill with a single sniper shot. The team's defensive setup is paying off.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:42",
+    "end_time": "2:45",
+    "phase": "transition",
+    "compass": {
+      "bearing": 118,
+      "direction": "ESE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Round 3 concludes with a victory for OPFOR. The team successfully defended the objective.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:45",
+    "end_time": "2:48",
+    "phase": "transition",
+    "compass": {
+      "bearing": 118,
+      "direction": "ESE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Round Win screen continues to display.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "2:48",
+    "end_time": "2:51",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay begins, showing teammate WindowLick3r securing the last kill of the round.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "WindowLick3r",
+      "weapon": "BASILISK",
+      "perks": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:51",
+    "end_time": "2:54",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues, showing WindowLick3r using the BASILISK revolver.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "WindowLick3r",
+      "weapon": "BASILISK",
+      "perks": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:54",
+    "end_time": "2:57",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay concludes.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "WindowLick3r",
+      "weapon": "BASILISK",
+      "perks": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:57",
+    "end_time": "3:00",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "SWITCHING SIDES"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Teams switch sides. OPFOR is now attacking.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:00",
+    "end_time": "3:03",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 4,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Countdown for Round 4 begins. Wakandan is equipped with a sniper rifle and a suppressed pistol.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:03",
+    "end_time": "3:06",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 3,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Countdown ends. Wakandan switches to his pistol for faster movement.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:06",
+    "end_time": "3:09",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 248,
+      "direction": "WSW",
+      "callout": "BRAVO GATE"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan sprints towards BRAVO GATE, likely to secure a sightline or push the objective.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:09",
+    "end_time": "3:12",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 256,
+      "direction": "WSW",
+      "callout": "BRAVO GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights at BRAVO GATE, checking for enemy presence.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:12",
+    "end_time": "3:15",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 256,
+      "direction": "WSW",
+      "callout": "BRAVO GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan spots an enemy and fires, but misses or lands a non-lethal hit.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:15",
+    "end_time": "3:18",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 231,
+      "direction": "SW",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan repositions to SHANTYTOWN after the engagement, seeking a better angle.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:18",
+    "end_time": "3:21",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 250,
+      "direction": "WSW",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights in SHANTYTOWN, covering the middle lane.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:21",
+    "end_time": "3:24",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 255,
+      "direction": "WSW",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan continues to hold the angle in SHANTYTOWN, waiting for enemy movement.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:24",
+    "end_time": "3:27",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 255,
+      "direction": "WSW",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan maintains his position, keeping the sightline covered.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:27",
+    "end_time": "3:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 288,
+      "direction": "WNW",
+      "callout": "BRAVO GATE"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "danger",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "System alerts that the enemy has the bomb. Wakandan immediately sprints back towards BRAVO GATE to intercept.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:30",
+    "end_time": "3:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 348,
+      "direction": "NNW",
+      "callout": "BRAVO GATE"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights at BRAVO GATE, anticipating the enemy bomb carrier.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:33",
+    "end_time": "3:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 348,
+      "direction": "NNW",
+      "callout": "BRAVO GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "danger",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan is flashed or stunned, losing visibility and control temporarily.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:36",
+    "end_time": "3:39",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 249,
+      "direction": "WSW",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "dead",
+    "kill_feed": [
+      {
+        "killer": "[KBS]Plato_God02",
+        "victim": "Wakandan",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan recovers from the stun, moves to SHANTYTOWN, but is killed by Plato_God02.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:39",
+    "end_time": "3:42",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan is now spectating teammate G0atphukr.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:42",
+    "end_time": "3:45",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan continues to spectate as the round progresses.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:45",
+    "end_time": "3:48",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Round 4 ends with a win for OPFOR, despite Wakandan's death.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "3:48",
+    "end_time": "3:51",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard is displayed. Wakandan has 3 kills and 2 deaths.",
+    "scoreboard": [
+      {
+        "player": "Anastasia",
+        "score": 875,
+        "kills": 5,
+        "deaths": 0
+      },
+      {
+        "player": "WindowLick3r",
+        "score": 825,
+        "kills": 5,
+        "deaths": 1
+      },
+      {
+        "player": "Lulu350z",
+        "score": 600,
+        "kills": 3,
+        "deaths": 2
+      },
+      {
+        "player": "Wakandan",
+        "score": 450,
+        "kills": 3,
+        "deaths": 2
+      },
+      {
+        "player": "Cursed Nites",
+        "score": 200,
+        "kills": 2,
+        "deaths": 3
+      },
+      {
+        "player": "G0atphukr",
+        "score": 100,
+        "kills": 1,
+        "deaths": 3
+      }
+    ],
+    "final_kill": null
+  },
+  {
+    "start_time": "3:51",
+    "end_time": "3:54",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay begins, showing WindowLick3r getting the final kill again.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "WindowLick3r",
+      "weapon": "BASILISK",
+      "perks": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "3:54",
+    "end_time": "3:57",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "WindowLick3r",
+      "weapon": "BASILISK",
+      "perks": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "3:57",
+    "end_time": "4:00",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay concludes.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "WindowLick3r",
+      "weapon": "BASILISK",
+      "perks": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "4:00",
+    "end_time": "4:03",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 4,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Countdown for Round 5 begins. Wakandan is ready with his sniper and pistol.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:03",
+    "end_time": "4:06",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 11,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Countdown ends. Wakandan switches to his pistol.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:06",
+    "end_time": "4:09",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 248,
+      "direction": "WSW",
+      "callout": "BRAVO GATE"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan sprints towards BRAVO GATE, repeating his previous route.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:09",
+    "end_time": "4:12",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 264,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights at BRAVO GATE, checking for enemies.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:12",
+    "end_time": "4:15",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 257,
+      "direction": "WSW",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan moves into SHANTYTOWN, pushing further into the map.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:15",
+    "end_time": "4:18",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 257,
+      "direction": "WSW",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan continues sprinting through SHANTYTOWN.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:18",
+    "end_time": "4:21",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 282,
+      "direction": "WNW",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan approaches JUNKYARD, preparing for a potential encounter.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:21",
+    "end_time": "4:24",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 252,
+      "direction": "WSW",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "[KBS]Plato_God02",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT ONE KILL"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan encounters Plato_God02 in JUNKYARD and quickly eliminates him with a pistol shot.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:24",
+    "end_time": "4:27",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 183,
+      "direction": "S",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "After the kill, Wakandan retreats slightly towards SHANTYTOWN to avoid being traded.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:27",
+    "end_time": "4:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 348,
+      "direction": "NNW",
+      "callout": "CENTER"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights towards CENTER, covering a key sightline.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:30",
+    "end_time": "4:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 349,
+      "direction": "NNW",
+      "callout": "CENTER"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan continues to hold the angle at CENTER.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:33",
+    "end_time": "4:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 349,
+      "direction": "NNW",
+      "callout": "CENTER"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan maintains his position, ensuring no enemies push through CENTER.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:36",
+    "end_time": "4:39",
+    "phase": "transition",
+    "compass": {
+      "bearing": 349,
+      "direction": "NNW",
+      "callout": "CENTER"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Round 5 ends with another win for OPFOR. They are dominating the match.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:39",
+    "end_time": "4:42",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard is displayed. Wakandan has 4 kills and 2 deaths.",
+    "scoreboard": [
+      {
+        "player": "Anastasia",
+        "score": 1000,
+        "kills": 7,
+        "deaths": 2
+      },
+      {
+        "player": "WindowLick3r",
+        "score": 875,
+        "kills": 5,
+        "deaths": 1
+      },
+      {
+        "player": "Lulu350z",
+        "score": 675,
+        "kills": 5,
+        "deaths": 2
+      },
+      {
+        "player": "Wakandan",
+        "score": 550,
+        "kills": 4,
+        "deaths": 2
+      },
+      {
+        "player": "Cursed Nites",
+        "score": 350,
+        "kills": 3,
+        "deaths": 3
+      },
+      {
+        "player": "G0atphukr",
+        "score": 100,
+        "kills": 1,
+        "deaths": 5
+      }
+    ],
+    "final_kill": null
+  },
+  {
+    "start_time": "4:42",
+    "end_time": "4:45",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay begins, showing Anastasia getting the final kill.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "Anastasia",
+      "weapon": "STATIQ-AM",
+      "perks": "NINJA VEST"
+    }
+  },
+  {
+    "start_time": "4:45",
+    "end_time": "4:48",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "Anastasia",
+      "weapon": "STATIQ-AM",
+      "perks": "NINJA VEST"
+    }
+  },
+  {
+    "start_time": "4:48",
+    "end_time": "4:51",
+    "phase": "replay",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 5,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay concludes.",
+    "scoreboard": null,
+    "final_kill": {
+      "operator": "Anastasia",
+      "weapon": "STATIQ-AM",
+      "perks": "NINJA VEST"
+    }
+  },
+  {
+    "start_time": "4:51",
+    "end_time": "4:54",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "MATCH POINT"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Match Point screen appears. OPFOR needs one more round to win the match.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:54",
+    "end_time": "4:57",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard is briefly shown again.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "4:57",
+    "end_time": "5:00",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 4,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Countdown for Round 6 begins. Wakandan is ready.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:00",
+    "end_time": "5:03",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 11,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Countdown ends. Wakandan switches to his pistol.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:03",
+    "end_time": "5:06",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 84,
+      "direction": "E",
+      "callout": "COURTYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan changes his route, sprinting towards COURTYARD instead of BRAVO GATE.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:06",
+    "end_time": "5:09",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 84,
+      "direction": "E",
+      "callout": "COURTYARD"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights at COURTYARD, checking for enemies.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:09",
+    "end_time": "5:12",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 76,
+      "direction": "ENE",
+      "callout": "COURTYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan continues sprinting through COURTYARD.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:12",
+    "end_time": "5:15",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 15,
+      "direction": "ENE",
+      "callout": "UNDERPASS"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights at UNDERPASS, covering another potential enemy route.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:15",
+    "end_time": "5:18",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 15,
+      "direction": "ENE",
+      "callout": "UNDERPASS"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan maintains his position at UNDERPASS.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:18",
+    "end_time": "5:21",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 158,
+      "direction": "SSE",
+      "callout": "COURTYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan turns and sprints back through COURTYARD.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:21",
+    "end_time": "5:24",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 158,
+      "direction": "SSE",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "FRIENDLY UAV ONLINE"
+    ],
+    "signal": "tactical",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan moves into JUNKYARD. A friendly UAV is called in, providing valuable intel.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:24",
+    "end_time": "5:27",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 155,
+      "direction": "SSE",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan continues sprinting through JUNKYARD.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:27",
+    "end_time": "5:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 149,
+      "direction": "SSE",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "tactical",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan throws a tactical grenade in JUNKYARD, likely to clear an area or check for enemies.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:30",
+    "end_time": "5:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 289,
+      "direction": "WNW",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan turns and sprints back through JUNKYARD.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:33",
+    "end_time": "5:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 289,
+      "direction": "WNW",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "ads",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan aims down sights in JUNKYARD, checking for any flanking enemies.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:36",
+    "end_time": "5:39",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 258,
+      "direction": "WSW",
+      "callout": "CENTER"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan moves towards CENTER, pushing towards the objective.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:39",
+    "end_time": "5:42",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 354,
+      "direction": "N",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ARMED BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "System alerts that the bomb has been armed by a teammate. Wakandan sprints towards FORKLIFT to defend the plant.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:42",
+    "end_time": "5:45",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 354,
+      "direction": "N",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "sprinting",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 4,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "movement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Wakandan continues sprinting through FORKLIFT to secure the area around the armed bomb.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:45",
+    "end_time": "5:48",
+    "phase": "transition",
+    "compass": {
+      "bearing": 354,
+      "direction": "N",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 5,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "VICTORY"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "The match ends with a VICTORY for OPFOR. They successfully defended the armed bomb or eliminated the remaining enemies.",
+    "scoreboard": null,
+    "final_kill": null
+  },
+  {
+    "start_time": "5:48",
+    "end_time": "5:51",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "N",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 6,
+      "score_friendly": 5,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final scoreboard is displayed. Wakandan finishes with 4 kills and 2 deaths.",
+    "scoreboard": [
+      {
+        "player": "Anastasia",
+        "score": 1100,
+        "kills": 8,
+        "deaths": 2
+      },
+      {
+        "player": "WindowLick3r",
+        "score": 875,
+        "kills": 5,
+        "deaths": 1
+      },
+      {
+        "player": "Lulu350z",
+        "score": 675,
+        "kills": 5,
+        "deaths": 2
+      },
+      {
+        "player": "Wakandan",
+        "score": 550,
+        "kills": 4,
+        "deaths": 2
+      },
+      {
+        "player": "Cursed Nites",
+        "score": 350,
+        "kills": 3,
+        "deaths": 3
+      },
+      {
+        "player": "G0atphukr",
+        "score": 100,
+        "kills": 1,
+        "deaths": 5
+      }
+    ],
+    "final_kill": null
+  }
+]

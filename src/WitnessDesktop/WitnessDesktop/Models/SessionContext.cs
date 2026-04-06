@@ -15,4 +15,5 @@ public class SessionContext
     public DateTime? GameStartedAt { get; set; }
     public string UserName { get; set; } = string.Empty;
     public string UserTier { get; set; } = "Adventurer";
+    public string? AgentKey { get; set; }
 }

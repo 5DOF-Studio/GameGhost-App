@@ -26,11 +26,11 @@ namespace WitnessDesktop.Services;
 public sealed class OpenAIRealtimeService : IDisposable
 {
     private const string WS_URL = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
-    private const string VOICE = "alloy"; // Options: alloy, echo, shimmer, ash, ballad, coral, sage, verse
     private const int CONNECT_TIMEOUT_MS = 30_000;
     private const int RECEIVE_BUFFER_SIZE = 64 * 1024; // 64KB
-    
+
     private readonly string _apiKey;
+    private readonly string _voice;
     private readonly SemaphoreSlim _connectLock = new(1, 1);
 
     private ClientWebSocket? _webSocket;
@@ -47,20 +47,22 @@ public sealed class OpenAIRealtimeService : IDisposable
     public ConnectionState State { get; private set; } = ConnectionState.Disconnected;
     public bool IsConnected => State == ConnectionState.Connected;
     
+    private volatile bool _isResponseActive;
+
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
     public event EventHandler<byte[]>? AudioReceived;
     public event EventHandler<string>? TextReceived;
     public event EventHandler? Interrupted;
     public event EventHandler<string>? ErrorOccurred;
+    public event EventHandler<string>? InputTranscriptionReceived;
     
-    public OpenAIRealtimeService(IConfiguration configuration)
+    public OpenAIRealtimeService(IConfiguration configuration, string voice = "ash")
     {
         _apiKey = configuration["OPENAI_APIKEY"]
             ?? configuration["OPENAI_API_KEY"]
             ?? configuration["OpenAiApiKey"]
-            ?? configuration["APIKEY"]        // from OPENAI_APIKEY prefix mapping
-            ?? configuration["API_KEY"]       // from OPENAI_API_KEY prefix mapping
             ?? string.Empty;
+        _voice = voice;
     }
     
     public async Task ConnectAsync(Agent agent)
@@ -155,32 +157,20 @@ public sealed class OpenAIRealtimeService : IDisposable
     
     private async Task SendSessionUpdateAsync(Agent agent)
     {
-        // OpenAI Realtime API session.update message format
-        var sessionUpdate = new
-        {
-            type = "session.update",
-            session = new
-            {
-                modalities = new[] { "text", "audio" },
-                instructions = agent.SystemInstruction,
-                voice = VOICE,
-                input_audio_format = "pcm16",
-                output_audio_format = "pcm16",
-                input_audio_transcription = new
-                {
-                    model = "whisper-1"
-                },
-                turn_detection = new
-                {
-                    type = "server_vad",
-                    threshold = 0.5,
-                    prefix_padding_ms = 300,
-                    silence_duration_ms = 500
-                }
-            }
-        };
-        
-        await SendJsonAsync(sessionUpdate);
+        var json = OpenAiRealtimeSessionOptions.BuildSessionUpdateJson(agent.ComposedPersonality, _voice);
+        await SendRawJsonAsync(json).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Update the voice provider's system instructions at runtime (e.g., on game state change).
+    /// Sends a session.update with new instructions without reconnecting.
+    /// </summary>
+    public async Task UpdateInstructionsAsync(string instructions)
+    {
+        if (!IsConnected) return;
+        var json = OpenAiRealtimeSessionOptions.BuildSessionUpdateJson(instructions, _voice);
+        await SendRawJsonAsync(json).ConfigureAwait(false);
+        Console.WriteLine("[OpenAI] Session instructions updated at runtime");
     }
     
     private async Task SendJsonAsync<T>(T payload)
@@ -191,6 +181,25 @@ public sealed class OpenAIRealtimeService : IDisposable
             return;
 
         var json = JsonSerializer.Serialize(payload, JsonOptions);
+        await SendRawJsonAsync(json).ConfigureAwait(false);
+    }
+
+    private async Task SendRawJsonAsync(string json)
+    {
+        var ws = _webSocket;
+        var cts = _cts;
+        if (ws?.State != WebSocketState.Open || cts == null)
+            return;
+
+        await SendRawJsonWithTokenAsync(json, cts.Token).ConfigureAwait(false);
+    }
+
+    private async Task SendRawJsonWithTokenAsync(string json, CancellationToken token)
+    {
+        var ws = _webSocket;
+        if (ws?.State != WebSocketState.Open)
+            return;
+
         var bytes = Encoding.UTF8.GetBytes(json);
         
         // Log session messages for debugging
@@ -205,7 +214,7 @@ public sealed class OpenAIRealtimeService : IDisposable
                 new ArraySegment<byte>(bytes),
                 WebSocketMessageType.Text,
                 endOfMessage: true,
-                cts.Token
+                token
             ).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -293,20 +302,17 @@ public sealed class OpenAIRealtimeService : IDisposable
     /// Sends user text to the conversation via conversation.item.create.
     /// </summary>
     public async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
-    {
-        if (!IsConnected || string.IsNullOrWhiteSpace(text)) return;
+        => await SendTextAsync(text, requestResponse: true, cancellationToken).ConfigureAwait(false);
 
-        var message = new
+    internal async Task SendTextAsync(string text, bool requestResponse, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return;
+        if (!IsConnected)
         {
-            type = "conversation.item.create",
-            item = new
-            {
-                type = "message",
-                role = "user",
-                status = "completed",
-                content = new[] { new { type = "input_text", text = text.Trim() } }
-            }
-        };
+            const string message = "Cannot send text: OpenAI provider is not connected.";
+            ErrorOccurred?.Invoke(this, message);
+            throw new InvalidOperationException(message);
+        }
 
         var ws = _webSocket;
         var cts = cancellationToken.CanBeCanceled
@@ -317,14 +323,14 @@ public sealed class OpenAIRealtimeService : IDisposable
         try
         {
             if (ws?.State != WebSocketState.Open) return;
-            var json = JsonSerializer.Serialize(message, JsonOptions);
-            var bytes = Encoding.UTF8.GetBytes(json);
-            await ws.SendAsync(
-                new ArraySegment<byte>(bytes),
-                WebSocketMessageType.Text,
-                endOfMessage: true,
-                token
-            ).ConfigureAwait(false);
+            await SendRawJsonWithTokenAsync(OpenAiRealtimeProtocol.BuildConversationItemCreateJson(text), token)
+                .ConfigureAwait(false);
+
+            if (requestResponse)
+            {
+                await SendRawJsonWithTokenAsync(OpenAiRealtimeProtocol.BuildResponseCreateJson(), token)
+                    .ConfigureAwait(false);
+            }
         }
         catch (Exception ex)
         {
@@ -377,10 +383,9 @@ public sealed class OpenAIRealtimeService : IDisposable
                             (int)messageBuffer.Length
                         );
                         
-                        // Log first few messages or every 10th
-                        if (count <= 5 || count % 10 == 0)
+                        // Log first 10 messages and every 50th
+                        if (count <= 10 || count % 50 == 0)
                         {
-                            // Truncate audio data for logging
                             var logJson = json.Length > 500 ? json[..500] + "..." : json;
                             Console.WriteLine($"[OpenAI] Received message #{count}: {logJson}");
                         }
@@ -496,6 +501,13 @@ public sealed class OpenAIRealtimeService : IDisposable
                     
                 case "input_audio_buffer.speech_started":
                     Console.WriteLine("[OpenAI] User speech started (VAD detected)");
+                    if (_isResponseActive)
+                    {
+                        _isResponseActive = false;
+                        Console.WriteLine("[OpenAI] Interrupting active response — user started speaking");
+                        _ = CancelResponseAsync();
+                        Interrupted?.Invoke(this, EventArgs.Empty);
+                    }
                     break;
                     
                 case "input_audio_buffer.speech_stopped":
@@ -507,7 +519,13 @@ public sealed class OpenAIRealtimeService : IDisposable
                     break;
                     
                 case "response.created":
-                    Console.WriteLine("[OpenAI] Response started");
+                    {
+                        _isResponseActive = true;
+                        var responseId = root.TryGetProperty("response", out var respCreated) &&
+                                         respCreated.TryGetProperty("id", out var ridEl)
+                            ? ridEl.GetString() : "?";
+                        Console.WriteLine($"[OpenAI] Response started (id={responseId})");
+                    }
                     break;
                     
                 case "response.audio.delta":
@@ -535,7 +553,8 @@ public sealed class OpenAIRealtimeService : IDisposable
                     break;
                     
                 case "response.done":
-                    Console.WriteLine("[OpenAI] Response complete");
+                    _isResponseActive = false;
+                    ProcessResponseDone(root);
                     break;
                     
                 case "conversation.item.input_audio_transcription.completed":
@@ -561,6 +580,39 @@ public sealed class OpenAIRealtimeService : IDisposable
         }
     }
     
+    private void ProcessResponseDone(JsonElement root)
+    {
+        if (!root.TryGetProperty("response", out var resp))
+        {
+            Console.WriteLine("[OpenAI] Response complete (no response object)");
+            return;
+        }
+
+        var status = resp.TryGetProperty("status", out var sEl) ? sEl.GetString() : "?";
+        var outputCount = resp.TryGetProperty("output", out var outEl) && outEl.ValueKind == JsonValueKind.Array
+            ? outEl.GetArrayLength() : -1;
+
+        if (status == "failed")
+        {
+            var errorCode = "unknown";
+            var errorMessage = "Voice service error";
+
+            if (resp.TryGetProperty("status_details", out var sd) &&
+                sd.TryGetProperty("error", out var errObj))
+            {
+                errorCode = errObj.TryGetProperty("code", out var cEl) ? cEl.GetString() ?? errorCode : errorCode;
+                errorMessage = errObj.TryGetProperty("message", out var mEl) ? mEl.GetString() ?? errorMessage : errorMessage;
+            }
+
+            Console.WriteLine($"[OpenAI] Response FAILED — code={errorCode}, message={errorMessage}");
+            ErrorOccurred?.Invoke(this, $"Voice service error: {errorMessage}");
+        }
+        else
+        {
+            Console.WriteLine($"[OpenAI] Response complete — status={status}, outputs={outputCount}");
+        }
+    }
+
     private void ProcessAudioDelta(JsonElement root)
     {
         if (!root.TryGetProperty("delta", out var deltaElement))
@@ -635,11 +687,12 @@ public sealed class OpenAIRealtimeService : IDisposable
     {
         if (!root.TryGetProperty("transcript", out var transcriptElement))
             return;
-            
+
         var transcript = transcriptElement.GetString();
         if (!string.IsNullOrEmpty(transcript))
         {
             Console.WriteLine($"[OpenAI] User said: {transcript}");
+            InputTranscriptionReceived?.Invoke(this, transcript);
         }
     }
     
@@ -729,3 +782,41 @@ public sealed class OpenAIRealtimeService : IDisposable
     }
 }
 
+internal static class OpenAiRealtimeProtocol
+{
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+    };
+
+    internal static string BuildConversationItemCreateJson(string text)
+    {
+        var payload = new
+        {
+            type = "conversation.item.create",
+            item = new
+            {
+                type = "message",
+                role = "user",
+                status = "completed",
+                content = new[] { new { type = "input_text", text = text.Trim() } }
+            }
+        };
+
+        return JsonSerializer.Serialize(payload, JsonOptions);
+    }
+
+    internal static string BuildResponseCreateJson()
+    {
+        var payload = new
+        {
+            type = "response.create",
+            response = new
+            {
+                modalities = new[] { "text", "audio" }
+            }
+        };
+
+        return JsonSerializer.Serialize(payload, JsonOptions);
+    }
+}

@@ -9,31 +9,28 @@ namespace WitnessDesktop.Services;
 /// <summary>
 /// WebSocket client for Gemini Live API real-time audio/visual interaction.
 /// </summary>
-public sealed class GeminiLiveService : IGeminiService
+public sealed class GeminiLiveService : IDisposable
 {
     private const string WS_URL_TEMPLATE = 
         "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key={0}";
-    private const string MODEL = "models/gemini-2.0-flash-exp";
-    private const string VOICE = "Fenrir";
     private const int CONNECT_TIMEOUT_MS = 30_000;
     private const int RECEIVE_BUFFER_SIZE = 64 * 1024; // 64KB
-    
+
     private readonly string _apiKey;
+    private readonly string _voice;
     private readonly SemaphoreSlim _connectLock = new(1, 1);
 
     private ClientWebSocket? _webSocket;
     private CancellationTokenSource? _cts;
     private Task? _receiveLoopTask;
     private Agent? _currentAgent;
+    private TaskCompletionSource? _setupCompleteTcs;
     private bool _disposed;
-
-    private static readonly JsonSerializerOptions SnakeCaseJson = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-    };
     
-    public ConnectionState State { get; private set; } = ConnectionState.Disconnected;
-    public bool IsConnected => State == ConnectionState.Connected;
+    private volatile ConnectionState _state = ConnectionState.Disconnected;
+    private readonly object _stateLock = new();
+    public ConnectionState State => _state;
+    public bool IsConnected => _state == ConnectionState.Connected;
     
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
     public event EventHandler<byte[]>? AudioReceived;
@@ -41,14 +38,13 @@ public sealed class GeminiLiveService : IGeminiService
     public event EventHandler? Interrupted;
     public event EventHandler<string>? ErrorOccurred;
     
-    public GeminiLiveService(IConfiguration configuration)
+    public GeminiLiveService(IConfiguration configuration, string voice = "Fenrir")
     {
         _apiKey = configuration["GeminiApiKey"]
-            ?? configuration["APIKEY"]          // Environment variable: GEMINI_APIKEY (via prefix mapping)
-            ?? configuration["API_KEY"]         // Environment variable: GEMINI_API_KEY (via prefix mapping)
-            ?? configuration["GEMINI_APIKEY"]   // Direct env var (unprefixed load)
-            ?? configuration["GEMINI_API_KEY"]  // Direct env var (unprefixed load)
+            ?? configuration["GEMINI_APIKEY"]
+            ?? configuration["GEMINI_API_KEY"]
             ?? string.Empty;
+        _voice = voice;
     }
     
     public async Task ConnectAsync(Agent agent)
@@ -80,6 +76,7 @@ public sealed class GeminiLiveService : IGeminiService
 
             _cts = new CancellationTokenSource();
             _webSocket = new ClientWebSocket();
+            _setupCompleteTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
             var uri = new Uri(string.Format(WS_URL_TEMPLATE, _apiKey));
 
@@ -89,17 +86,18 @@ public sealed class GeminiLiveService : IGeminiService
             await _webSocket.ConnectAsync(uri, linkedCts.Token).ConfigureAwait(false);
             Console.WriteLine("[Gemini] WebSocket connected");
 
+            // Start receive loop before setup so setupComplete can be observed.
+            var ws = _webSocket;
+            var token = _cts.Token;
+            _receiveLoopTask = Task.Run(() => ReceiveLoopAsync(ws, token));
+
             // Send setup message with agent's system instruction
             await SendSetupMessageAsync(agent).ConfigureAwait(false);
             Console.WriteLine("[Gemini] Setup message sent");
 
+            await _setupCompleteTcs.Task.WaitAsync(linkedCts.Token).ConfigureAwait(false);
             SetState(ConnectionState.Connected);
             Console.WriteLine("[Gemini] Connection established, receive loop starting");
-
-            // Start receive loop (fire and forget) using stable references.
-            var ws = _webSocket;
-            var token = _cts.Token;
-            _receiveLoopTask = Task.Run(() => ReceiveLoopAsync(ws, token));
         }
         catch (OperationCanceledException)
         {
@@ -130,55 +128,29 @@ public sealed class GeminiLiveService : IGeminiService
     
     private void SetState(ConnectionState state)
     {
-        if (State != state)
+        lock (_stateLock)
         {
-            State = state;
-            ConnectionStateChanged?.Invoke(this, state);
+            if (_state == state) return;
+            _state = state;
         }
+        // Fire outside lock to prevent deadlocks with subscribers
+        Console.WriteLine($"[Gemini] State -> {state}");
+        ConnectionStateChanged?.Invoke(this, state);
     }
     
     private async Task SendSetupMessageAsync(Agent agent)
     {
-        var setup = new
-        {
-            setup = new
-            {
-                model = MODEL,
-                generation_config = new
-                {
-                    response_modalities = new[] { "AUDIO" },
-                    speech_config = new
-                    {
-                        voice_config = new
-                        {
-                            prebuilt_voice_config = new
-                            {
-                                voice_name = VOICE
-                            }
-                        }
-                    }
-                },
-                system_instruction = new
-                {
-                    parts = new[]
-                    {
-                        new { text = agent.SystemInstruction }
-                    }
-                }
-            }
-        };
-        
-        await SendJsonAsync(setup);
+        var json = GeminiLiveProtocol.BuildSetupMessageJson(agent.ComposedPersonality, _voice);
+        await SendRawJsonAsync(json).ConfigureAwait(false);
     }
-    
-    private async Task SendJsonAsync<T>(T payload)
+
+    private async Task SendRawJsonAsync(string json)
     {
         var ws = _webSocket;
         var cts = _cts;
         if (ws?.State != WebSocketState.Open || cts == null)
             return;
 
-        var json = JsonSerializer.Serialize(payload, SnakeCaseJson);
         var bytes = Encoding.UTF8.GetBytes(json);
         
         // Log first message (setup) for debugging
@@ -207,25 +179,8 @@ public sealed class GeminiLiveService : IGeminiService
     public async Task SendAudioAsync(byte[] audioData)
     {
         if (!IsConnected) return;
-        
-        var base64 = Convert.ToBase64String(audioData);
-        
-        var message = new
-        {
-            realtime_input = new
-            {
-                media_chunks = new[]
-                {
-                    new
-                    {
-                        mime_type = "audio/pcm;rate=16000",
-                        data = base64
-                    }
-                }
-            }
-        };
-        
-        var json = JsonSerializer.Serialize(message, SnakeCaseJson);
+
+        var json = GeminiLiveProtocol.BuildAudioMessageJson(audioData);
         var bytes = Encoding.UTF8.GetBytes(json);
         
         try
@@ -257,25 +212,8 @@ public sealed class GeminiLiveService : IGeminiService
     public async Task SendImageAsync(byte[] imageData, string mimeType = "image/jpeg")
     {
         if (!IsConnected) return;
-        
-        var base64 = Convert.ToBase64String(imageData);
-        
-        var message = new
-        {
-            realtime_input = new
-            {
-                media_chunks = new[]
-                {
-                    new
-                    {
-                        mime_type = mimeType,
-                        data = base64
-                    }
-                }
-            }
-        };
-        
-        var json = JsonSerializer.Serialize(message, SnakeCaseJson);
+
+        var json = GeminiLiveProtocol.BuildImageMessageJson(imageData, mimeType);
         var bytes = Encoding.UTF8.GetBytes(json);
         
         try
@@ -302,25 +240,15 @@ public sealed class GeminiLiveService : IGeminiService
     /// </summary>
     public async Task SendTextAsync(string text, CancellationToken cancellationToken = default)
     {
-        if (!IsConnected || string.IsNullOrWhiteSpace(text)) return;
-
-        var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(text.Trim()));
-        var message = new
+        if (string.IsNullOrWhiteSpace(text)) return;
+        if (!IsConnected)
         {
-            realtime_input = new
-            {
-                media_chunks = new[]
-                {
-                    new
-                    {
-                        mime_type = "text/plain",
-                        data = base64
-                    }
-                }
-            }
-        };
+            const string message = "Cannot send text: Gemini provider is not connected.";
+            ErrorOccurred?.Invoke(this, message);
+            throw new InvalidOperationException(message);
+        }
 
-        var json = JsonSerializer.Serialize(message, SnakeCaseJson);
+        var json = GeminiLiveProtocol.BuildTextMessageJson(text);
         var bytes = Encoding.UTF8.GetBytes(json);
 
         try
@@ -365,6 +293,13 @@ public sealed class GeminiLiveService : IGeminiService
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
                     Console.WriteLine($"[Gemini] Server closed connection. CloseStatus: {ws.CloseStatus}, CloseDescription: {ws.CloseStatusDescription}");
+                    if (!_disposed)
+                    {
+                        var reason = ws.CloseStatusDescription ?? "Gemini Live closed the connection during setup.";
+                        SetState(ConnectionState.Error);
+                        ErrorOccurred?.Invoke(this, reason);
+                        _setupCompleteTcs?.TrySetException(new InvalidOperationException(reason));
+                    }
                     break;
                 }
                 
@@ -480,15 +415,16 @@ public sealed class GeminiLiveService : IGeminiService
     {
         try
         {
-            using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
-            
-            // Check for setup confirmation (optional logging)
-            if (root.TryGetProperty("setupComplete", out _))
+            var kind = GeminiLiveProtocol.ClassifyServerMessage(json);
+            if (kind == GeminiServerMessageKind.SetupComplete)
             {
                 Console.WriteLine("[Gemini] Setup complete - ready to receive audio");
+                _setupCompleteTcs?.TrySetResult();
                 return;
             }
+
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
             
             // Check for server content (audio/interruption)
             if (root.TryGetProperty("serverContent", out var serverContent))
@@ -627,14 +563,134 @@ public sealed class GeminiLiveService : IGeminiService
     {
         var ws = _webSocket;
         var cts = _cts;
+        var setupCompleteTcs = _setupCompleteTcs;
 
         _webSocket = null;
         _cts = null;
         _receiveLoopTask = null;
+        _setupCompleteTcs = null;
 
+        setupCompleteTcs?.TrySetCanceled();
         try { cts?.Cancel(); } catch { /* best effort */ }
         try { ws?.Abort(); } catch { /* best effort */ }
         try { ws?.Dispose(); } catch { /* best effort */ }
         try { cts?.Dispose(); } catch { /* best effort */ }
+    }
+}
+
+internal enum GeminiServerMessageKind
+{
+    Unknown,
+    SetupComplete,
+    ServerContent,
+    GoAway,
+    SessionResumptionUpdate
+}
+
+internal static class GeminiLiveProtocol
+{
+    private const string Model = "models/gemini-2.5-flash-native-audio-preview-12-2025";
+
+    private static readonly JsonSerializerOptions CamelCaseJson = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    internal static string BuildSetupMessageJson(string systemInstruction, string voice)
+    {
+        var payload = new
+        {
+            setup = new
+            {
+                model = Model,
+                generationConfig = new
+                {
+                    responseModalities = new[] { "AUDIO" },
+                    speechConfig = new
+                    {
+                        voiceConfig = new
+                        {
+                            prebuiltVoiceConfig = new
+                            {
+                                voiceName = voice
+                            }
+                        }
+                    }
+                },
+                systemInstruction = new
+                {
+                    parts = new[]
+                    {
+                        new { text = systemInstruction }
+                    }
+                }
+            }
+        };
+
+        return JsonSerializer.Serialize(payload, CamelCaseJson);
+    }
+
+    internal static string BuildAudioMessageJson(byte[] audioData)
+    {
+        var payload = new
+        {
+            realtimeInput = new
+            {
+                audio = new
+                {
+                    mimeType = "audio/pcm;rate=16000",
+                    data = Convert.ToBase64String(audioData)
+                }
+            }
+        };
+
+        return JsonSerializer.Serialize(payload, CamelCaseJson);
+    }
+
+    internal static string BuildImageMessageJson(byte[] imageData, string mimeType)
+    {
+        var payload = new
+        {
+            realtimeInput = new
+            {
+                video = new
+                {
+                    mimeType,
+                    data = Convert.ToBase64String(imageData)
+                }
+            }
+        };
+
+        return JsonSerializer.Serialize(payload, CamelCaseJson);
+    }
+
+    internal static string BuildTextMessageJson(string text)
+    {
+        var payload = new
+        {
+            realtimeInput = new
+            {
+                text = text.Trim()
+            }
+        };
+
+        return JsonSerializer.Serialize(payload, CamelCaseJson);
+    }
+
+    internal static GeminiServerMessageKind ClassifyServerMessage(string json)
+    {
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+
+        if (root.TryGetProperty("setupComplete", out _))
+            return GeminiServerMessageKind.SetupComplete;
+        if (root.TryGetProperty("serverContent", out _))
+            return GeminiServerMessageKind.ServerContent;
+        if (root.TryGetProperty("goAway", out _))
+            return GeminiServerMessageKind.GoAway;
+        if (root.TryGetProperty("sessionResumptionUpdate", out _))
+            return GeminiServerMessageKind.SessionResumptionUpdate;
+
+        return GeminiServerMessageKind.Unknown;
     }
 }

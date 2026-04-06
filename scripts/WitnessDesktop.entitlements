@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Developer ID distribution for a non-App-Sandbox desktop app.
+      TCC for microphone/screen capture is driven by Info.plist usage descriptions
+      plus a stable code signature. Sandbox-only entitlements here produce an
+      invalid blob, which macOS ignores.
+    -->
+
+    <!-- Allow loading bundled native frameworks that are not library-validated -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+
+    <!-- Required by the .NET runtime on macOS -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+
+    <!-- Required by the .NET runtime on macOS -->
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+</dict>
+</plist>

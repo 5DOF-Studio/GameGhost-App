@@ -5,8 +5,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!-- ========================================
-         GAME GHOST STYLES
-         Rich black, pale azure, yellow contrast
+         GAIMER STYLES
+         Dark gaming theme with purple/cyan accents
          ======================================== -->
 
     <!-- Activity Indicator -->
@@ -27,7 +27,7 @@
         <Setter Property="BackgroundColor" Value="{StaticResource BgCard}" />
     </Style>
 
-    <!-- Button - Primary Style -->
+    <!-- Button - Gaimer Primary Style -->
     <Style TargetType="Button">
         <Setter Property="TextColor" Value="{StaticResource White}" />
         <Setter Property="BackgroundColor" Value="{StaticResource AccentYellow}" />

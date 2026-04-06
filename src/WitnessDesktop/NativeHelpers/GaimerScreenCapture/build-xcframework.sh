@@ -8,7 +8,7 @@
 # Prerequisites: Xcode with Mac Catalyst support, Swift 5.9+
 # Usage: ./build-xcframework.sh
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="$SCRIPT_DIR/.build-xcframework"
@@ -27,6 +27,7 @@ mkdir -p "$BUILD_DIR"
 # 2. Build the Swift Package for Mac Catalyst using xcodebuild
 echo ""
 echo "--- Building for Mac Catalyst (Release) ---"
+cd "$SCRIPT_DIR"
 xcodebuild build \
     -scheme "$FRAMEWORK_NAME" \
     -destination "generic/platform=macOS,variant=Mac Catalyst" \
@@ -40,13 +41,17 @@ echo ""
 echo "--- Locating built framework ---"
 
 # 3. Locate the built framework or dylib in derived data
-BUILT_FRAMEWORK=$(find "$BUILD_DIR/derived" -name "${FRAMEWORK_NAME}.framework" -type d | head -1)
+BUILT_FRAMEWORK=$(find "$BUILD_DIR/derived/Build/Products/Release-maccatalyst" -name "${FRAMEWORK_NAME}.framework" -type d | head -1 || true)
+
+if [ -z "$BUILT_FRAMEWORK" ]; then
+    BUILT_FRAMEWORK=$(find "$BUILD_DIR/derived" -name "${FRAMEWORK_NAME}.framework" -type d | head -1 || true)
+fi
 
 if [ -z "$BUILT_FRAMEWORK" ]; then
     echo "Framework directory not found. Looking for bare dylib..."
 
     # If xcodebuild produces a bare dylib instead of a .framework, create the framework structure
-    BUILT_DYLIB=$(find "$BUILD_DIR/derived" -name "lib${FRAMEWORK_NAME}.dylib" -o -name "${FRAMEWORK_NAME}" -type f | grep -v ".dSYM" | head -1)
+    BUILT_DYLIB=$(find "$BUILD_DIR/derived" \( -name "lib${FRAMEWORK_NAME}.dylib" -o -name "${FRAMEWORK_NAME}" \) -type f | grep -v ".dSYM" | head -1 || true)
 
     if [ -z "$BUILT_DYLIB" ]; then
         # Check for .o or other artifacts
@@ -87,7 +92,11 @@ if [ -z "$BUILT_FRAMEWORK" ]; then
     <string>16.0</string>
     <key>CFBundleSupportedPlatforms</key>
     <array>
-        <string>MacOSX</string>
+        <string>iPhoneOS</string>
+    </array>
+    <key>UIDeviceFamily</key>
+    <array>
+        <integer>2</integer>
     </array>
 </dict>
 </plist>

@@ -5,6 +5,9 @@ namespace WitnessDesktop.Services;
 public class MockWindowCaptureService : IWindowCaptureService
 {
     private Timer? _captureTimer;
+    private CaptureEmissionGate _emissionGate = new();
+    private long _frameCounter;
+    private int _captureIntervalMs = 5000;
 
     public event EventHandler<byte[]>? FrameCaptured;
 
@@ -52,13 +55,16 @@ public class MockWindowCaptureService : IWindowCaptureService
         return Task.FromResult<IReadOnlyList<CaptureTarget>>(targets);
     }
 
-    public Task StartCaptureAsync(CaptureTarget target)
+    public Task StartCaptureAsync(CaptureTarget target, int captureIntervalMs = 5000)
     {
         if (IsCapturing) return Task.CompletedTask;
 
         CurrentTarget = target;
         IsCapturing = true;
-        _captureTimer = new Timer(CaptureFrame, null, 0, 1000);
+        _frameCounter = 0;
+        _captureIntervalMs = captureIntervalMs;
+        _emissionGate = new CaptureEmissionGate();
+        _captureTimer = new Timer(CaptureFrame, null, 0, _captureIntervalMs);
         return Task.CompletedTask;
     }
 
@@ -66,6 +72,7 @@ public class MockWindowCaptureService : IWindowCaptureService
     {
         IsCapturing = false;
         CurrentTarget = null;
+        _emissionGate.Reset();
         _captureTimer?.Dispose();
         _captureTimer = null;
         return Task.CompletedTask;
@@ -74,12 +81,20 @@ public class MockWindowCaptureService : IWindowCaptureService
     private void CaptureFrame(object? state)
     {
         if (!IsCapturing) return;
-        FrameCaptured?.Invoke(this, GeneratePlaceholderImage());
+        var frame = GeneratePlaceholderImage();
+        if (_emissionGate.ShouldEmit(frame))
+        {
+            FrameCaptured?.Invoke(this, frame);
+        }
     }
 
-    private static byte[] GeneratePlaceholderImage()
+    /// <summary>
+    /// Generates a unique placeholder frame each tick so the change-only
+    /// emission gate treats every mock capture as a board change.
+    /// </summary>
+    private byte[] GeneratePlaceholderImage()
     {
-        return [];
+        var counter = Interlocked.Increment(ref _frameCounter);
+        return BitConverter.GetBytes(counter);
     }
 }
-

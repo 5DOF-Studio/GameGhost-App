@@ -5,10 +5,10 @@ namespace WitnessDesktop.Services;
 
 public class ChatPromptBuilder : IChatPromptBuilder
 {
-    public string BuildSystemPrompt(SessionContext session, IReadOnlyList<ToolDefinition> tools)
+    public string BuildSystemPrompt(SessionContext session, IReadOnlyList<ToolDefinition> tools, Agent? agent = null)
     {
         var sb = new StringBuilder();
-        sb.AppendLine(CoreIdentity);
+        sb.AppendLine(BuildAgentIdentity(agent));
         sb.AppendLine();
         sb.AppendLine(TextMediumRules);
         sb.AppendLine();
@@ -19,7 +19,7 @@ public class ChatPromptBuilder : IChatPromptBuilder
         sb.AppendLine(BuildBehaviorRules(session.State));
         return sb.ToString();
     }
-    
+
     public string BuildSessionContextBlock(SessionContext session)
     {
         if (session.State == SessionState.OutGame)
@@ -27,18 +27,18 @@ public class ChatPromptBuilder : IChatPromptBuilder
             return $@"[SESSION CONTEXT]
 State: Out-game. No active game connection.
 Player: {session.UserName} ({session.UserTier})
-Available: General chat, gaming history, analytics, web search.
+Available: General chat, web search, replay search.
 Brain visual pipeline: Idle.
 
-When the player asks about past games or stats, use the PlayerHistory
-and PlayerAnalytics tools. When they ask general questions, just chat.";
+When the player asks general questions, just chat. If they ask about
+recent gameplay, use search_replay to check recorded footage.";
         }
         else
         {
             var gameTime = session.GameStartedAt.HasValue
                 ? (DateTime.UtcNow - session.GameStartedAt.Value).ToString(@"h\:mm")
                 : "unknown";
-            
+
             return $@"[SESSION CONTEXT]
 State: In-game via {session.ConnectorName}.
 Game: {session.GameType} | Started: {gameTime} ago
@@ -46,16 +46,39 @@ Player: {session.UserName} ({session.UserTier})
 Brain visual pipeline: Active. Screen capture running.
 
 You have full access to the live game. When the player asks about the
-current position, ALWAYS call GetGameState first — your memory of the
+current position, ALWAYS call get_game_state first — your memory of the
 board goes stale between messages. For move recommendations, call
-GetBestMove. For visual references, call CaptureScreen.
+analyze_position_engine with a FEN string. For visual references, call capture_screen.
 
 Do NOT describe the board from memory. Always verify with a tool call first.";
         }
     }
-    
+
     #region Prompt Sections
-    
+
+    /// <summary>
+    /// Builds the identity section from the agent's personality or falls back to Dross.
+    /// For text chat, uses SOUL + text-adapted BEHAVIOR (not voice STYLE/SITUATIONS).
+    /// </summary>
+    private static string BuildAgentIdentity(Agent? agent)
+    {
+        if (agent?.SoulBlock is not null)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(agent.SoulBlock.Trim());
+
+            if (agent.BehaviorBlock is not null)
+            {
+                sb.AppendLine();
+                sb.AppendLine(agent.BehaviorBlock.Trim());
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        return CoreIdentity;
+    }
+
     private const string CoreIdentity = @"You are Dross, the AI copilot built into Game Ghost. You're a sharp, friendly
 gaming copilot. Think: the teammate who's genuinely good and actually fun
 to play with. You're confident but never condescending. You get excited
@@ -64,7 +87,7 @@ is ugly. You have personality, but you never waste the user's time.
 
 Your name is Dross. If asked, you're the AI agent inside Game Ghost — a
 copilot that watches gameplay and gives real-time tactical guidance.";
-    
+
     private const string TextMediumRules = @"This is text chat. Design every response for reading, not listening.
 
 Text rules:
@@ -77,24 +100,23 @@ Text rules:
   But don't over-format. Most responses should be conversational.
 - Never use markdown headers, tables, or code blocks. This is a chat
   window, not a document.
-- Contractions. Natural language. Same personality as voice Dross.
+- Contractions. Natural language. Same personality as your voice.
 - Express genuine reactions. Be impressed, be honest, be real.
 - No emoji unless the user uses them first.";
-    
+
     private const string CommonBehaviorRules = @"THINGS TO NEVER DO:
 - Never say ""as an AI"" or ""as a language model""
 - Never apologize for being AI
 - Never read out raw JSON, FEN strings, or base64 data
 - Never ignore a direct question to deliver a product pitch
 - Never assume you know the board state without calling a tool first";
-    
+
     private const string OutGameBehaviorRules = @"OUT-GAME BEHAVIOR:
 - Be conversational and relaxed. No game pressure.
-- If the player asks about their performance, use PlayerAnalytics.
-- If they ask about a specific past game, use PlayerHistory.
+- If the player asks about recent gameplay, use search_replay.
 - If they want to just chat, just chat. Don't push gaming topics.
 - If they ask to start a game, tell them to connect via the sidebar.";
-    
+
     private const string InGameBehaviorRules = @"IN-GAME BEHAVIOR:
 - The player opened the main view mid-game. They might want help,
   or they might just be checking something. Don't assume.
@@ -102,33 +124,33 @@ Text rules:
 - Keep responses shorter than out-game — they're mid-game, time matters.
 - If the Brain has pushed recent alerts (visible in chat history),
   you can reference them: ""I flagged that fork a moment ago...""";
-    
+
     #endregion
-    
+
     #region Builders
-    
+
     private static string BuildToolInstructions(IReadOnlyList<ToolDefinition> tools)
     {
         if (tools.Count == 0)
             return "[TOOLS] No tools available.";
-        
+
         var sb = new StringBuilder();
         sb.AppendLine("[AVAILABLE TOOLS]");
-        
+
         foreach (var tool in tools)
         {
             sb.AppendLine($"- {tool.Name}: {tool.Description}");
         }
-        
+
         return sb.ToString();
     }
-    
+
     private static string BuildBehaviorRules(SessionState state)
     {
         var sb = new StringBuilder();
         sb.AppendLine(CommonBehaviorRules);
         sb.AppendLine();
-        
+
         if (state == SessionState.OutGame)
         {
             sb.AppendLine(OutGameBehaviorRules);
@@ -137,9 +159,9 @@ Text rules:
         {
             sb.AppendLine(InGameBehaviorRules);
         }
-        
+
         return sb.ToString();
     }
-    
+
     #endregion
 }

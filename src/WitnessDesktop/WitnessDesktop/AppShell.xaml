@@ -13,9 +13,9 @@
     <!-- Production flow -->
     <TabBar x:Name="ProductionTab">
         <ShellContent
-            Title="Agent Selection"
-            ContentTemplate="{DataTemplate views:AgentSelectionPage}"
-            Route="AgentSelection" />
+            Title="Onboarding"
+            ContentTemplate="{DataTemplate views:OnboardingPage}"
+            Route="Onboarding" />
     </TabBar>
 
     <!-- Dev launcher (toggled via code-behind #if DEBUG) -->

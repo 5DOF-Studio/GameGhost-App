@@ -22,6 +22,9 @@ let package = Package(
                 .linkedFramework("ScreenCaptureKit"),
                 .linkedFramework("CoreGraphics"),
                 .linkedFramework("CoreImage"),
+                .linkedFramework("AVFoundation"),
+                .linkedFramework("CoreMedia"),
+                .linkedFramework("VideoToolbox"),
                 .linkedFramework("UIKit", .when(platforms: [.macCatalyst]))
             ]
         )

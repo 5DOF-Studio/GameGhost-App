@@ -113,6 +113,18 @@ if [ -f "$BINARY_PATH" ]; then
     echo ""
 fi
 
+echo ""
+echo "--- Copying SwiftPM resource bundle into framework ---"
+RESOURCE_BUNDLE=$(find "$BUILD_DIR/derived/Build/Products/Release" -name "${FRAMEWORK_NAME}_${FRAMEWORK_NAME}.bundle" -type d | head -1)
+if [ -n "$RESOURCE_BUNDLE" ] && [ -d "$RESOURCE_BUNDLE" ]; then
+    mkdir -p "$BUILT_FRAMEWORK/Resources"
+    rm -rf "$BUILT_FRAMEWORK/Resources/$(basename "$RESOURCE_BUNDLE")"
+    cp -R "$RESOURCE_BUNDLE" "$BUILT_FRAMEWORK/Resources/"
+    echo "Copied resource bundle: $RESOURCE_BUNDLE"
+else
+    echo "WARNING: SwiftPM resource bundle not found for $FRAMEWORK_NAME"
+fi
+
 # 4. Create the xcframework (still tagged as macOS at this point)
 echo "--- Creating xcframework ---"
 XCFRAMEWORK_PATH="$BUILD_DIR/${FRAMEWORK_NAME}.xcframework"

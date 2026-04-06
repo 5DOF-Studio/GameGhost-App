@@ -16,7 +16,9 @@
             <utils:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
             <utils:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
             <utils:AudioBarHeightConverter x:Key="AudioBarHeightConverter"/>
-            
+            <utils:BoolToSettingsColorConverter x:Key="BoolToSettingsColor"/>
+            <utils:BoolToSettingsTextColorConverter x:Key="BoolToSettingsTextColor"/>
+
             <!-- Timeline Converters -->
             <utils:RoleToUserVisibilityConverter x:Key="RoleToUserVisibility"/>
             <utils:RoleToAssistantVisibilityConverter x:Key="RoleToAssistantVisibility"/>

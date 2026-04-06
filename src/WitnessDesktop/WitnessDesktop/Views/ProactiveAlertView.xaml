@@ -43,14 +43,14 @@
             <Border Grid.Column="0"
                     BackgroundColor="{StaticResource BgSecondary}"
                     StrokeThickness="0"
-                    Padding="12,4.5"
+                    Padding="12,5"
                     VerticalOptions="Center">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="7.5" />
+                    <RoundRectangle CornerRadius="8" />
                 </Border.StrokeShape>
 
                 <Label Text="{Binding Brain.Signal, Converter={StaticResource SignalToUpperCase}}"
-                       FontSize="21"
+                       FontSize="17"
                        FontFamily="Rajdhani-SemiBold"
                        TextColor="{StaticResource TextMuted}" />
             </Border>
@@ -58,7 +58,7 @@
             <!-- Summary text -->
             <Label Grid.Column="1"
                    Text="{Binding Summary}"
-                   FontSize="27"
+                   FontSize="22"
                    FontFamily="Rajdhani-Regular"
                    TextColor="{StaticResource TextPrimary}"
                    VerticalOptions="Center"
@@ -67,7 +67,7 @@
             <!-- Eval delta (if present) -->
             <Label Grid.Column="2"
                    Text="{Binding Brain.EvalDelta, StringFormat='{0:+#;-#;0}cp'}"
-                   FontSize="24"
+                   FontSize="19"
                    FontFamily="Rajdhani-SemiBold"
                    TextColor="{StaticResource TextMuted}"
                    VerticalOptions="Center"

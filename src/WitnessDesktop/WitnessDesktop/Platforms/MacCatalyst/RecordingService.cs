@@ -123,16 +123,27 @@ public sealed class RecordingService : IAudioRecordingService
 
     public Task StopRecordingAsync()
     {
+        AVAudioEngine? engineToTeardown;
+
         lock (_gate)
         {
             if (!IsRecording) return Task.CompletedTask;
 
-            try { _engine?.InputNode.RemoveTapOnBus(0); } catch { /* best effort */ }
-            try { _engine?.Stop(); } catch { /* best effort */ }
-
+            // Set state first so the tap callback (which also acquires _gate) will
+            // bail out on its next invocation.
             IsRecording = false;
             _onAudioCaptured = null;
             InputVolume = 0f;
+            engineToTeardown = _engine;
+        }
+
+        // CRITICAL: RemoveTapOnBus and Stop MUST run OUTSIDE the lock.
+        // RemoveTapOnBus waits for any in-flight tap callback to complete,
+        // and the tap callback acquires _gate — holding _gate here deadlocks.
+        if (engineToTeardown != null)
+        {
+            try { engineToTeardown.InputNode.RemoveTapOnBus(0); } catch { /* best effort */ }
+            try { engineToTeardown.Stop(); } catch { /* best effort */ }
         }
 
         InputVolumeChanged?.Invoke(this, 0f);

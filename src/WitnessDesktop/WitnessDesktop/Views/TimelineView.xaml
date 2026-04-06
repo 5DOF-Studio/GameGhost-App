@@ -9,39 +9,208 @@
 
     <ContentView.Resources>
         <ResourceDictionary>
-            <!-- Direct Message Template (full text, no truncation) -->
+            <!-- Direct Message Template: full bubble when expanded, icon token when collapsed -->
             <DataTemplate x:Key="DirectMessageTemplate" x:DataType="models:TimelineEvent">
-                <views:DirectMessageBubble />
-            </DataTemplate>
+                <Grid>
+                    <!-- Expanded: full message bubble -->
+                    <views:DirectMessageBubble IsVisible="{Binding IsExpanded}" />
 
-            <!-- Proactive Alert Template (urgency-colored card) -->
-            <DataTemplate x:Key="ProactiveAlertTemplate" x:DataType="models:TimelineEvent">
-                <views:ProactiveAlertView />
-            </DataTemplate>
-
-            <!-- Default Event Template: Capsule pill -->
-            <DataTemplate x:Key="DefaultEventTemplate" x:DataType="models:TimelineEvent">
-                <Border BackgroundColor="{Binding CapsuleColor}"
-                        Stroke="{Binding CapsuleStroke}"
-                        StrokeThickness="1.5"
-                        Padding="15,7.5"
-                        Margin="0,3,9,3"
-                        ToolTipProperties.Text="{Binding FullContent}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="21" />
-                    </Border.StrokeShape>
-                    <HorizontalStackLayout Spacing="9">
+                    <!-- Collapsed: compact icon token -->
+                    <Border IsVisible="{Binding IsCollapsed}"
+                            BackgroundColor="{Binding CapsuleColor}"
+                            Stroke="{Binding CapsuleStroke}"
+                            StrokeThickness="1.5"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            Margin="0,3,6,3"
+                            ToolTipProperties.Text="{Binding Summary}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
+                        </Border.GestureRecognizers>
                         <Image Source="{Binding Icon}"
-                               WidthRequest="30"
-                               HeightRequest="30"
+                               WidthRequest="20"
+                               HeightRequest="20"
+                               HorizontalOptions="Center"
                                VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+            </DataTemplate>
+
+            <!-- Proactive Alert Template: full card when expanded, icon token when collapsed -->
+            <DataTemplate x:Key="ProactiveAlertTemplate" x:DataType="models:TimelineEvent">
+                <Grid>
+                    <!-- Expanded: urgency-colored alert card -->
+                    <views:ProactiveAlertView IsVisible="{Binding IsExpanded}" />
+
+                    <!-- Collapsed: compact icon token -->
+                    <Border IsVisible="{Binding IsCollapsed}"
+                            BackgroundColor="{Binding CapsuleColor}"
+                            Stroke="{Binding CapsuleStroke}"
+                            StrokeThickness="1.5"
+                            WidthRequest="36"
+                            HeightRequest="36"
+                            Margin="0,3,6,3"
+                            ToolTipProperties.Text="{Binding Summary}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Image Source="{Binding Icon}"
+                               WidthRequest="20"
+                               HeightRequest="20"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+            </DataTemplate>
+
+            <!-- Tool Call Template: intentional operational status chip, distinct from commentary -->
+            <DataTemplate x:Key="ToolCallTemplate" x:DataType="models:TimelineEvent">
+                <Grid>
+                    <!-- Expanded: operational status chip with icon-led layout -->
+                    <Border IsVisible="{Binding IsExpanded}"
+                            BackgroundColor="#0860A0FF"
+                            Stroke="#4060A0FF"
+                            StrokeThickness="1.5"
+                            Padding="12,7"
+                            Margin="0,3,9,3">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="8">
+                            <Image Source="{Binding Icon}"
+                                   WidthRequest="20"
+                                   HeightRequest="20"
+                                   Opacity="0.85"
+                                   VerticalOptions="Center" />
+                            <Label Text="{Binding Summary}"
+                                   FontSize="16"
+                                   FontFamily="Rajdhani-SemiBold"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center" />
+                            <Label Text="{Binding ToolCall.DurationLabel}"
+                                   FontSize="13"
+                                   FontFamily="Rajdhani-Regular"
+                                   TextColor="{StaticResource TextMuted}"
+                                   Opacity="0.6"
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding ToolCall.HasDuration}" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Collapsed: compact icon token -->
+                    <Border IsVisible="{Binding IsCollapsed}"
+                            BackgroundColor="#1060A0FF"
+                            Stroke="#3060A0FF"
+                            StrokeThickness="1.5"
+                            WidthRequest="32"
+                            HeightRequest="32"
+                            Margin="0,3,5,3"
+                            ToolTipProperties.Text="{Binding Summary}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="16" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
+                        </Border.GestureRecognizers>
+                        <Image Source="{Binding Icon}"
+                               WidthRequest="16"
+                               HeightRequest="16"
+                               Opacity="0.7"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+            </DataTemplate>
+
+            <!-- Default Event Template: icon + text pill when expanded, small text capsule when collapsed -->
+            <DataTemplate x:Key="DefaultEventTemplate" x:DataType="models:TimelineEvent">
+                <Grid>
+                    <!-- Expanded: standalone icon + text-only pill -->
+                    <HorizontalStackLayout IsVisible="{Binding IsExpanded}"
+                                           Spacing="6">
+                        <Image Source="{Binding Icon}"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               VerticalOptions="Center" />
+                        <Border BackgroundColor="{Binding CapsuleColor}"
+                                Stroke="{Binding CapsuleStroke}"
+                                StrokeThickness="1.5"
+                                Padding="12,6"
+                                Margin="0,2"
+                                MaximumWidthRequest="520"
+                                ToolTipProperties.Text="{Binding FullContent}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="16" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
+                            </Border.GestureRecognizers>
+                            <Label Text="{Binding FullContent}"
+                                   FontSize="17"
+                                   FontFamily="Rajdhani-Regular"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   LineBreakMode="WordWrap"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </HorizontalStackLayout>
+
+                    <!-- Collapsed: small text capsule (no icon) -->
+                    <Border IsVisible="{Binding IsCollapsed}"
+                            BackgroundColor="{Binding CapsuleColor}"
+                            Stroke="{Binding CapsuleStroke}"
+                            StrokeThickness="1"
+                            Padding="8,3"
+                            Margin="0,2,4,2"
+                            MaximumWidthRequest="120"
+                            HeightRequest="24"
+                            ToolTipProperties.Text="{Binding Summary}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12" />
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleExpandedCommand}" />
+                        </Border.GestureRecognizers>
                         <Label Text="{Binding Summary}"
-                               FontSize="24"
+                               FontSize="11"
                                FontFamily="Rajdhani-Regular"
                                TextColor="{StaticResource TextPrimary}"
                                LineBreakMode="TailTruncation"
-                               MaxLines="1"
-                               MaximumWidthRequest="480"
+                               VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+            </DataTemplate>
+
+            <!-- Archived Boundary Marker: grey capsule, not commentary -->
+            <DataTemplate x:Key="ArchivedTemplate" x:DataType="models:TimelineEvent">
+                <Border BackgroundColor="#10808080"
+                        Stroke="#20808080"
+                        StrokeThickness="1"
+                        Padding="14,6"
+                        Margin="0,8,0,4"
+                        HorizontalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14" />
+                    </Border.StrokeShape>
+                    <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                        <Image Source="history_clock.png"
+                               WidthRequest="14"
+                               HeightRequest="14"
+                               Opacity="0.4"
+                               VerticalOptions="Center" />
+                        <Label Text="Archived"
+                               FontSize="12"
+                               FontFamily="Rajdhani-Regular"
+                               TextColor="{StaticResource TextMuted}"
+                               Opacity="0.5"
                                VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </Border>
@@ -51,6 +220,8 @@
             <utils:TimelineEventTemplateSelector x:Key="EventTemplateSelector"
                 DirectMessageTemplate="{StaticResource DirectMessageTemplate}"
                 ProactiveAlertTemplate="{StaticResource ProactiveAlertTemplate}"
+                ToolCallTemplate="{StaticResource ToolCallTemplate}"
+                ArchivedTemplate="{StaticResource ArchivedTemplate}"
                 DefaultTemplate="{StaticResource DefaultEventTemplate}" />
         </ResourceDictionary>
     </ContentView.Resources>
@@ -58,65 +229,93 @@
     <CollectionView x:Name="TimelineCollection"
                     ItemsSource="{Binding TimelineFeed.Checkpoints}"
                     SelectionMode="None"
-                    ItemsUpdatingScrollMode="KeepLastItemInView">
+                    ItemsUpdatingScrollMode="KeepScrollOffset">
 
         <CollectionView.ItemTemplate>
             <DataTemplate x:DataType="models:TimelineCheckpoint">
-                <VerticalStackLayout Spacing="0" Padding="0,18,0,0">
+                <Grid>
+                    <!-- Normal checkpoint (header + event lines) -->
+                    <VerticalStackLayout Spacing="0" Padding="0,18,0,0"
+                                         IsVisible="{Binding IsArchiveBoundary, Converter={StaticResource InvertedBoolConverter}}">
 
-                    <!-- Checkpoint Header -->
-                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12" Padding="24,15">
-                        <Image Grid.Column="0"
-                               Source="{Binding HeaderIcon}"
-                               WidthRequest="36"
-                               HeightRequest="36"
-                               VerticalOptions="Center" />
+                        <!-- Checkpoint Header -->
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12" Padding="24,15">
+                            <Image Grid.Column="0"
+                                   Source="{Binding HeaderIcon}"
+                                   WidthRequest="36"
+                                   HeightRequest="36"
+                                   VerticalOptions="Center" />
 
-                        <Label Grid.Column="1"
-                               Text="{Binding DisplayHeader}"
-                               FontSize="27"
-                               FontFamily="Rajdhani-SemiBold"
-                               TextColor="{StaticResource TextMuted}"
-                               VerticalOptions="Center" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding DisplayHeader}"
+                                   FontSize="22"
+                                   FontFamily="Rajdhani-SemiBold"
+                                   TextColor="{StaticResource TextMuted}"
+                                   VerticalOptions="Center" />
 
-                        <Label Grid.Column="3"
-                               Text="{Binding ContextBadge}"
-                               FontSize="22.5"
-                               FontFamily="Rajdhani-Regular"
-                               TextColor="{StaticResource TextMuted}"
-                               Opacity="0.6"
-                               VerticalOptions="Center" />
-                    </Grid>
+                            <Label Grid.Column="3"
+                                   Text="{Binding ContextBadge}"
+                                   FontSize="18"
+                                   FontFamily="Rajdhani-Regular"
+                                   TextColor="{StaticResource TextMuted}"
+                                   Opacity="0.6"
+                                   VerticalOptions="Center" />
+                        </Grid>
 
-                    <!-- Event Lines -->
-                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding EventLines}"
-                                         Spacing="3"
-                                         Padding="0,0,0,12">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="models:EventLine">
-                                <Grid ColumnDefinitions="60,3,*" Padding="24,6">
+                        <!-- Event Lines -->
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding EventLines}"
+                                             Spacing="3"
+                                             Padding="0,0,0,12">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:EventLine">
+                                    <Grid Padding="12,4">
 
-                                    <!-- Connector line -->
-                                    <BoxView Grid.Column="1"
-                                             WidthRequest="3"
-                                             HeightRequest="48"
-                                             Color="{StaticResource TextMuted}"
-                                             Opacity="0.3"
-                                             VerticalOptions="Center" />
+                                        <!-- Direct chat: full vertical layout -->
+                                        <VerticalStackLayout IsVisible="{Binding IsDirectChat}"
+                                                             BindableLayout.ItemsSource="{Binding Events}"
+                                                             BindableLayout.ItemTemplateSelector="{StaticResource EventTemplateSelector}"
+                                                             Spacing="0" />
 
-                                    <!-- Capsule events (stacked horizontally) -->
-                                    <FlexLayout Grid.Column="2"
-                                                BindableLayout.ItemsSource="{Binding Events}"
-                                                BindableLayout.ItemTemplateSelector="{StaticResource EventTemplateSelector}"
-                                                Wrap="Wrap"
-                                                JustifyContent="Start"
-                                                AlignItems="Center" />
-                                </Grid>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
+                                        <!-- Non-chat: horizontal capsules (icon now inside each event template) -->
+                                        <FlexLayout IsVisible="{Binding IsDirectChat, Converter={StaticResource InvertedBoolConverter}}"
+                                                    BindableLayout.ItemsSource="{Binding Events}"
+                                                    BindableLayout.ItemTemplateSelector="{StaticResource EventTemplateSelector}"
+                                                    Wrap="Wrap"
+                                                    JustifyContent="Start"
+                                                    AlignItems="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
                     </VerticalStackLayout>
 
-                </VerticalStackLayout>
+                    <!-- Archive boundary marker (centered in full feed width) -->
+                    <Border IsVisible="{Binding IsArchiveBoundary}"
+                            BackgroundColor="#10808080"
+                            Stroke="#20808080"
+                            StrokeThickness="1"
+                            Padding="14,6"
+                            Margin="0,12,0,8"
+                            HorizontalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="14" />
+                        </Border.StrokeShape>
+                        <HorizontalStackLayout Spacing="6" HorizontalOptions="Center">
+                            <Image Source="history_clock.png"
+                                   WidthRequest="14"
+                                   HeightRequest="14"
+                                   Opacity="0.4"
+                                   VerticalOptions="Center" />
+                            <Label Text="Archived"
+                                   FontSize="12"
+                                   FontFamily="Rajdhani-Regular"
+                                   TextColor="{StaticResource TextMuted}"
+                                   Opacity="0.5"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
             </DataTemplate>
         </CollectionView.ItemTemplate>
 

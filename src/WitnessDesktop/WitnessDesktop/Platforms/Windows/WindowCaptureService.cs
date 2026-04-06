@@ -7,15 +7,19 @@ namespace WitnessDesktop.Platforms.Windows;
 
 /// <summary>
 /// Windows screen capture service using PrintWindow + GDI.
-/// Enumerates visible top-level windows and captures frames at ~1 FPS.
+/// Enumerates visible top-level windows and captures frames on a one-shot timer
+/// to avoid overlapping ticks when capture work runs longer than the interval.
 /// </summary>
 public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
 {
     private const int MinWindowDimension = 200;
-    private const int CaptureIntervalMs = 1000; // 1 FPS
+    private const int DefaultCaptureIntervalMs = 5000;
+    private const int ChangeDetectionPollIntervalMs = 5000;
+    private int _captureIntervalMs = DefaultCaptureIntervalMs;
 
     private readonly object _gate = new();
     private Timer? _captureTimer;
+    private CaptureEmissionGate _emissionGate = new();
     private bool _disposed;
 
     public event EventHandler<byte[]>? FrameCaptured;
@@ -96,7 +100,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
         return Task.FromResult<IReadOnlyList<CaptureTarget>>(targets);
     }
 
-    public Task StartCaptureAsync(CaptureTarget target)
+    public Task StartCaptureAsync(CaptureTarget target, int captureIntervalMs = 5000)
     {
         lock (_gate)
         {
@@ -105,8 +109,10 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
 
             CurrentTarget = target;
             IsCapturing = true;
+            _captureIntervalMs = captureIntervalMs;
+            _emissionGate = new CaptureEmissionGate();
 
-            _captureTimer = new Timer(OnCaptureTimerTick, null, 0, CaptureIntervalMs);
+            _captureTimer = new Timer(OnCaptureTimerTick, null, 0, Timeout.Infinite);
         }
 
         return Task.CompletedTask;
@@ -118,6 +124,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
         {
             IsCapturing = false;
             CurrentTarget = null;
+            _emissionGate.Reset();
             _captureTimer?.Dispose();
             _captureTimer = null;
         }
@@ -133,6 +140,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
             _disposed = true;
             IsCapturing = false;
             CurrentTarget = null;
+            _emissionGate.Reset();
             _captureTimer?.Dispose();
             _captureTimer = null;
         }
@@ -154,16 +162,24 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
             var frameData = CaptureWindowAsPng(target.Handle);
             if (frameData.Length > 0)
             {
-                var compressed = ImageProcessor.ScaleAndCompress(frameData);
-                if (compressed.Length > 0)
-                {
-                    FrameCaptured?.Invoke(this, compressed);
-                }
+                // Emit raw PNG capture bytes and let MainViewModel own the
+                // preview/diff/compression pipeline so Windows and Mac follow
+                // the same observation-first processing path.
+                if (_emissionGate.ShouldEmit(frameData))
+                    FrameCaptured?.Invoke(this, frameData);
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Capture] Frame capture failed: {ex.Message}");
+        }
+        finally
+        {
+            lock (_gate)
+            {
+                if (IsCapturing && !_disposed)
+                    _captureTimer?.Change(Math.Min(_captureIntervalMs, ChangeDetectionPollIntervalMs), Timeout.Infinite);
+            }
         }
     }
 

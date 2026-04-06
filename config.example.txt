@@ -1,0 +1,56 @@
+# Gaimer Desktop - Configuration
+# ========================================
+
+## API Key Setup (Choose ONE method)
+
+### Method 1: User Secrets (Recommended for Development)
+cd src/WitnessDesktop/WitnessDesktop
+dotnet user-secrets init
+dotnet user-secrets set "GeminiApiKey" "YOUR_API_KEY_HERE"
+
+### Method 2: Environment Variable (Recommended for Production)
+# macOS/Linux:
+export GEMINI_APIKEY="YOUR_API_KEY_HERE"
+# Also supported:
+export GEMINI_API_KEY="YOUR_API_KEY_HERE"
+
+# Windows PowerShell:
+$env:GEMINI_APIKEY="YOUR_API_KEY_HERE"
+# Also supported:
+$env:GEMINI_API_KEY="YOUR_API_KEY_HERE"
+
+# Windows CMD:
+set GEMINI_APIKEY=YOUR_API_KEY_HERE
+REM Also supported:
+set GEMINI_API_KEY=YOUR_API_KEY_HERE
+
+## Optional: Force mock services (ignores API key)
+# USE_MOCK_SERVICES=true
+
+## Get Your API Key
+1. Go to https://aistudio.google.com/app/apikey
+2. Create a new API key
+3. Copy and configure using one of the methods above
+
+## Build & Run (macOS)
+
+# Build:
+dotnet build src/WitnessDesktop/WitnessDesktop/WitnessDesktop.csproj -f net8.0-maccatalyst -p:EnableCodeSigning=false
+
+# Run (requires /tmp workaround for Documents path):
+rm -rf /tmp/WitnessDesktop.app
+ditto --norsrc src/WitnessDesktop/WitnessDesktop/bin/Debug/net8.0-maccatalyst/maccatalyst-x64/WitnessDesktop.app /tmp/WitnessDesktop.app
+codesign --force --deep --sign - /tmp/WitnessDesktop.app
+open /tmp/WitnessDesktop.app
+
+# Why? macOS File Provider adds xattrs that block codesign/launch from ~/Documents.
+# ditto --norsrc strips them. This is an environment issue, not a code issue.
+
+## Notes
+- The app will automatically use MockGeminiService if no API key is configured
+- USE_MOCK_SERVICES=true forces MockGeminiService even if an API key is present
+- Restart the app after setting the API key
+- User secrets are platform-specific and stored securely
+- Environment variables persist for the current shell session
+- .env files are NOT automatically loaded by .NET/MAUI; if you use a .env file, ensure your tooling exports its values into the environment (or use user-secrets).
+

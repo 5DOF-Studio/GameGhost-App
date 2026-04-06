@@ -29,4 +29,25 @@ public sealed class SharedContextEnvelope
     /// Recent chat turns included in budget (for interim prefixed-text path).
     /// </summary>
     public string RecentChatSummary { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Recent voice transcript turns included in budget.
+    /// Formatted as "User (voice): ... / AI (voice): ..." lines.
+    /// </summary>
+    public string RecentVoiceTranscript { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Exchange metadata for brain context awareness (Phase 12E).
+    /// Null when exchange system is not active.
+    /// </summary>
+    public ExchangeContextInfo? ExchangeContext { get; init; }
 }
+
+/// <summary>
+/// Exchange state metadata included in brain context envelope.
+/// </summary>
+public sealed record ExchangeContextInfo(
+    Guid? ExchangeId,
+    bool IsExchangeActive,
+    TimeSpan? TimeSinceExchangeOpened,
+    string? AgentName);

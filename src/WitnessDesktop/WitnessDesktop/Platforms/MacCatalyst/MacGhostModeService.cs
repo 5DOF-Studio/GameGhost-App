@@ -19,14 +19,20 @@ public class MacGhostModeService : IGhostModeService, IDisposable
     // to prevent GC collection while native code holds function pointers.
     private GhostModeNativeMethods.GhostModeCallback? _fabTapCallback;
     private GhostModeNativeMethods.GhostModeCallback? _cardDismissCallback;
+    private GhostModeNativeMethods.GhostModeCallback? _gearTapCallback;
+    private GhostModeNativeMethods.AudioToggleCallback? _audioToggleCallback;
     private GCHandle _fabTapHandle;
     private GCHandle _cardDismissHandle;
+    private GCHandle _gearTapHandle;
+    private GCHandle _audioToggleHandle;
 
     public bool IsGhostModeActive => _isGhostModeActive;
     public bool IsSupported => _isSupported;
 
     public event EventHandler? FabTapped;
     public event EventHandler? CardDismissed;
+    public event EventHandler? GearTapped;
+    public event EventHandler<AudioToggleEventArgs>? AudioToggleChanged;
 
     public MacGhostModeService()
     {
@@ -58,14 +64,20 @@ public class MacGhostModeService : IGhostModeService, IDisposable
         // Create managed delegates for native callbacks
         _fabTapCallback = OnFabTapped;
         _cardDismissCallback = OnCardDismissed;
+        _gearTapCallback = OnGearTapped;
+        _audioToggleCallback = OnAudioToggleChanged;
 
         // Pin delegates to prevent GC collection while native code holds function pointers
         _fabTapHandle = GCHandle.Alloc(_fabTapCallback);
         _cardDismissHandle = GCHandle.Alloc(_cardDismissCallback);
+        _gearTapHandle = GCHandle.Alloc(_gearTapCallback);
+        _audioToggleHandle = GCHandle.Alloc(_audioToggleCallback);
 
         // Register callbacks with native layer
         GhostModeNativeMethods.ghost_panel_set_fab_tap_callback(_fabTapCallback);
         GhostModeNativeMethods.ghost_panel_set_card_dismiss_callback(_cardDismissCallback);
+        GhostModeNativeMethods.ghost_panel_set_gear_tap_callback(_gearTapCallback);
+        GhostModeNativeMethods.ghost_panel_set_audio_toggle_callback(_audioToggleCallback);
     }
 
     private void OnFabTapped()
@@ -76,6 +88,16 @@ public class MacGhostModeService : IGhostModeService, IDisposable
     private void OnCardDismissed()
     {
         CardDismissed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnGearTapped()
+    {
+        GearTapped?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnAudioToggleChanged(int toggleIndex, bool newValue)
+    {
+        AudioToggleChanged?.Invoke(this, new AudioToggleEventArgs(toggleIndex, newValue));
     }
 
     public Task EnterGhostModeAsync()
@@ -130,11 +152,12 @@ public class MacGhostModeService : IGhostModeService, IDisposable
         GhostModeNativeMethods.ghost_panel_set_fab_connected(connected);
     }
 
-    public void ShowCard(FabCardVariant variant, string? title, string? text, string? imagePath)
+    public void ShowCard(FabCardVariant variant, string? title, string? text, string? imagePath,
+                         bool isAlert = false, bool isVoiceDelivered = false)
     {
         if (!_isSupported) return;
 
-        GhostModeNativeMethods.ghost_panel_show_card((int)variant, title, text, imagePath);
+        GhostModeNativeMethods.ghost_panel_show_card((int)variant, title, text, imagePath, isAlert, isVoiceDelivered);
     }
 
     public void DismissCard()
@@ -142,6 +165,51 @@ public class MacGhostModeService : IGhostModeService, IDisposable
         if (!_isSupported) return;
 
         GhostModeNativeMethods.ghost_panel_dismiss_card();
+    }
+
+    public void SetPosition(double x, double y)
+    {
+        if (!_isSupported) return;
+
+        GhostModeNativeMethods.ghost_panel_set_position(x, y);
+    }
+
+    public void SetSize(double width, double height)
+    {
+        if (!_isSupported) return;
+
+        GhostModeNativeMethods.ghost_panel_set_size(width, height);
+    }
+
+    public void SetAudioState(bool voiceChatActive, bool voiceCommandActive,
+                              bool gameAudioActive, bool audioInActive)
+    {
+        if (!_isSupported) return;
+
+        GhostModeNativeMethods.ghost_panel_set_audio_state(
+            voiceChatActive, voiceCommandActive, gameAudioActive, audioInActive);
+    }
+
+    public void SetVadLevel(float level)
+    {
+        if (!_isSupported) return;
+
+        GhostModeNativeMethods.ghost_panel_set_vad_level(level);
+    }
+
+    public void SetExchangeState(int state)
+    {
+        if (!_isSupported) return;
+
+        try
+        {
+            GhostModeNativeMethods.ghost_panel_set_exchange_state(state);
+        }
+        catch (EntryPointNotFoundException)
+        {
+            // Native framework may not implement this export yet — graceful no-op
+            System.Diagnostics.Debug.WriteLine("[GhostMode] ghost_panel_set_exchange_state not available in native framework");
+        }
     }
 
     public void Dispose()
@@ -177,6 +245,12 @@ public class MacGhostModeService : IGhostModeService, IDisposable
 
         if (_cardDismissHandle.IsAllocated)
             _cardDismissHandle.Free();
+
+        if (_gearTapHandle.IsAllocated)
+            _gearTapHandle.Free();
+
+        if (_audioToggleHandle.IsAllocated)
+            _audioToggleHandle.Free();
 
         _disposed = true;
     }

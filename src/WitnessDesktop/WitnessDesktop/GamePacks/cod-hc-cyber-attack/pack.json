@@ -1,0 +1,52 @@
+{
+  "id": "cod-hc-cyber-attack",
+  "name": "CoD MW3 — HC Cyber Attack",
+  "version": "1.0.0",
+  "genre": "fps",
+  "silenceTimeoutPreset": "Quick",
+
+  "observationSchema": {
+    "schemaName": "fps_analysis",
+    "fields": [
+      { "key": "phase", "type": "string", "required": true, "route": "metadata", "description": "menu|lobby|loadout|gameplay|scoreboard|replay|transition" },
+      { "key": "compass", "type": "object", "required": false, "route": "temporal", "description": "Bearing, direction, and callout" },
+      { "key": "player_state", "type": "string", "required": false, "route": "temporal", "description": "ads|hip_fire|sprinting|reloading|dead|spectating|menu" },
+      { "key": "kill_feed", "type": "array", "required": false, "route": "temporal", "description": "Kill events with killer, victim, attribution" },
+      { "key": "player_kills", "type": "array", "required": false, "route": "visual", "description": "Kills by the observed player only" },
+      { "key": "accolades", "type": "array", "required": false, "route": "temporal", "description": "Medal popups trailing kills" },
+      { "key": "round_state", "type": "object", "required": false, "route": "temporal", "description": "Round number, score, side" },
+      { "key": "system_alerts", "type": "array", "required": false, "route": "visual", "description": "ENEMY HAS THE BOMB, ragequits, match point" },
+      { "key": "objective", "type": "object", "required": false, "route": "temporal", "description": "Bomb/defend status and distance" },
+      { "key": "assessment", "type": "string", "required": true, "route": "visual", "description": "Tactical situation summary" },
+      { "key": "confidence", "type": "enum", "values": ["CERTAIN", "LIKELY", "UNCERTAIN", "GUESSING"], "required": true, "route": "metadata", "description": "Overall confidence level" }
+    ]
+  },
+
+  "eventMapping": [
+    { "field": "system_alerts", "eventType": "GameStateChange" },
+    { "field": "player_kills", "eventType": "Opportunity" },
+    { "field": "assessment", "eventType": "Assessment" }
+  ],
+
+  "topStripField": "assessment",
+  "userPromptTemplate": "Analyze this gameplay frame.",
+  "brainInstructions": "brain-instructions.md",
+
+  "voiceClassification": {
+    "gameStateSensitive": [
+      "\\b(?:where(?:'s| is) (?:the bomb|the objective|the enemy|they)|am i winning|are we winning|who(?:'s| is) (?:winning|losing)|what(?:'s| is) the (?:score|round)|enemy (?:position|location)|how many (?:alive|dead|left)|what(?:'s| is) (?:happening|going on)|should i (?:push|rotate|hold|flank|plant|defuse)|are they (?:rushing|camping|planting))\\b"
+    ],
+    "generalKnowledge": [
+      "\\b(?:what(?:'s| is) (?:hardpoint|domination|cyber attack|search and destroy|kill confirmed)|how (?:does|do) (?:you|i) (?:play|counter|win)|what(?:'s| is) the (?:meta|best (?:gun|loadout|class))|explain|teach me|what are (?:the )?(?:rules|basics|callouts))\\b"
+    ]
+  },
+
+  "groundingLanguage": {
+    "refreshDisplay": "checking the footage…",
+    "staleDisplay": "intel may be outdated",
+    "unavailableDisplay": "no current intel",
+    "refreshCorrection": "[SYSTEM: You do not have current gameplay information. Do NOT make specific tactical claims. Say you are checking the footage and will update shortly.]",
+    "staleCorrection": "[SYSTEM: Your gameplay information may be outdated. Express uncertainty about the current situation. Use phrases like 'from what I last saw' or 'I'm not fully sure right now'.]",
+    "unavailableCorrection": "[SYSTEM: No gameplay information is available. Do NOT make claims about the current match state. If asked, honestly say you cannot see the game right now.]"
+  }
+}

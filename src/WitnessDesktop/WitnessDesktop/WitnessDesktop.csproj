@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks>net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
@@ -13,15 +13,17 @@
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
-		<OutputType>Exe</OutputType>
+		<!-- net8.0 target is library-only (for unit tests); platform targets are apps -->
+		<OutputType Condition="'$(TargetFramework)' != 'net8.0'">Exe</OutputType>
 		<RootNamespace>WitnessDesktop</RootNamespace>
-		<UseMaui>true</UseMaui>
+		<UseMaui Condition="'$(TargetFramework)' != 'net8.0'">true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
 		<ApplicationTitle>Game Ghost</ApplicationTitle>
+		<AssemblyName>GameGhost</AssemblyName>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.5dof.gameghost</ApplicationId>
@@ -38,12 +40,13 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<!-- MAUI resources — only for platform targets -->
+	<ItemGroup Condition="'$(TargetFramework)' != 'net8.0'">
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#000F0F" />
+		<MauiIcon Include="Resources\AppIcon\appicon.png" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#000F0F" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -56,24 +59,71 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!-- MAUI packages — only for platform targets -->
+	<ItemGroup Condition="'$(TargetFramework)' != 'net8.0'">
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.1" />
+	</ItemGroup>
+
+	<!-- Shared packages — all targets -->
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Porcupine" Version="4.0.2" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.1" />
+	</ItemGroup>
+
+	<!-- net8.0 library target — minimal packages for compilation (unit test reference) -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.91" />
+		<PackageReference Include="SkiaSharp" Version="3.119.1" />
+	</ItemGroup>
+
+	<!-- Exclude MAUI-dependent code from net8.0 library build.
+	     Only Services/, Models/, and interfaces compile for net8.0 (unit test target). -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<Compile Remove="Views\**" />
+		<Compile Remove="Controls\**" />
+		<Compile Remove="Platforms\**" />
+		<Compile Remove="ViewModels\**" />
+		<Compile Remove="Utilities\**" />
+		<Compile Remove="MauiProgram.cs" />
+		<Compile Remove="MainPage.xaml.cs" />
+		<Compile Remove="App.xaml.cs" />
+		<Compile Remove="AppShell.xaml.cs" />
+		<Compile Remove="Models\AiDisplayContent.cs" />
+		<Compile Remove="Models\SlidingPanelContent.cs" />
+		<None Remove="Views\**" />
+		<None Remove="Controls\**" />
+
+		<!-- Re-include ViewModels + dependent models for net8.0 testing -->
+		<Compile Include="ViewModels\MainViewModel.cs" />
+		<Compile Include="ViewModels\AgentSelectionViewModel.cs" />
+		<Compile Include="ViewModels\SettingsViewModel.cs" />
+		<Compile Include="Models\AiDisplayContent.cs" />
+		<Compile Include="Models\SlidingPanelContent.cs" />
+
+		<!-- Re-include Mac speech providers for net8.0 unit testing (native interop is mocked) -->
+		<Compile Include="Platforms\MacCatalyst\MacSpeechToTextProvider.cs" />
+		<Compile Include="Platforms\MacCatalyst\MacTextToSpeechProvider.cs" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">
 		<PackageReference Include="NAudio" Version="2.2.1" />
 	</ItemGroup>
 
-	<!-- Native Swift helper for ScreenCaptureKit (Mac Catalyst only) -->
+	<!-- Native Swift helpers for Mac Catalyst only -->
 	<ItemGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
 		<NativeReference Include="Platforms\MacCatalyst\GaimerScreenCapture.xcframework">
+			<Kind>Framework</Kind>
+			<SmartLink>True</SmartLink>
+		</NativeReference>
+		<NativeReference Include="Platforms\MacCatalyst\GaimerSpeech.xcframework">
 			<Kind>Framework</Kind>
 			<SmartLink>True</SmartLink>
 		</NativeReference>
@@ -83,15 +133,49 @@
 	     rejects it because it expects a maccatalyst slice. Instead, manually copy the
 	     framework into the app bundle. The DllImportResolver in NativeMethods.cs loads
 	     it from Contents/Frameworks/ at runtime. -->
+	<ItemGroup>
+		<Content Include="GamePacks\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 	<Target Name="CopyGhostModeFramework" AfterTargets="_ExpandNativeReferences" Condition="$(TargetFramework.Contains('maccatalyst'))">
 		<PropertyGroup>
-			<_GhostModeSrc>$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/macos-arm64_x86_64/GaimerGhostMode.framework</_GhostModeSrc>
+			<_GhostModeCatalystSrc Condition="Exists('$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/ios-arm64_x86_64-maccatalyst/GaimerGhostMode.framework')">$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/ios-arm64_x86_64-maccatalyst/GaimerGhostMode.framework</_GhostModeCatalystSrc>
+			<_GhostModeMacSrc Condition="Exists('$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/macos-arm64_x86_64/GaimerGhostMode.framework')">$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/macos-arm64_x86_64/GaimerGhostMode.framework</_GhostModeMacSrc>
+			<_GhostModeSrc Condition="'$(_GhostModeCatalystSrc)' != ''">$(_GhostModeCatalystSrc)</_GhostModeSrc>
+			<_GhostModeSrc Condition="'$(_GhostModeSrc)' == '' and '$(_GhostModeMacSrc)' != ''">$(_GhostModeMacSrc)</_GhostModeSrc>
 			<_GhostModeDest>$(AppBundleDir)/Contents/Frameworks/GaimerGhostMode.framework</_GhostModeDest>
 		</PropertyGroup>
+		<Error Condition="'$(_GhostModeSrc)' == ''" Text="GaimerGhostMode.framework not found under Platforms/MacCatalyst/GaimerGhostMode.xcframework. Expected either ios-arm64_x86_64-maccatalyst or macos-arm64_x86_64 slice layout." />
 		<Message Text="Copying GaimerGhostMode.framework to app bundle..." Importance="high" />
 		<Exec Command="rm -rf &quot;$(_GhostModeDest)&quot;" />
 		<Exec Command="mkdir -p &quot;$(AppBundleDir)/Contents/Frameworks&quot;" />
 		<Exec Command="cp -R &quot;$(_GhostModeSrc)&quot; &quot;$(_GhostModeDest)&quot;" />
+	</Target>
+
+	<Target Name="CopyGhostModeResourceBundle" AfterTargets="Build" Condition="$(TargetFramework.Contains('maccatalyst'))">
+		<PropertyGroup>
+			<_GhostModeCatalystSrc Condition="Exists('$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/ios-arm64_x86_64-maccatalyst/GaimerGhostMode.framework')">$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/ios-arm64_x86_64-maccatalyst/GaimerGhostMode.framework</_GhostModeCatalystSrc>
+			<_GhostModeMacSrc Condition="Exists('$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/macos-arm64_x86_64/GaimerGhostMode.framework')">$(MSBuildProjectDirectory)/Platforms/MacCatalyst/GaimerGhostMode.xcframework/macos-arm64_x86_64/GaimerGhostMode.framework</_GhostModeMacSrc>
+			<_GhostModeSrc Condition="'$(_GhostModeCatalystSrc)' != ''">$(_GhostModeCatalystSrc)</_GhostModeSrc>
+			<_GhostModeSrc Condition="'$(_GhostModeSrc)' == '' and '$(_GhostModeMacSrc)' != ''">$(_GhostModeMacSrc)</_GhostModeSrc>
+			<_GhostModeResourceBundleSrc>$(_GhostModeSrc)/Versions/A/Resources/GaimerGhostMode_GaimerGhostMode.bundle</_GhostModeResourceBundleSrc>
+			<_GhostModeResourceBundleDestDir>$(AppBundleDir)/Contents/Frameworks/GaimerGhostMode.framework/Versions/A/Resources</_GhostModeResourceBundleDestDir>
+			<_GhostModeResourceBundleDest>$(_GhostModeResourceBundleDestDir)/GaimerGhostMode_GaimerGhostMode.bundle</_GhostModeResourceBundleDest>
+		</PropertyGroup>
+		<Message Condition="Exists('$(_GhostModeResourceBundleSrc)')" Text="Copying GaimerGhostMode resource bundle to app framework..." Importance="high" />
+		<Exec Condition="Exists('$(_GhostModeResourceBundleSrc)')" Command="mkdir -p &quot;$(_GhostModeResourceBundleDestDir)&quot;" />
+		<Exec Condition="Exists('$(_GhostModeResourceBundleDest)')" Command="rm -rf &quot;$(_GhostModeResourceBundleDest)&quot;" />
+		<Exec Condition="Exists('$(_GhostModeResourceBundleSrc)')" Command="cp -R &quot;$(_GhostModeResourceBundleSrc)&quot; &quot;$(_GhostModeResourceBundleDest)&quot;" />
+	</Target>
+
+	<Target Name="InjectSpeechRecognitionUsageDescription" AfterTargets="Build" Condition="$(TargetFramework.Contains('maccatalyst'))">
+		<PropertyGroup>
+			<_AppInfoPlist>$(AppBundleDir)/Contents/Info.plist</_AppInfoPlist>
+			<_SpeechUsageDescription>Game Ghost needs speech recognition access to transcribe your voice for local AI conversations.</_SpeechUsageDescription>
+		</PropertyGroup>
+		<Message Text="Ensuring NSSpeechRecognitionUsageDescription exists in app bundle Info.plist..." Importance="high" />
+		<Exec Condition="Exists('$(_AppInfoPlist)')" IgnoreExitCode="true" Command="/usr/libexec/PlistBuddy -c &quot;Set :NSSpeechRecognitionUsageDescription '$(_SpeechUsageDescription)'&quot; &quot;$(_AppInfoPlist)&quot;" />
+		<Exec Condition="Exists('$(_AppInfoPlist)')" IgnoreExitCode="true" Command="/usr/libexec/PlistBuddy -c &quot;Add :NSSpeechRecognitionUsageDescription string '$(_SpeechUsageDescription)'&quot; &quot;$(_AppInfoPlist)&quot;" />
 	</Target>
 
 </Project>

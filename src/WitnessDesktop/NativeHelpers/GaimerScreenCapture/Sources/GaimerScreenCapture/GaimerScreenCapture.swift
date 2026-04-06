@@ -47,10 +47,8 @@ private func cgImageToPNGData(_ cgImage: CGImage) -> Data? {
 @_cdecl("sck_is_available")
 public func sckIsAvailable() -> Bool {
     if #available(macCatalyst 18.2, macOS 14.0, *) {
-        NSLog("[GaimerScreenCapture] sck_is_available: TRUE (macCatalyst 18.2+ / macOS 14+)")
         return true
     }
-    NSLog("[GaimerScreenCapture] sck_is_available: FALSE (platform too old)")
     return false
 }
 
@@ -80,8 +78,6 @@ public func sckCaptureWindow(
 ) {
     #if canImport(ScreenCaptureKit)
     if #available(macCatalyst 18.2, macOS 14.0, *) {
-        NSLog("[GaimerScreenCapture] sck_capture_window called: windowID=%u, size=%dx%d", windowID, width, height)
-
         // Use a detached Task to avoid inheriting any actor context.
         // This runs on the global concurrent executor (background thread).
         // SCScreenshotManager.captureImage works fine from background threads.
@@ -92,27 +88,11 @@ public func sckCaptureWindow(
                     false, onScreenWindowsOnly: true
                 )
 
-                // Log available windows for debugging
-                let windowIDs = content.windows.map { $0.windowID }
-                NSLog("[GaimerScreenCapture] Available windows: %d total. IDs: %@",
-                      content.windows.count,
-                      windowIDs.prefix(20).map { String($0) }.joined(separator: ", "))
-
                 guard let window = content.windows.first(where: { $0.windowID == windowID }) else {
-                    NSLog("[GaimerScreenCapture] Window %u NOT FOUND in SCShareableContent. Available: %@",
-                          windowID,
-                          content.windows.prefix(10).map {
-                              "\($0.windowID):\($0.owningApplication?.applicationName ?? "?"):\($0.title ?? "untitled")"
-                          }.joined(separator: ", "))
+                    NSLog("[GaimerScreenCapture] Window %u not found in SCShareableContent", windowID)
                     callback(nil, 0)
                     return
                 }
-
-                NSLog("[GaimerScreenCapture] Found window %u: app=%@, title=%@, frame=%@",
-                      windowID,
-                      window.owningApplication?.applicationName ?? "unknown",
-                      window.title ?? "untitled",
-                      NSStringFromCGRect(window.frame))
 
                 // Create filter for single window capture
                 let filter = SCContentFilter(desktopIndependentWindow: window)
@@ -125,27 +105,19 @@ public func sckCaptureWindow(
                 config.pixelFormat = kCVPixelFormatType_32BGRA
                 // Retina quality capture
                 config.captureResolution = .best
-                // Show cursor for debugging (confirms capture is executing)
-                config.showsCursor = true
-
-                NSLog("[GaimerScreenCapture] Calling SCScreenshotManager.captureImage...")
+                config.showsCursor = false
 
                 // Single-frame capture using SCScreenshotManager (macOS 14+ API)
                 let cgImage = try await SCScreenshotManager.captureImage(
                     contentFilter: filter, configuration: config
                 )
 
-                NSLog("[GaimerScreenCapture] captureImage returned: %dx%d",
-                      cgImage.width, cgImage.height)
-
                 // Convert CGImage to PNG using ImageIO (Mac Catalyst compatible)
                 guard let pngData = cgImageToPNGData(cgImage) else {
-                    NSLog("[GaimerScreenCapture] cgImageToPNGData failed — conversion returned nil")
+                    NSLog("[GaimerScreenCapture] cgImageToPNGData failed")
                     callback(nil, 0)
                     return
                 }
-
-                NSLog("[GaimerScreenCapture] PNG encoded: %d bytes", pngData.count)
 
                 // Pass PNG bytes back to C# via the callback
                 pngData.withUnsafeBytes { rawBuffer in
@@ -168,7 +140,6 @@ public func sckCaptureWindow(
     #endif
 
     // SCK not available on this platform/version
-    NSLog("[GaimerScreenCapture] SCK not available, returning nil")
     callback(nil, 0)
 }
 

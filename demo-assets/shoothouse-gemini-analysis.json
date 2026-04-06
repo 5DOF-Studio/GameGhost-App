@@ -1,0 +1,3575 @@
+[
+  {
+    "start_time": "0:00",
+    "end_time": "0:03",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:03",
+    "end_time": "0:06",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:06",
+    "end_time": "0:09",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:09",
+    "end_time": "0:12",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:12",
+    "end_time": "0:15",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:15",
+    "end_time": "0:18",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:18",
+    "end_time": "0:21",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:21",
+    "end_time": "0:24",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges."
+  },
+  {
+    "start_time": "0:24",
+    "end_time": "0:27",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges. Teammates appear in the background."
+  },
+  {
+    "start_time": "0:27",
+    "end_time": "0:30",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges. Countdown for match start is visible (8)."
+  },
+  {
+    "start_time": "0:30",
+    "end_time": "0:33",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges. Countdown for match start is visible (5)."
+  },
+  {
+    "start_time": "0:33",
+    "end_time": "0:36",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges. Countdown for match start is visible (4)."
+  },
+  {
+    "start_time": "0:36",
+    "end_time": "0:39",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges. Countdown for match start is visible (7)."
+  },
+  {
+    "start_time": "0:39",
+    "end_time": "0:42",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges. Countdown for match start is visible (4)."
+  },
+  {
+    "start_time": "0:42",
+    "end_time": "0:45",
+    "phase": "lobby",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in the lobby, viewing daily challenges. Countdown for match start is visible (2)."
+  },
+  {
+    "start_time": "0:45",
+    "end_time": "0:48",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Black screen transitioning to map loading. 'SHOOT HOUSE HC CYBER ATTACK' displayed."
+  },
+  {
+    "start_time": "0:48",
+    "end_time": "0:51",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Map loading screen for Shoothouse."
+  },
+  {
+    "start_time": "0:51",
+    "end_time": "0:54",
+    "phase": "loadout",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Loadout selection screen. Match starting in 10 seconds."
+  },
+  {
+    "start_time": "0:54",
+    "end_time": "0:57",
+    "phase": "loadout",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Loadout selection screen. Match starting in 7 seconds."
+  },
+  {
+    "start_time": "0:57",
+    "end_time": "1:00",
+    "phase": "loadout",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 0,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "none"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Loadout selection screen. Match starting in 5 seconds."
+  },
+  {
+    "start_time": "1:00",
+    "end_time": "1:03",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 46,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in game, looking towards Alpha Gate. Countdown 3, 2, 1."
+  },
+  {
+    "start_time": "1:03",
+    "end_time": "1:06",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player moves slightly, switches to pistol."
+  },
+  {
+    "start_time": "1:06",
+    "end_time": "1:09",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights with pistol."
+  },
+  {
+    "start_time": "1:09",
+    "end_time": "1:12",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "PHATT|G0atphukr",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "FIRST BLOOD"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Teammate gets First Blood. Player spots an enemy and shoots."
+  },
+  {
+    "start_time": "1:12",
+    "end_time": "1:15",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "JustOneMoreSong",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT, ONE KILL",
+      "LONGSHOT"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 28,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player gets a longshot kill with one shot."
+  },
+  {
+    "start_time": "1:15",
+    "end_time": "1:18",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "Lulu350z",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT, ONE KILL",
+      "LONGSHOT"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 28,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player gets another longshot kill."
+  },
+  {
+    "start_time": "1:18",
+    "end_time": "1:21",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 28,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol. Enemy picks up the bomb."
+  },
+  {
+    "start_time": "1:21",
+    "end_time": "1:24",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 18,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player moves towards the objective."
+  },
+  {
+    "start_time": "1:24",
+    "end_time": "1:27",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Lulu350z",
+        "victim": "OMEN|WindowLick3r",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT, ONE KILL",
+      "HEADSHOT"
+    ],
+    "objective": {
+      "type": "defend",
+      "distance_m": 18,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "engagement",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Teammate gets a headshot kill. Player aims down sights."
+  },
+  {
+    "start_time": "1:27",
+    "end_time": "1:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 80,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 18,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol and moves."
+  },
+  {
+    "start_time": "1:30",
+    "end_time": "1:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 329,
+      "direction": "NW",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "Lulu350z",
+        "victim": "OMEN|WindowLick3r",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT, ONE KILL"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 20,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player moves on top of a container. Teammate gets a kill."
+  },
+  {
+    "start_time": "1:33",
+    "end_time": "1:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 302,
+      "direction": "NW",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Anastasia",
+        "victim": "Vanilla Coffee",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "escort",
+      "distance_m": 22,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!",
+      "Anastasia PICKED UP THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Teammate Anastasia picks up the bomb."
+  },
+  {
+    "start_time": "1:36",
+    "end_time": "1:39",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 294,
+      "direction": "NW",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "KBS|Plato_Gud2",
+        "victim": "E-3K|tsem71",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "LAST ENEMY KILLED"
+    ],
+    "objective": {
+      "type": "escort",
+      "distance_m": 22,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Teammate kills the last enemy."
+  },
+  {
+    "start_time": "1:39",
+    "end_time": "1:42",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 188,
+      "direction": "S",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "dead",
+    "kill_feed": [
+      {
+        "killer": "Lulu350z",
+        "victim": "Wakandan",
+        "attribution": "teamkill"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "escort",
+      "distance_m": 7.9,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "danger",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player is killed by a teammate (friendly fire). 'LOADING NEXT PLAYER' appears."
+  },
+  {
+    "start_time": "1:42",
+    "end_time": "1:45",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 220,
+      "direction": "SW",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "escort",
+      "distance_m": 18,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [
+      "KBS|Plato_Gud2"
+    ],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is spectating Anastasia, who is reviving a teammate."
+  },
+  {
+    "start_time": "1:45",
+    "end_time": "1:48",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 345,
+      "direction": "NW",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "escort",
+      "distance_m": 18,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [
+      "KBS|Plato_Gud2"
+    ],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is spectating Anastasia, who is reviving a teammate."
+  },
+  {
+    "start_time": "1:48",
+    "end_time": "1:51",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 105,
+      "direction": "E",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "escort",
+      "distance_m": 45,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is spectating Anastasia, who is moving."
+  },
+  {
+    "start_time": "1:51",
+    "end_time": "1:54",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 150,
+      "direction": "SE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "escort",
+      "distance_m": 38,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is spectating Anastasia, who is moving."
+  },
+  {
+    "start_time": "1:54",
+    "end_time": "1:57",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 150,
+      "direction": "SE",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "escort",
+      "distance_m": 15,
+      "status": "picked_up"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 0,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is spectating Anastasia. Round ends."
+  },
+  {
+    "start_time": "1:57",
+    "end_time": "2:00",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard displayed. OPFOR won Round 1 (1-0).",
+    "scoreboard": {
+      "opfor": [
+        {
+          "name": "Lulu350z#5583623",
+          "kills": 3,
+          "deaths": 0,
+          "score": 525
+        },
+        {
+          "name": "Anastasia#8026884",
+          "kills": 2,
+          "deaths": 0,
+          "score": 325
+        },
+        {
+          "name": "OMEN|WindowLick3r#172944",
+          "kills": 1,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "Wakandan#1252904",
+          "kills": 2,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "E-3K|tsem71#3938222",
+          "kills": 0,
+          "deaths": 1,
+          "score": 100
+        },
+        {
+          "name": "PHATT|G0atphukr#5946593",
+          "kills": 0,
+          "deaths": 1,
+          "score": 0
+        }
+      ],
+      "task_force_141": [
+        {
+          "name": "Bluey#1293993",
+          "kills": 0,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "KBS|Plato_Gud2#2807487",
+          "kills": 0,
+          "deaths": 1,
+          "score": 200
+        },
+        {
+          "name": "Cursed Nites#9103039",
+          "kills": 0,
+          "deaths": 1,
+          "score": 100
+        },
+        {
+          "name": "Vanilla Coffee#3391882",
+          "kills": 0,
+          "deaths": 1,
+          "score": 75
+        },
+        {
+          "name": "L.J._#69941",
+          "kills": 0,
+          "deaths": 1,
+          "score": 0
+        },
+        {
+          "name": "JustOneMoreSong#9947746",
+          "kills": 0,
+          "deaths": 2,
+          "score": 0
+        }
+      ]
+    }
+  },
+  {
+    "start_time": "2:00",
+    "end_time": "2:03",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay starts.",
+    "final_kill": {
+      "killer": "Lulu350z#5583623",
+      "weapon": "PROXIMITY MINE",
+      "operator": "TANTO",
+      "attachments": [],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:03",
+    "end_time": "2:06",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues.",
+    "final_kill": {
+      "killer": "Lulu350z#5583623",
+      "weapon": "PROXIMITY MINE",
+      "operator": "TANTO",
+      "attachments": [],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:06",
+    "end_time": "2:09",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay shows the explosion.",
+    "final_kill": {
+      "killer": "Lulu350z#5583623",
+      "weapon": "PROXIMITY MINE",
+      "operator": "TANTO",
+      "attachments": [],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:09",
+    "end_time": "2:12",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 1,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay shows the explosion.",
+    "final_kill": {
+      "killer": "Lulu350z#5583623",
+      "weapon": "PROXIMITY MINE",
+      "operator": "TANTO",
+      "attachments": [],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:12",
+    "end_time": "2:15",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in game, holding a weapon. Countdown 3, 2, 1."
+  },
+  {
+    "start_time": "2:15",
+    "end_time": "2:18",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "ADS",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "defend",
+      "distance_m": 10,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is aiming down sights."
+  },
+  {
+    "start_time": "2:18",
+    "end_time": "2:21",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 52,
+      "direction": "NE",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol and moves."
+  },
+  {
+    "start_time": "2:21",
+    "end_time": "2:24",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 98,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "Bluey",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "FIRST BLOOD"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Teammate gets First Blood. Player aims down sights."
+  },
+  {
+    "start_time": "2:24",
+    "end_time": "2:27",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 98,
+      "direction": "E",
+      "callout": "ALPHA_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "PHATT|G0atphukr",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "DEFENSE",
+      "ONE SHOT, ONE KILL",
+      "LONGSHOT",
+      "HEADSHOT"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player gets a headshot longshot kill."
+  },
+  {
+    "start_time": "2:27",
+    "end_time": "2:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 96,
+      "direction": "E",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "Anastasia",
+        "victim": "Cursed Nites",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [
+      "plogwalk left the game"
+    ],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol. Teammate gets a kill. An enemy leaves the game."
+  },
+  {
+    "start_time": "2:30",
+    "end_time": "2:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 328,
+      "direction": "NW",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Anastasia",
+        "victim": "PHATT|G0atphukr",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Teammate gets a kill."
+  },
+  {
+    "start_time": "2:33",
+    "end_time": "2:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 74,
+      "direction": "E",
+      "callout": "FORKLIFT"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "Cursed Nites",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "OMEN|WindowLick3r"
+    ],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Teammate gets a kill."
+  },
+  {
+    "start_time": "2:36",
+    "end_time": "2:39",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 105,
+      "direction": "E",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player moves and reloads."
+  },
+  {
+    "start_time": "2:39",
+    "end_time": "2:42",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 105,
+      "direction": "E",
+      "callout": "CONTAINERS"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "KBS|Plato_Gud2",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 1,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Teammate gets a kill."
+  },
+  {
+    "start_time": "2:42",
+    "end_time": "2:45",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard displayed. OPFOR won Round 2 (2-0).",
+    "scoreboard": {
+      "opfor": [
+        {
+          "name": "Lulu350z#5583623",
+          "kills": 3,
+          "deaths": 0,
+          "score": 525
+        },
+        {
+          "name": "Anastasia#8026884",
+          "kills": 2,
+          "deaths": 0,
+          "score": 325
+        },
+        {
+          "name": "OMEN|WindowLick3r#172944",
+          "kills": 1,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "Wakandan#1252904",
+          "kills": 2,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "E-3K|tsem71#3938222",
+          "kills": 0,
+          "deaths": 1,
+          "score": 100
+        },
+        {
+          "name": "PHATT|G0atphukr#5946593",
+          "kills": 0,
+          "deaths": 1,
+          "score": 0
+        }
+      ],
+      "task_force_141": [
+        {
+          "name": "Bluey#1293993",
+          "kills": 0,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "KBS|Plato_Gud2#2807487",
+          "kills": 0,
+          "deaths": 1,
+          "score": 200
+        },
+        {
+          "name": "Cursed Nites#9103039",
+          "kills": 0,
+          "deaths": 1,
+          "score": 100
+        },
+        {
+          "name": "Vanilla Coffee#3391882",
+          "kills": 0,
+          "deaths": 1,
+          "score": 75
+        },
+        {
+          "name": "L.J._#69941",
+          "kills": 0,
+          "deaths": 1,
+          "score": 0
+        },
+        {
+          "name": "JustOneMoreSong#9947746",
+          "kills": 0,
+          "deaths": 2,
+          "score": 0
+        }
+      ]
+    }
+  },
+  {
+    "start_time": "2:45",
+    "end_time": "2:48",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard displayed. OPFOR won Round 2 (2-0).",
+    "scoreboard": {
+      "opfor": [
+        {
+          "name": "Lulu350z#5583623",
+          "kills": 3,
+          "deaths": 0,
+          "score": 525
+        },
+        {
+          "name": "Anastasia#8026884",
+          "kills": 2,
+          "deaths": 0,
+          "score": 325
+        },
+        {
+          "name": "OMEN|WindowLick3r#172944",
+          "kills": 1,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "Wakandan#1252904",
+          "kills": 2,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "E-3K|tsem71#3938222",
+          "kills": 0,
+          "deaths": 1,
+          "score": 100
+        },
+        {
+          "name": "PHATT|G0atphukr#5946593",
+          "kills": 0,
+          "deaths": 1,
+          "score": 0
+        }
+      ],
+      "task_force_141": [
+        {
+          "name": "Bluey#1293993",
+          "kills": 0,
+          "deaths": 1,
+          "score": 250
+        },
+        {
+          "name": "KBS|Plato_Gud2#2807487",
+          "kills": 0,
+          "deaths": 1,
+          "score": 200
+        },
+        {
+          "name": "Cursed Nites#9103039",
+          "kills": 0,
+          "deaths": 1,
+          "score": 100
+        },
+        {
+          "name": "Vanilla Coffee#3391882",
+          "kills": 0,
+          "deaths": 1,
+          "score": 75
+        },
+        {
+          "name": "L.J._#69941",
+          "kills": 0,
+          "deaths": 1,
+          "score": 0
+        },
+        {
+          "name": "JustOneMoreSong#9947746",
+          "kills": 0,
+          "deaths": 2,
+          "score": 0
+        }
+      ]
+    }
+  },
+  {
+    "start_time": "2:48",
+    "end_time": "2:51",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay starts.",
+    "final_kill": {
+      "killer": "OMEN|WindowLick3r#172944",
+      "weapon": "BASILISK",
+      "operator": "TANTO",
+      "attachments": [
+        "MODERNCCT90",
+        "SD-R0-889GRIP",
+        "JAK GUNSLINGER",
+        "10.5\" FTAC ARROW"
+      ],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:51",
+    "end_time": "2:54",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues.",
+    "final_kill": {
+      "killer": "OMEN|WindowLick3r#172944",
+      "weapon": "BASILISK",
+      "operator": "TANTO",
+      "attachments": [
+        "MODERNCCT90",
+        "SD-R0-889GRIP",
+        "JAK GUNSLINGER",
+        "10.5\" FTAC ARROW"
+      ],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:54",
+    "end_time": "2:57",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues.",
+    "final_kill": {
+      "killer": "OMEN|WindowLick3r#172944",
+      "weapon": "BASILISK",
+      "operator": "TANTO",
+      "attachments": [
+        "MODERNCCT90",
+        "SD-R0-889GRIP",
+        "JAK GUNSLINGER",
+        "10.5\" FTAC ARROW"
+      ],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "2:57",
+    "end_time": "3:00",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [
+      "SWITCHING SIDES"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "'SWITCHING SIDES' screen."
+  },
+  {
+    "start_time": "3:00",
+    "end_time": "3:03",
+    "phase": "transition",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 2,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Transition screen with map overview."
+  },
+  {
+    "start_time": "3:03",
+    "end_time": "3:06",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "ADS",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 50,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in game, aiming down sights. Countdown 3, 2, 1."
+  },
+  {
+    "start_time": "3:06",
+    "end_time": "3:09",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 308,
+      "direction": "NW",
+      "callout": "BRAVO_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 48,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol and moves."
+  },
+  {
+    "start_time": "3:09",
+    "end_time": "3:12",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 256,
+      "direction": "W",
+      "callout": "BRAVO_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights."
+  },
+  {
+    "start_time": "3:12",
+    "end_time": "3:15",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 261,
+      "direction": "W",
+      "callout": "BRAVO_GATE"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Anastasia",
+        "victim": "E-3K|tsem71",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "FIRST BLOOD"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Teammate gets First Blood. Player aims down sights."
+  },
+  {
+    "start_time": "3:15",
+    "end_time": "3:18",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 235,
+      "direction": "SW",
+      "callout": "BRAVO_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "E-3K|tsem71",
+        "victim": "Lulu350z",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player moves. Teammate Lulu350z is killed by an enemy."
+  },
+  {
+    "start_time": "3:18",
+    "end_time": "3:21",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 247,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "PHATT|G0atphukr",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "OMEN|WindowLick3r",
+      "Bluey",
+      "Cursed Nites"
+    ],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Teammate gets a kill."
+  },
+  {
+    "start_time": "3:21",
+    "end_time": "3:24",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 254,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "Cursed Nites",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "OMEN|WindowLick3r",
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Teammate gets a kill."
+  },
+  {
+    "start_time": "3:24",
+    "end_time": "3:27",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 254,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "PHATT|G0atphukr",
+        "victim": "Vanilla Coffee",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 39,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "PHATT|G0atphukr"
+    ],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Enemy gets a kill."
+  },
+  {
+    "start_time": "3:27",
+    "end_time": "3:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 288,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "Lulu350z",
+        "victim": "JustOneMoreSong",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "5 KILL STREAK"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Lulu350z"
+    ],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol. Teammate Lulu350z gets a 5 kill streak. Enemy has the bomb."
+  },
+  {
+    "start_time": "3:30",
+    "end_time": "3:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 288,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 35,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ENEMY HAS THE BOMB!"
+    ],
+    "signal": "objective",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player moves through a doorway."
+  },
+  {
+    "start_time": "3:33",
+    "end_time": "3:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 340,
+      "direction": "NW",
+      "callout": "BRAVO_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "danger",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player is flashed."
+  },
+  {
+    "start_time": "3:36",
+    "end_time": "3:39",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 248,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "dead",
+    "kill_feed": [
+      {
+        "killer": "KBS|Plato_Gud2",
+        "victim": "Wakandan",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "danger",
+    "urgency": "high",
+    "confidence": "CERTAIN",
+    "observations": "Player is killed by an enemy. 'LOADING NEXT PLAYER' appears."
+  },
+  {
+    "start_time": "3:39",
+    "end_time": "3:42",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 255,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 19,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is spectating PHATT|G0atphukr."
+  },
+  {
+    "start_time": "3:42",
+    "end_time": "3:45",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 170,
+      "direction": "S",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 42,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 2,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is spectating PHATT|G0atphukr."
+  },
+  {
+    "start_time": "3:45",
+    "end_time": "3:48",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 170,
+      "direction": "S",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "spectating",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "KBS|Plato_Gud2",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 42,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Teammate gets a kill. Round ends. Scoreboard displayed. OPFOR won Round 3 (3-0).",
+    "scoreboard": {
+      "opfor": [
+        {
+          "name": "Anastasia#8026884",
+          "kills": 5,
+          "deaths": 1,
+          "score": 1000
+        },
+        {
+          "name": "Lulu350z#5583623",
+          "kills": 5,
+          "deaths": 1,
+          "score": 875
+        },
+        {
+          "name": "OMEN|WindowLick3r#172944",
+          "kills": 5,
+          "deaths": 1,
+          "score": 675
+        },
+        {
+          "name": "Wakandan#1252904",
+          "kills": 2,
+          "deaths": 2,
+          "score": 450
+        },
+        {
+          "name": "E-3K|tsem71#3938222",
+          "kills": 3,
+          "deaths": 2,
+          "score": 350
+        },
+        {
+          "name": "PHATT|G0atphukr#5946593",
+          "kills": 1,
+          "deaths": 3,
+          "score": 100
+        }
+      ],
+      "task_force_141": [
+        {
+          "name": "Bluey#1293993",
+          "kills": 3,
+          "deaths": 3,
+          "score": 400
+        },
+        {
+          "name": "KBS|Plato_Gud2#2807487",
+          "kills": 3,
+          "deaths": 4,
+          "score": 400
+        },
+        {
+          "name": "Cursed Nites#9103039",
+          "kills": 3,
+          "deaths": 4,
+          "score": 300
+        },
+        {
+          "name": "JustOneMoreSong#9947746",
+          "kills": 1,
+          "deaths": 3,
+          "score": 150
+        },
+        {
+          "name": "Vanilla Coffee#3391882",
+          "kills": 0,
+          "deaths": 3,
+          "score": 75
+        },
+        {
+          "name": "L.J._#69941",
+          "kills": 0,
+          "deaths": 3,
+          "score": 0
+        }
+      ]
+    }
+  },
+  {
+    "start_time": "3:48",
+    "end_time": "3:51",
+    "phase": "scoreboard",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [
+      "ROUND WIN"
+    ],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Scoreboard displayed. OPFOR won Round 3 (3-0).",
+    "scoreboard": {
+      "opfor": [
+        {
+          "name": "Anastasia#8026884",
+          "kills": 5,
+          "deaths": 1,
+          "score": 1000
+        },
+        {
+          "name": "Lulu350z#5583623",
+          "kills": 5,
+          "deaths": 1,
+          "score": 875
+        },
+        {
+          "name": "OMEN|WindowLick3r#172944",
+          "kills": 5,
+          "deaths": 1,
+          "score": 675
+        },
+        {
+          "name": "Wakandan#1252904",
+          "kills": 2,
+          "deaths": 2,
+          "score": 450
+        },
+        {
+          "name": "E-3K|tsem71#3938222",
+          "kills": 3,
+          "deaths": 2,
+          "score": 350
+        },
+        {
+          "name": "PHATT|G0atphukr#5946593",
+          "kills": 1,
+          "deaths": 3,
+          "score": 100
+        }
+      ],
+      "task_force_141": [
+        {
+          "name": "Bluey#1293993",
+          "kills": 3,
+          "deaths": 3,
+          "score": 400
+        },
+        {
+          "name": "KBS|Plato_Gud2#2807487",
+          "kills": 3,
+          "deaths": 4,
+          "score": 400
+        },
+        {
+          "name": "Cursed Nites#9103039",
+          "kills": 3,
+          "deaths": 4,
+          "score": 300
+        },
+        {
+          "name": "JustOneMoreSong#9947746",
+          "kills": 1,
+          "deaths": 3,
+          "score": 150
+        },
+        {
+          "name": "Vanilla Coffee#3391882",
+          "kills": 0,
+          "deaths": 3,
+          "score": 75
+        },
+        {
+          "name": "L.J._#69941",
+          "kills": 0,
+          "deaths": 3,
+          "score": 0
+        }
+      ]
+    }
+  },
+  {
+    "start_time": "3:51",
+    "end_time": "3:54",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay starts.",
+    "final_kill": {
+      "killer": "OMEN|WindowLick3r#172944",
+      "weapon": "BASILISK",
+      "operator": "TANTO",
+      "attachments": [
+        "MODERNCCT90",
+        "SD-R0-889GRIP",
+        "JAK GUNSLINGER",
+        "10.5\" FTAC ARROW"
+      ],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "3:54",
+    "end_time": "3:57",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues.",
+    "final_kill": {
+      "killer": "OMEN|WindowLick3r#172944",
+      "weapon": "BASILISK",
+      "operator": "TANTO",
+      "attachments": [
+        "MODERNCCT90",
+        "SD-R0-889GRIP",
+        "JAK GUNSLINGER",
+        "10.5\" FTAC ARROW"
+      ],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "3:57",
+    "end_time": "4:00",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay continues.",
+    "final_kill": {
+      "killer": "OMEN|WindowLick3r#172944",
+      "weapon": "BASILISK",
+      "operator": "TANTO",
+      "attachments": [
+        "MODERNCCT90",
+        "SD-R0-889GRIP",
+        "JAK GUNSLINGER",
+        "10.5\" FTAC ARROW"
+      ],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "4:00",
+    "end_time": "4:03",
+    "phase": "final_kill",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "menu",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "none",
+      "distance_m": 0,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 3,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "attack"
+    },
+    "system_alerts": [],
+    "signal": "downtime",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Final Kill replay ends.",
+    "final_kill": {
+      "killer": "OMEN|WindowLick3r#172944",
+      "weapon": "BASILISK",
+      "operator": "TANTO",
+      "attachments": [
+        "MODERNCCT90",
+        "SD-R0-889GRIP",
+        "JAK GUNSLINGER",
+        "10.5\" FTAC ARROW"
+      ],
+      "perk": "DEMOLITION VEST"
+    }
+  },
+  {
+    "start_time": "4:03",
+    "end_time": "4:06",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 0,
+      "direction": "UNKNOWN",
+      "callout": "UNKNOWN"
+    },
+    "player_state": "ADS",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player is in game, aiming down sights."
+  },
+  {
+    "start_time": "4:06",
+    "end_time": "4:09",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 195,
+      "direction": "SSW",
+      "callout": "BRAVO_GATE"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "positioning",
+    "urgency": "low",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol and moves."
+  },
+  {
+    "start_time": "4:09",
+    "end_time": "4:12",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 264,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Anastasia",
+        "victim": "E-3K|tsem71",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "FIRST BLOOD"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Teammate gets First Blood. Player aims down sights."
+  },
+  {
+    "start_time": "4:12",
+    "end_time": "4:15",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 257,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "PHATT|G0atphukr",
+        "victim": "Cursed Nites",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "PHATT|G0atphukr"
+    ],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player switches to pistol. Enemy gets a kill."
+  },
+  {
+    "start_time": "4:15",
+    "end_time": "4:18",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 247,
+      "direction": "W",
+      "callout": "SHANTYTOWN"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "Cursed Nites",
+        "victim": "Lulu350z",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 38,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player moves. Teammate Lulu350z is killed."
+  },
+  {
+    "start_time": "4:18",
+    "end_time": "4:21",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 19,
+      "direction": "NNE",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "Anastasia",
+        "victim": "JustOneMoreSong",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [
+      "5 KILL STREAK"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 23,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia"
+    ],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player moves. Teammate Anastasia gets a 5 kill streak."
+  },
+  {
+    "start_time": "4:21",
+    "end_time": "4:24",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 252,
+      "direction": "W",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "Wakandan",
+        "victim": "OMEN|WindowLick3r",
+        "attribution": "player"
+      }
+    ],
+    "accolades": [
+      "ONE SHOT, ONE KILL"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 23,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player gets a one shot kill with pistol."
+  },
+  {
+    "start_time": "4:24",
+    "end_time": "4:27",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 183,
+      "direction": "S",
+      "callout": "JUNKYARD"
+    },
+    "player_state": "hip_fire",
+    "kill_feed": [
+      {
+        "killer": "OMEN|WindowLick3r",
+        "victim": "Bluey",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 23,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "OMEN|WindowLick3r"
+    ],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player moves. Teammate gets a kill."
+  },
+  {
+    "start_time": "4:27",
+    "end_time": "4:30",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 341,
+      "direction": "NW",
+      "callout": "CENTER"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "Anastasia",
+        "victim": "Vanilla Coffee",
+        "attribution": "teammate"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 19,
+      "status": "none"
+    },
+    "teammates_nearby": [
+      "Anastasia",
+      "Cursed Nites",
+      "E-3K|tsem71"
+    ],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [
+      "Vanilla Coffee left the game"
+    ],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Teammate gets a kill. An enemy leaves the game."
+  },
+  {
+    "start_time": "4:30",
+    "end_time": "4:33",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 349,
+      "direction": "NW",
+      "callout": "CENTER"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "KBS|Plato_Gud2",
+        "victim": "Anastasia",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [
+      "LAST ENEMY KILLED"
+    ],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 19,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Enemy kills teammate Anastasia."
+  },
+  {
+    "start_time": "4:33",
+    "end_time": "4:36",
+    "phase": "gameplay",
+    "compass": {
+      "bearing": 349,
+      "direction": "NW",
+      "callout": "CENTER"
+    },
+    "player_state": "ADS",
+    "kill_feed": [
+      {
+        "killer": "KBS|Plato_Gud2",
+        "victim": "PHATT|G0atphukr",
+        "attribution": "enemy"
+      }
+    ],
+    "accolades": [],
+    "objective": {
+      "type": "bomb",
+      "distance_m": 9.9,
+      "status": "none"
+    },
+    "teammates_nearby": [],
+    "round_state": {
+      "round": 4,
+      "score_friendly": 3,
+      "score_enemy": 0,
+      "side": "defend"
+    },
+    "system_alerts": [],
+    "signal": "engagement",
+    "urgency": "medium",
+    "confidence": "CERTAIN",
+    "observations": "Player aims down sights. Enemy kills teammate PHATT|G0atphukr."
+  }
+]
