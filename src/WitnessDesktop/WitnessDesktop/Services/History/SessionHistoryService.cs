@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using WitnessDesktop.Data;
 using WitnessDesktop.Data.Entities;
 using WitnessDesktop.Models;
@@ -15,6 +16,7 @@ namespace WitnessDesktop.Services.History;
 public class SessionHistoryService : ISessionHistoryService
 {
     private readonly string _dbPath;
+    private readonly ISessionTraceService? _sessionTrace;
 
     /// <summary>
     /// Gate that child writes await before inserting. Ensures the session row
@@ -29,9 +31,10 @@ public class SessionHistoryService : ISessionHistoryService
     /// </summary>
     private static readonly TimeSpan SessionReadyTimeout = TimeSpan.FromSeconds(10);
 
-    public SessionHistoryService(string dbPath)
+    public SessionHistoryService(string dbPath, ISessionTraceService? sessionTrace = null)
     {
         _dbPath = dbPath;
+        _sessionTrace = sessionTrace;
 
         // Bootstrap schema exactly once on construction.
         try
@@ -77,6 +80,13 @@ public class SessionHistoryService : ISessionHistoryService
                              ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString()
             });
             await ctx.SaveChangesAsync();
+
+            _sessionTrace?.TrackEvent("history.session.started", new Dictionary<string, string>
+            {
+                ["session_id"] = sessionId,
+                ["agent_key"] = agentKey ?? "unknown",
+                ["game_type"] = gameType ?? "unknown"
+            });
 
             // Signal success — child writes may proceed.
             tcs.TrySetResult();
@@ -130,6 +140,14 @@ public class SessionHistoryService : ISessionHistoryService
             {
                 session.EndedAtUtc = DateTime.UtcNow;
                 await ctx.SaveChangesAsync();
+
+                var durationMs = (long)(session.EndedAtUtc!.Value - session.StartedAtUtc).TotalMilliseconds;
+
+                _sessionTrace?.TrackEvent("history.session.finalized", new Dictionary<string, string>
+                {
+                    ["session_id"] = sessionId,
+                    ["duration_ms"] = durationMs.ToString()
+                });
             }
         }
         catch (Exception ex)

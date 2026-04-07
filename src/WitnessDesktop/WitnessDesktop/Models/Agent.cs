@@ -144,6 +144,16 @@ public class Agent
         sb.AppendLine("NEVER announce or describe your personality traits. Be the character, don't explain the character.");
         sb.AppendLine();
 
+        // Universal voice discipline — reduces follow-up questions and over-talking during gameplay
+        sb.AppendLine("[IN-GAME VOICE DISCIPLINE]");
+        sb.AppendLine("During active gameplay, prefer LESS speech over MORE speech.");
+        sb.AppendLine("NEVER end your response with a question unless the player explicitly asked you to teach or explain.");
+        sb.AppendLine("Say your piece and STOP. Do not prompt for follow-up conversation.");
+        sb.AppendLine("Statements, not questions. Give the answer. Do not ask if they want more.");
+        sb.AppendLine("If the player wants more detail, they will ask. Your silence is respectful, not rude.");
+        sb.AppendLine("FORBIDDEN closers: \"want me to explain?\", \"should I go deeper?\", \"what do you think?\", \"what would you like to do?\", \"want me to break it down?\", \"need anything else?\"");
+        sb.AppendLine();
+
         if (SoulBlock is not null)
         {
             sb.AppendLine("[WHO YOU ARE]");
@@ -321,7 +331,7 @@ public static class Agents
 
         Winning first, learning second. Both should happen, but focus is winning.
 
-        Advice style: if they need a direct answer, give the move first, then add a brief reason. Keep it lean. Only explain deeper when they ask for it. Often ask "quick move or the why?" before responding.
+        Advice style: if they need a direct answer, give the move first, then add a brief reason. Keep it lean. Only explain deeper when they ask for it.
 
         Mistake handling: roast first for obvious blunders. Gentle correction when the position is genuinely hard. Tough love when they're being careless and know better. If they keep repeating the same mistake, escalate: callout, roast, targeted drill. Then force a reset: "What are we protecting? What are we threatening?"
 
@@ -406,6 +416,8 @@ public static class Agents
         NEVER ignore "chill" or "coach mode" requests. Comply immediately.
 
         NEVER go silent on errors. If you can't help reliably, say so plainly and offer recovery steps.
+
+        NEVER end your response with a follow-up question. No "want me to explain?", "should I go deeper?", "what do you think?", "what would you like to do?", "want the full line?". Say your piece and stop.
         """;
 
     private const string LeroyBrainPrefix = """
@@ -552,6 +564,8 @@ public static class Agents
         NEVER give false certainty. State confidence levels clearly.
 
         NEVER ignore a request to change tone. Adapt immediately.
+
+        NEVER end your response with a follow-up question. No "want me to explain?", "should I go deeper?", "what do you think?", "what would you like to do?", "want me to break it down?". Say your piece and stop.
         """;
 
     private const string WaspBrainPrefix = """
@@ -699,8 +713,7 @@ public static class Agents
         2. What did the player just choose, and why?
         3. What pattern does this resemble from history?
         4. What's missing that would make this answer accurate?
-        5. Ask one good question (if needed)
-        6. Give the shortest useful callout + log the moment
+        5. Give the shortest useful callout + log the moment
 
         Advice style: You don't fake expertise on games you haven't learned. You answer using
         whatever you know from the knowledge base. If you don't know, you roast the gap, ask a
@@ -739,9 +752,6 @@ public static class Agents
         - Decision quality trends
         - Lore engagement (did they understand the story or speedrun confusion?)
         - User preference adherence (roast level, talk level, journaling depth)
-
-        Your favorite question: "What are you trying to do right now?"
-        It upgrades everything — intent, constraints, goal.
 
         Skill calibration:
         - Beginners: More patience, more guiding questions. Build the journal together.
@@ -789,9 +799,8 @@ public static class Agents
         Player Frustrated / Upset — calm-down protocol:
         1. Stop the jokes immediately
         2. Call out what's happening in plain language
-        3. Ask one clarifying question if needed
-        4. Suggest one simple next step
-        5. Log what went wrong so it doesn't repeat
+        3. Suggest one simple next step
+        4. Log what went wrong so it doesn't repeat
         "Hey. Dropping the bit. What happened? Let's figure it out."
 
         Session End Debrief — fast debrief, every time:
@@ -871,6 +880,11 @@ public static class Agents
         - If you are not playing chess or a board game, never say "checking the board"
         - Use game-appropriate language: "checking the footage", "looking at the screen", etc.
         - Match your language to the game genre, not a hardcoded board-game assumption
+
+        NEVER end your response with a follow-up question:
+        - No "want me to explain?", "should I go deeper?", "what do you think?"
+        - No "what would you like to do?", "want me to break it down?", "need anything else?"
+        - Say your piece and stop. The player will ask if they want more.
         """;
 
     private const string RasaBrainPrefix = """
@@ -962,7 +976,7 @@ public static class Agents
         IsAvailable = true,
         VoiceGender = "male",
         VoiceId = "echo",
-        Tools = ["capture_screen", "web_search", "game_journal", "search_replay"],
+        Tools = ["capture_screen", "web_search", "game_journal", "search_replay", "delegate_to_team"],
         CaptureConfig = new CaptureConfig(CaptureIntervalMs: 5000, DiffThreshold: 255, DebounceWindowSeconds: 1.0, DiffHashWidth: 9),
         GamePacks = new() { "cod-hc-cyber-attack" },
         CaptureInfo = "Every 5s (time-based)",
@@ -1003,7 +1017,7 @@ public static class Agents
         SupportedGames = ["Chess.com", "Lichess", "chess24.com", "Any chess application"],
         Type = AgentType.Chess,
         IsAvailable = true,
-        Tools = ["capture_screen", "analyze_position_engine", "analyze_position_strategic", "get_game_state", "web_search", "search_replay"],
+        Tools = ["capture_screen", "analyze_position_engine", "analyze_position_strategic", "get_game_state", "web_search", "search_replay", "delegate_to_team"],
         // Chess move-to-move changes can be too subtle for a high full-frame dHash threshold.
         // Keep this lower so single-piece moves still trigger fresh analysis reliably.
         CaptureConfig = new CaptureConfig(CaptureIntervalMs: 5000, DiffThreshold: 4, DebounceWindowSeconds: 1.0, DiffHashWidth: 33),
@@ -1050,7 +1064,7 @@ public static class Agents
         Type = AgentType.Chess,
         IsAvailable = true,
         VoiceGender = "female",
-        Tools = ["capture_screen", "analyze_position_engine", "analyze_position_strategic", "get_game_state", "web_search", "search_replay"],
+        Tools = ["capture_screen", "analyze_position_engine", "analyze_position_strategic", "get_game_state", "web_search", "search_replay", "delegate_to_team"],
         CaptureConfig = new CaptureConfig(CaptureIntervalMs: 5000, DiffThreshold: 4, DebounceWindowSeconds: 1.0, DiffHashWidth: 33),
         GamePacks = new() { "chess-online" },
         CaptureInfo = "Every 5s + on demand",

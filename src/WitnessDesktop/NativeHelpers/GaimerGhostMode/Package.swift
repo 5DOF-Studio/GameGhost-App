@@ -24,6 +24,14 @@ let package = Package(
                 .linkedFramework("AppKit"),
                 .linkedFramework("CoreGraphics")
             ]
-        )
+        ),
+        .executableTarget(
+            name: "GhostModeHarness",
+            dependencies: ["GaimerGhostMode"],
+            path: "Harness",
+            resources: [
+                .copy("Resources")
+            ]
+        ),
     ]
 )

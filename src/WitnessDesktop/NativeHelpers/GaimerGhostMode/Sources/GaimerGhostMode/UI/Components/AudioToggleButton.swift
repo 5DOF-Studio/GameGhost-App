@@ -91,10 +91,9 @@ public class AudioToggleButton: NSView {
         badge.frame = bounds
         badge.layer?.borderWidth = 2.5  // Override default 1pt stroke width
 
-        // Load icons from the packaged GhostFab resource bundle when present.
-        let bundle = GhostFabResources.bundle
-        iconOn = Self.loadIcon(named: iconOnName, from: bundle)
-        iconOff = Self.loadIcon(named: iconOffName, from: bundle)
+        // Load icons via GhostFabResources (handles both compiled xcassets and raw PNGs)
+        iconOn = Self.loadIcon(named: iconOnName)
+        iconOff = Self.loadIcon(named: iconOffName)
 
         addSubview(badge)
 
@@ -102,9 +101,9 @@ public class AudioToggleButton: NSView {
         applyToggleState()
     }
 
-    private static func loadIcon(named name: String?, from bundle: Bundle) -> NSImage? {
+    private static func loadIcon(named name: String?) -> NSImage? {
         guard let name = name else { return nil }
-        return bundle.image(forResource: name)
+        return GhostFabResources.image(named: name)
     }
 
     @available(*, unavailable)

@@ -25,7 +25,7 @@ namespace WitnessDesktop.Services;
 /// </remarks>
 public sealed class OpenAIRealtimeService : IDisposable
 {
-    private const string WS_URL = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
+    private const string WS_URL = "wss://api.openai.com/v1/realtime?model=gpt-realtime-1.5";
     private const int CONNECT_TIMEOUT_MS = 30_000;
     private const int RECEIVE_BUFFER_SIZE = 64 * 1024; // 64KB
 

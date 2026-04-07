@@ -8,12 +8,14 @@ public sealed class GameSkillPackService : IGameSkillPackService
 {
     private readonly string _packsDirectory;
     private readonly Dictionary<string, GameSkillPack> _cache = new();
+    private readonly ISessionTraceService? _sessionTrace;
 
     public GameSkillPack? ActivePack { get; private set; }
 
-    public GameSkillPackService(string packsDirectory)
+    public GameSkillPackService(string packsDirectory, ISessionTraceService? sessionTrace = null)
     {
         _packsDirectory = packsDirectory;
+        _sessionTrace = sessionTrace;
     }
 
     public GameSkillPack? LoadPack(string packId)
@@ -72,6 +74,13 @@ public sealed class GameSkillPackService : IGameSkillPackService
             return null;
 
         _cache[packId] = pack;
+
+        _sessionTrace?.TrackEvent("game.pack.loaded", new Dictionary<string, string>
+        {
+            ["pack_id"] = packId,
+            ["game_type"] = pack.Genre
+        });
+
         return pack;
     }
 
@@ -84,6 +93,15 @@ public sealed class GameSkillPackService : IGameSkillPackService
         }
 
         ActivePack = LoadPack(packId);
+
+        if (ActivePack != null)
+        {
+            _sessionTrace?.TrackEvent("game.pack.activated", new Dictionary<string, string>
+            {
+                ["pack_id"] = packId,
+                ["agent_name"] = ActivePack.Name
+            });
+        }
     }
 
     public IReadOnlyList<string> GetAvailablePackIds()

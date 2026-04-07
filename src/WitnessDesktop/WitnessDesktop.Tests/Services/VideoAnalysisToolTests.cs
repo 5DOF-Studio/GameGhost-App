@@ -32,7 +32,7 @@ public class VideoAnalysisToolTests
     public VideoAnalysisToolTests()
     {
         _mockClient = new Mock<GeminiVideoClient>(
-            new HttpClient(), "test-key", 120, 2000) { CallBase = false };
+            new HttpClient(), "test-key", 120, 2000, null) { CallBase = false };
         _sut = new VideoAnalysisTool(_mockClient.Object, "gemini-2.5-flash", "gemini-3-pro-preview");
     }
 

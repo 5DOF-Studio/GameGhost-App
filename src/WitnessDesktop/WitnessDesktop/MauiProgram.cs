@@ -147,8 +147,8 @@ public static class MauiProgram
         // History + Replay — shared database path for session persistence and retrieval
         var historyDbPath = Path.Combine(FileSystem.AppDataDirectory, "phase07", "gaimer-history.db");
 
-        services.AddSingleton<ISessionHistoryService>(_ =>
-            new SessionHistoryService(historyDbPath));
+        services.AddSingleton<ISessionHistoryService>(sp =>
+            new SessionHistoryService(historyDbPath, sp.GetService<ISessionTraceService>()));
 
         // Settings + Auth — registered first, other services may depend on them
         services.AddSingleton<ISettingsService, SettingsService>();
@@ -222,7 +222,7 @@ public static class MauiProgram
         var geminiProModel = Environment.GetEnvironmentVariable("GEMINI_PRO_MODEL") ?? "gemini-3-pro-preview";
 
         services.AddSingleton<ISegmentAnalysisStore>(sp =>
-            new SqliteSegmentAnalysisStore(historyDbPath));
+            new SqliteSegmentAnalysisStore(historyDbPath, sp.GetService<ISessionTraceService>()));
 
         if (!string.IsNullOrEmpty(geminiApiKey))
         {
@@ -234,14 +234,16 @@ public static class MauiProgram
                     BaseAddress = new Uri("https://generativelanguage.googleapis.com/"),
                     Timeout = TimeSpan.FromMinutes(3)
                 };
-                return new GeminiVideoClient(httpClient, geminiApiKey);
+                return new GeminiVideoClient(httpClient, geminiApiKey,
+                    sessionTrace: sp.GetService<ISessionTraceService>());
             });
 
             services.AddSingleton<IVideoAnalysisTool>(sp =>
                 new VideoAnalysisTool(
                     sp.GetRequiredService<GeminiVideoClient>(),
                     geminiFlashModel,
-                    geminiProModel));
+                    geminiProModel,
+                    sp.GetService<ISessionTraceService>()));
 
             services.AddSingleton<IReplayAnalysisOrchestrator>(sp =>
                 new ReplayAnalysisOrchestrator(
@@ -274,7 +276,8 @@ public static class MauiProgram
         var gamePacksDir = Path.Combine(AppContext.BaseDirectory, "GamePacks");
         if (!Directory.Exists(gamePacksDir))
             gamePacksDir = Path.Combine(AppContext.BaseDirectory, "..", "Resources", "GamePacks");
-        services.AddSingleton<IGameSkillPackService>(new GameSkillPackService(gamePacksDir));
+        services.AddSingleton<IGameSkillPackService>(sp =>
+            new GameSkillPackService(gamePacksDir, sp.GetService<ISessionTraceService>()));
         services.AddSingleton<IBrainPromptBuilder, BrainPromptBuilder>();
         services.AddSingleton<IGameJournalService>(sp =>
             new GameJournalService(sp.GetService<ITelemetryService>()));
@@ -305,7 +308,8 @@ public static class MauiProgram
                 sp.GetRequiredService<IExchangeManager>(),
                 sp.GetService<IBargeInPolicyService>(),
                 sp.GetService<Services.Audio.IUserSpeechDetector>(),
-                sp.GetService<Services.Audio.IAgentSpeechTracker>()));
+                sp.GetService<Services.Audio.IAgentSpeechTracker>(),
+                sp.GetService<ISessionTraceService>()));
 
         // Audio speech tracking (Phase 12B)
         services.AddSingleton<Services.Audio.IAgentSpeechTracker, Services.Audio.AgentSpeechTracker>();
@@ -320,6 +324,14 @@ public static class MauiProgram
 
         // Brain request channel (Phase 12D) — voice-to-brain deferral priority queue
         services.AddSingleton<IBrainRequestChannel, BrainRequestChannel>();
+
+        // Gaimer Team multi-agent service (Phase B)
+        services.AddSingleton<IGaimerPipeClient, GaimerPipeClient>();
+        services.AddSingleton<IClaudeProcessManager, ClaudeProcessManager>();
+        if (useMockServices)
+            services.AddSingleton<IGaimerTeamService, MockGaimerTeamService>();
+        else
+            services.AddSingleton<IGaimerTeamService, GaimerTeamService>();
 
         services.AddSingleton<IBrainEventRouter>(sp =>
         {
@@ -472,7 +484,8 @@ public static class MauiProgram
                             segmentAnalysisStore: sp.GetService<ISegmentAnalysisStore>(),
                             videoAnalysisTool: sp.GetService<IVideoAnalysisTool>(),
                             replayRecording: sp.GetService<IReplayRecordingService>(),
-                            packService: sp.GetService<IGameSkillPackService>());
+                            packService: sp.GetService<IGameSkillPackService>(),
+                            gaimerTeam: sp.GetService<IGaimerTeamService>());
                         return new OpenRouterBrainService(
                             client, toolExecutor, sp.GetRequiredService<ISessionManager>(),
                             brainPromptBuilder: sp.GetRequiredService<IBrainPromptBuilder>(),

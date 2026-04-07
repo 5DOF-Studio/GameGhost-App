@@ -23,17 +23,20 @@ public sealed class VoiceDeliveryGate : IVoiceDeliveryGate
     private readonly IBargeInPolicyService? _bargeInPolicy;
     private readonly IUserSpeechDetector? _userSpeechDetector;
     private readonly IAgentSpeechTracker? _agentSpeechTracker;
+    private readonly ISessionTraceService? _sessionTrace;
 
     public VoiceDeliveryGate(
         IExchangeManager exchangeManager,
         IBargeInPolicyService? bargeInPolicy = null,
         IUserSpeechDetector? userSpeechDetector = null,
-        IAgentSpeechTracker? agentSpeechTracker = null)
+        IAgentSpeechTracker? agentSpeechTracker = null,
+        ISessionTraceService? sessionTrace = null)
     {
         _exchangeManager = exchangeManager ?? throw new ArgumentNullException(nameof(exchangeManager));
         _bargeInPolicy = bargeInPolicy;
         _userSpeechDetector = userSpeechDetector;
         _agentSpeechTracker = agentSpeechTracker;
+        _sessionTrace = sessionTrace;
     }
 
     public DeliveryDecision ShouldDeliver(BrainResultPriority priority)
@@ -41,47 +44,83 @@ public sealed class VoiceDeliveryGate : IVoiceDeliveryGate
 
     public DeliveryDecision ShouldDeliver(BrainResultPriority priority, BrainResultType resultType)
     {
+        DeliveryDecision decision;
+        string reason;
+
         // 1. Silent → always suppress
         if (priority == BrainResultPriority.Silent)
-            return DeliveryDecision.Suppress;
-
+        {
+            decision = DeliveryDecision.Suppress;
+            reason = "silent_priority";
+        }
         // 2. Exchange active → deliver
-        if (_exchangeManager.IsExchangeActive)
-            return DeliveryDecision.Deliver;
-
+        else if (_exchangeManager.IsExchangeActive)
+        {
+            decision = DeliveryDecision.Deliver;
+            reason = "exchange_active";
+        }
         // 3. Interrupt → deliver (safety override)
-        if (priority == BrainResultPriority.Interrupt)
-            return DeliveryDecision.Deliver;
-
+        else if (priority == BrainResultPriority.Interrupt)
+        {
+            decision = DeliveryDecision.Deliver;
+            reason = "interrupt_override";
+        }
         // --- Exchange inactive, non-interrupt, non-silent ---
-
         // No barge-in service → suppress (pre-12C backward compat)
-        if (_bargeInPolicy == null)
-            return DeliveryDecision.Suppress;
-
+        else if (_bargeInPolicy == null)
+        {
+            decision = DeliveryDecision.Suppress;
+            reason = "no_bargein_service";
+        }
         // 4. Barge-in disabled → queue reminder
-        if (!_bargeInPolicy.IsBargeInEnabled)
-            return DeliveryDecision.QueueReminder;
+        else if (!_bargeInPolicy.IsBargeInEnabled)
+        {
+            decision = DeliveryDecision.QueueReminder;
+            reason = "bargein_disabled";
+        }
+        else
+        {
+            // Map result type to barge-in category
+            var category = MapToCategory(resultType);
+            if (category == null)
+            {
+                decision = DeliveryDecision.Suppress;
+                reason = "no_bargein_category";
+            }
+            // 5. Category not allowed → queue reminder
+            else if (!_bargeInPolicy.IsCategoryAllowed(category.Value))
+            {
+                decision = DeliveryDecision.QueueReminder;
+                reason = "category_not_allowed";
+            }
+            // 6. D-AI-4: User speaking → queue reminder (NEVER barge in while user speaking)
+            else if (_userSpeechDetector?.IsUserSpeaking == true)
+            {
+                decision = DeliveryDecision.QueueReminder;
+                reason = "user_speaking";
+            }
+            // 6b. D-AI-4: Agent speaking → queue reminder (NEVER barge in while agent speaking)
+            else if (_agentSpeechTracker?.IsSpeaking == true)
+            {
+                decision = DeliveryDecision.QueueReminder;
+                reason = "agent_speaking";
+            }
+            // 7. All checks passed → deliver (barge-in!)
+            else
+            {
+                decision = DeliveryDecision.Deliver;
+                reason = "bargein_allowed";
+            }
+        }
 
-        // Map result type to barge-in category
-        var category = MapToCategory(resultType);
-        if (category == null)
-            return DeliveryDecision.Suppress; // Error type — no barge-in category
+        _sessionTrace?.TrackEvent("voice.delivery.decision", new Dictionary<string, string>
+        {
+            ["result_type"] = resultType.ToString(),
+            ["decision"] = decision.ToString(),
+            ["reason"] = reason
+        });
 
-        // 5. Category not allowed → queue reminder
-        if (!_bargeInPolicy.IsCategoryAllowed(category.Value))
-            return DeliveryDecision.QueueReminder;
-
-        // 6. D-AI-4: User speaking → queue reminder (NEVER barge in while user speaking)
-        if (_userSpeechDetector?.IsUserSpeaking == true)
-            return DeliveryDecision.QueueReminder;
-
-        // 6b. D-AI-4: Agent speaking → queue reminder (NEVER barge in while agent speaking)
-        if (_agentSpeechTracker?.IsSpeaking == true)
-            return DeliveryDecision.QueueReminder;
-
-        // 7. All checks passed → deliver (barge-in!)
-        return DeliveryDecision.Deliver;
+        return decision;
     }
 
     private static BargeInCategory? MapToCategory(BrainResultType type) => type switch

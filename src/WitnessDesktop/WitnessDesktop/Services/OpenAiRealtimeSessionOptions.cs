@@ -27,12 +27,14 @@ public static class OpenAiRealtimeSessionOptions
                 },
                 turn_detection = new
                 {
-                    type = "server_vad",
-                    threshold = 0.5,
-                    prefix_padding_ms = 300,
-                    silence_duration_ms = 500,
+                    type = "semantic_vad",
+                    eagerness = "low",
                     create_response = true,
                     interrupt_response = true
+                },
+                input_audio_noise_reduction = new
+                {
+                    type = "near_field"
                 }
             }
         };

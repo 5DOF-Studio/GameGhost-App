@@ -1,232 +1,460 @@
-# Claude Agent Integration Spec — Gaimer Team
+# Claude Code Integration Spec — Gaimer Team
 
-**Status:** Draft (revised)
+**Status:** Draft (Channels-first revision)
 **Created:** 2026-04-01
-**Revised:** 2026-04-01
+**Revised:** 2026-04-06
 **Author:** Brainstorm session (PM + Claude)
 
 ---
 
 ## 1. Vision
 
-Gaimer's gaming agents (Leroy, Wasp, RASA) are the user's sole companion during gameplay. When they encounter tasks beyond local context — web research, strategy guides, code generation, external data — they hand off to **Gaimer Team**, a background service powered by Claude.
+Gaimer's gaming agents (Leroy, Wasp, RASA) are the user's sole companion during gameplay. When they encounter tasks beyond local context — web research, highlight reels, strategy guides, file operations, streaming control — they escalate to **Gaimer Team**, a background capability powered by Claude Code.
 
-Gaimer Team is never user-facing. It has no voice, no personality, no agent card. The gaming agent decides when to delegate, tells the user "I'm handing that to the team," and continues the gaming session uninterrupted. When Gaimer Team returns a result, the gaming agent narrates it in its own voice.
+Gaimer Team is never user-facing. It has no voice, no personality, no agent card. The gaming agent says "I'm handing that to the team," continues the gaming session uninterrupted, and narrates the result when it arrives.
 
 The user never talks to Gaimer Team directly. They talk to their agent, and their agent has a team behind it.
 
-Gaimer connects to a **locally-running Claude instance** (Desktop, Code, or Cowork) through an async messaging bridge. Gaimer is a peer to the Claude platform, not a wrapper around the API. The user opens Claude + opens Gaimer, and they communicate through a shared channel.
+**The key architectural insight: the user's machine is the computer. Their Claude Code config is their tool ecosystem. Gaimer is just the voice trigger and gaming-context layer.** Claude Code already has file ops, bash, web search, MCP servers, plugins — Gaimer doesn't re-provide any of it. It sends intents and receives results.
+
+The transport is **Claude Code Channels** — Gaimer ships a custom channel plugin that bridges the gaming companion to a running Claude Code session via named pipes. The user connects through ConnectorCards in the Gaimer UI — either launching a new Claude Code session or connecting to an existing one.
 
 ## 2. Key Decisions
 
 | # | Decision | Rationale |
 |---|----------|-----------|
 | D1 | Gaimer Team is a background service, not a voice agent | Oracle-class tasks are async. No personality, no voice, no agent card. Gaming agents relay results. |
-| D2 | Gaming agents own the handoff decision | No intent router. The agent knows what it can't answer from local context and initiates delegation. |
-| D3 | Fire-and-forget with callback notification | Submit task -> agent tells user "team's on it" -> gaming continues -> result arrives -> agent narrates. No blocking. |
-| D4 | Primary transport is async messaging bridge | Discord or Telegram as bidirectional channel to a running Claude instance. Fits the async pattern naturally. Direct API as fallback. |
-| D5 | Gaming agents keep their own fast tools | Quick lookups (web search, stat checks) stay on the gaming agent. Gaimer Team handles deep research, multi-step reasoning, code generation — tasks taking 10+ seconds. |
-| D6 | Connect to Claude's local platform, not wrap the API | Gaimer as peer to locally-running Claude. Messaging bridge is the practical path today. Swap transport when platform evolves. |
-| D7 | Gaimer Team Skills extend Claude's capabilities | Player-created tool bundles for Claude's agent. Distinct from existing `GameSkillPack` (brain observation schemas). Naming cleanup deferred. |
-| D8 | Auth is Claude's problem, not Gaimer's | User already has Claude running and authenticated. Gaimer doesn't manage API keys for Gaimer Team. |
-| D9 | Results flow through existing pipeline | Gaimer Team returns text -> gaming agent routes through voice (TTS) and/or timeline. No new UI surface. |
-| D10 | Interface is `IGaimerTeamService` | Fire-and-forget semantics. Callback/event for completion. Connection via messaging bridge discovery. |
+| D2 | Gaming agents own escalation via "Gaimer Team" keyword | Agent self-classifies what it can't handle locally. User can also explicitly request team. No separate classifier or intent router. |
+| D3 | Fire-and-forget with callback notification | Submit task → agent tells user "team's on it" → gaming continues → result arrives → agent narrates. No blocking. |
+| D4 | Primary transport is Claude Code Channels | Custom Gaimer Channel Plugin (MCP server declaring `claude/channel`). Named pipe IPC between Gaimer and plugin. |
+| D5 | Gaming agents keep their own fast tools | Quick lookups (Stockfish, brain analysis, journal) stay on the gaming agent. Gaimer Team handles deep research, multi-step reasoning, file operations — tasks taking 10+ seconds. |
+| D6 | Gaimer is a thin pipe to Claude Code's full ecosystem | Claude Code already has file ops, bash, web search, MCP servers. Gaimer sends intents, receives results. Channel plugin is ~200 lines — dumb pipe, no business logic. |
+| D7 | CLAUDE.md templates extend capabilities | Community writes CLAUDE.md overlay templates (OBS, Twitch, video pipelines). Claude Code's existing tool ecosystem does the rest. No custom tool bundles needed. |
+| D8 | Auth is Claude Code's problem, not Gaimer's | User authenticates via `claude auth login` (browser OAuth). Gaimer triggers this during setup but never touches credentials. |
+| D9 | Results flow through existing pipeline | Voice (TTS), timeline, ghost card. No new UI surface for results. Gaming agent routes Gaimer Team results through the same pipeline as brain results. |
+| D10 | Interface is `IGaimerTeamService` | Fire-and-forget semantics. Callback/event for completion. Connection via named pipe to channel plugin. |
+| D11 | Channel plugin bundled in Gaimer repo | Ship bundled for zero-friction. User never installs it manually. Publish to Claude Code plugin marketplace when protocol stabilizes. |
+| D12 | Layered CLAUDE.md — core + overlays | Gaimer owns a core CLAUDE.md (protocol rules, safety scoping — inviolate, never user-edited). Users add overlay templates for personalization. Community extends via overlays, not code. |
+| D13 | Process lifecycle: launch or discover | ConnectorCards UI. User can launch a new Claude Code session or connect to an existing one. Gaimer manages process health when it launches. |
+| D14 | Named pipes / Unix domain sockets for IPC | macOS: Unix domain socket. Windows: named pipes. No network exposure, file-system permissions, lower latency than WebSocket. Channel plugin's stdio is reserved for MCP transport to Claude Code. |
 
 ## 3. Architecture Overview
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  User's Machine                                              │
-│                                                              │
-│  ┌───────────────┐                     ┌──────────────────┐  │
-│  │  Gaimer       │                     │  Claude Instance  │  │
-│  │  (.NET MAUI)  │                     │  (Desktop/Code/   │  │
-│  │               │   Discord/Telegram  │   Cowork)         │  │
-│  │  RASA ────────┤──── async task ────►│                   │  │
-│  │  Leroy        │                     │  Tools:           │  │
-│  │  Wasp         │◄── result ──────────┤  - web search     │  │
-│  │               │   (callback)        │  - code exec      │  │
-│  │  Voice ◄──┐   │                     │  - file ops       │  │
-│  │  Brain    │   │                     │  - reasoning      │  │
-│  │  Timeline │   │                     │  - Gaimer Team    │  │
-│  │  Journal  │   │                     │    Skills         │  │
-│  └───────────┘   │                     └────────┬─────────┘  │
-│                  │                              │             │
-└──────────────────┼──────────────────────────────┼─────────────┘
-                   │                              │ Claude API
-                   │                              ▼
-                   │                     ┌──────────────┐
-                   │                     │  Anthropic   │
-                   │                     │  Cloud       │
-                   │                     └──────────────┘
-                   │
-            Gaming agent narrates
-            result in its own voice
+┌──────────────────────────────────────────────────────────────────┐
+│  User's Machine                                                   │
+│                                                                   │
+│  ┌───────────────────┐         ┌──────────────────────────────┐  │
+│  │  Gaimer            │         │  Channel Plugin (Node/Bun)   │  │
+│  │  (.NET MAUI)       │  named  │                              │  │
+│  │                    │  pipe   │  - Pipe listener              │  │
+│  │  Gaming Agents ────┤────────►│  - MCP notification fwd      │  │
+│  │  (RASA/Leroy/Wasp) │         │  - Response relay             │  │
+│  │                    │◄────────┤  - ~200 lines, dumb pipe     │  │
+│  │  IGaimerTeamService│         │                              │  │
+│  │                    │         │      ↕ MCP stdio             │  │
+│  │  Voice ◄──┐        │         └──────────┬───────────────────┘  │
+│  │  Brain    │        │                    │                      │
+│  │  Timeline │        │         ┌──────────┴───────────────────┐  │
+│  │  Ghost    │        │         │  Claude Code                  │  │
+│  │           │        │         │                               │  │
+│  └───────────┘        │         │  CLAUDE.md (core + overlays)  │  │
+│                       │         │  Tools: bash, fs, web search  │  │
+│            Gaming agent         │  MCP servers (user's config)  │  │
+│            narrates result      │  Plugins (user's ecosystem)   │  │
+│                                 └───────────────┬───────────────┘  │
+│                                                 │ Anthropic API    │
+└─────────────────────────────────────────────────┼──────────────────┘
+                                                  ▼
+                                         ┌──────────────┐
+                                         │  Anthropic    │
+                                         │  Cloud        │
+                                         └──────────────┘
 ```
 
 ### Separation of Concerns
 
 | Component | Responsibility |
 |-----------|---------------|
-| **Gaming Agent** (RASA/Leroy/Wasp) | Voice companion, game commentary, handoff decision, result narration |
-| **Gaimer Team** (`IGaimerTeamService`) | Async task submission, messaging bridge, callback dispatch |
-| **Claude Instance** (local) | Task reasoning, tool use, web search, code, information retrieval |
-| **Gaimer Team Skill** | Teaches Claude the GaimerProtocol, response format, gaming context |
+| **Gaming Agent** (RASA/Leroy/Wasp) | Voice companion, game commentary, escalation decision, result narration |
+| **IGaimerTeamService** | Task submission, named pipe client, process lifecycle, ConnectorCard state |
+| **Channel Plugin** | Dumb pipe — named pipe listener ↔ MCP notification forwarder. No business logic. |
+| **Claude Code** | Task reasoning, tool use, web search, file ops — full ecosystem. Governed by CLAUDE.md. |
+| **CLAUDE.md Core** | Gaimer protocol rules, safety scoping, response format. Owned by Gaimer, never edited by user. |
+| **CLAUDE.md Overlays** | User workflows — OBS, Twitch, video pipelines, streaming. Community-extensible. |
 | **Brain/Voice/Timeline** | Unchanged — gaming agent routes Gaimer Team results through existing pipeline |
 
-## 4. User Experience Flow
+### What's New vs Unchanged
 
-### The Handoff Pattern
+| Existing System | Impact |
+|----------------|--------|
+| IConversationProvider (Voice) | UNCHANGED — voice chat stays on OpenAI Realtime |
+| IBrainService (Vision) | UNCHANGED — visual analysis stays on OpenRouter/Gemini |
+| Brain-Voice Pipeline Rules | UNCHANGED — brain is sole image consumer, voice gets text only |
+| ConnectorCards | EXTENDED — new card type for Claude Code session connection |
+| **IGaimerTeamService** | NEW — async task submission to Claude Code via Channels |
+
+## 4. Configuration, Auth & Connection Flow
+
+### Feature Configuration (Settings → Team)
 
 ```
-1. User is playing, talking to RASA (gaming agent)
-2. User: "What's the best loadout for this map right now?"
-3. RASA recognizes this needs external research (beyond local context)
-4. RASA: "Let me hand that to the team. I'll let you know what they find."
-   → IGaimerTeamService.SubmitTaskAsync(task) — fire and forget
-   → RASA continues gaming commentary normally
-5. ...15-30 seconds pass, user keeps playing...
-6. Gaimer Team result arrives via callback
-7. RASA: "The team's back. The meta build for Ascent right now is Jett
-   with Operator, full shields. Top pick rate this patch at Diamond+.
-   Want the full breakdown?"
+Settings
+└── Team
+    ├── Provider: [Claude Code ▼]  (future: Codex, etc.)
+    │
+    └── When "Claude Code" selected:
+        ├── Installation check → install prompt if missing
+        ├── Authentication → browser OAuth flow
+        └── Status: ✓ Configured / ✗ Not configured
 ```
 
-### What Stays Local vs What Goes to Gaimer Team
+If a user tries to activate the Claude Code ConnectorCard from MainView without configuring first:
 
-| Local (Gaming Agent) | Gaimer Team (Claude) |
-|---------------------|---------------------|
-| Board evaluation, move analysis | Strategy research, opening theory deep dives |
-| Current game state commentary | Patch notes, meta analysis |
-| Stockfish engine queries | Build guides, loadout optimization |
-| Brain visual analysis | Code generation (scripts, trackers) |
-| Journal entries | Community resources (Discord servers, guides) |
-| Quick stat lookups (agent tools) | Multi-source synthesis, comparison research |
+```
+Alert: "Configure Claude Code in Settings → Team"
+       [Open Settings]  [Cancel]
+```
 
-The gaming agent makes this call. No classifier, no router — the agent knows its own limits.
+### Pre-flight Checks (triggered on provider selection)
 
-## 5. GaimerProtocol — Message Format
+1. **Claude Code installed?** — Check if `claude` CLI exists on PATH. If missing: show install prompt with download link. Re-check after user returns.
+2. **Claude Code authenticated?** — Run `claude auth status` (or equivalent). If not authenticated: "Sign in to Claude" button triggers `claude auth login` → opens browser for OAuth. Gaimer polls/waits for auth completion.
+3. **Both pass** → Feature status: ✓ Configured. ConnectorCard unlocked on MainView.
 
-### 5.1 Task Request (Gaimer → Claude via bridge)
+Auth persistence: Claude Code manages its own tokens. If auth expires mid-session, connection fails → Gaimer detects, shows "Re-authenticate" prompt on ConnectorCard. Don't re-check on every app launch — only on first enable and auth-related connection failures.
+
+### Configuration State
+
+| State | Settings shows | ConnectorCard shows |
+|-------|---------------|-------------------|
+| No provider selected | Provider dropdown, empty | Disabled or hidden |
+| Claude Code selected, not installed | Install prompt + link | Alert → "Configure in Settings" |
+| Claude Code selected, not authenticated | Authenticate button | Alert → "Configure in Settings" |
+| Claude Code configured | ✓ Configured | **Enabled** — [New Session] [Connect Existing] |
+| Connected | ✓ Configured, Connected | ● Connected, [Disconnect] |
+
+### ConnectorCard — Session Lifecycle
+
+**New Session flow:**
+1. User taps "New Session" on ConnectorCard
+2. Gaimer spawns Claude Code as a managed background process:
+   `claude --channels {plugin_path} --dangerously-skip-permissions`
+3. Channel plugin starts, creates named pipe/socket at known path
+4. Gaimer connects to pipe, sends health ping
+5. Claude Code responds → ConnectorCard status: **Connected**
+6. Gaming agent: "Team's online."
+
+**Connect Existing flow:**
+1. User taps "Connect Existing"
+2. Gaimer checks for an active named pipe/socket at the known path
+3. If found → sends health ping → ConnectorCard status: **Connected**
+4. If not found → "No active session detected. Launch a new one?"
+
+**Known socket paths:**
+- macOS: `~/Library/Application Support/Gaimer/gaimer-team.sock`
+- Windows: `\\.\pipe\gaimer-team`
+
+### Process Health Management (Gaimer-launched session)
+
+| Event | Gaimer's Response |
+|-------|-------------------|
+| Claude Code process exits | Attempt restart (max 3). After 3 failures → Disconnected, agent: "Team's offline right now." |
+| Named pipe connection drops | Reconnect with 2s backoff. If pipe path gone, treat as process exit. |
+| No response to health ping (30s) | Mark unhealthy. Retry ping. After 3 missed pings, restart process. |
+| User disconnects via ConnectorCard | Graceful shutdown — close pipe, terminate Claude Code process. |
+| Gaimer app closes | Terminate owned Claude Code process on app exit. |
+
+### Process Health Management (connected to existing session)
+
+| Event | Gaimer's Response |
+|-------|-------------------|
+| Pipe connection drops | Disconnected. "Session ended. Launch a new one?" |
+| No response to health ping | Same — offer to launch new session. |
+| User disconnects | Close pipe only. Do NOT terminate Claude Code (Gaimer doesn't own it). |
+
+## 5. Message Flow
+
+The channel plugin is a dumb pipe. The message format is what Gaimer writes to the named pipe and what it reads back.
+
+### Task Request (Gaimer → Claude Code)
 
 ```json
 {
-  "protocol": "gaimer/v1",
   "type": "task_request",
   "id": "task_a1b2c3",
-  "timestamp": "2026-04-01T21:30:00Z",
-  "task": "What's the best opening against the Sicilian Defense?",
+  "timestamp": "2026-04-06T21:30:00Z",
+  "task": "What's the best loadout for Shoothouse right now?",
   "context": {
-    "game": "Chess",
-    "agent": "Leroy",
-    "session_id": "s_abc123def456",
-    "game_state": {
-      "position_fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
-      "move_number": 1,
-      "player_color": "white"
-    },
-    "recent_activity": "User just played e4. Opponent responded c5 (Sicilian).",
-    "l1_context": "Board position after 1. e4 c5.",
-    "l2_context": "User has played 3 games this session. Opened with e4 each time.",
-    "response_format": "voice"
-  }
+    "game": "Call of Duty",
+    "agent": "RASA",
+    "session_id": "s_abc123",
+    "recent_activity": "User just finished a 12-kill game on Shoothouse. Running MP5 build.",
+    "l1_context": "Shoothouse HC Cyber Attack. User is top fragger.",
+    "l2_context": "3 games this session, averaging 1.8 K/D."
+  },
+  "response_format": "voice"
 }
 ```
 
-### 5.2 Task Result (Claude → Gaimer via bridge)
+### Task Result (Claude Code → Gaimer)
 
 ```json
 {
-  "protocol": "gaimer/v1",
   "type": "task_result",
   "id": "task_a1b2c3",
   "status": "complete",
-  "response": "Against the Sicilian, the Open Sicilian with 2. Nf3 and 3. d4 is the most aggressive mainline. If you want something solid, the Alapin with 2. c3 is easier to play and avoids heavy theory. Given your level, I'd go Alapin — it leads to positions where piece activity matters more than memorization.",
-  "actions_taken": [
-    "web_search: Sicilian Defense best responses for intermediate players",
-    "synthesized 3 sources"
-  ],
-  "follow_up": "Want me to walk you through the Alapin main lines?",
+  "response": "The meta build for Shoothouse right now is the MCW with JAK Heretic carbine kit. Faster TTK than your MP5 at every range on that map. Want the full attachment list?",
+  "actions_taken": ["web_search", "file_read: game-packs/cod-hc-cyber-attack/meta.md"],
+  "follow_up": "I can also check what the pros are running if you want.",
   "artifacts": []
 }
 ```
 
-### 5.3 Status Update (Claude → Gaimer, Optional)
-
-For long-running tasks, Claude can send progress:
+### Status Update (Claude Code → Gaimer, optional)
 
 ```json
 {
-  "protocol": "gaimer/v1",
   "type": "status_update",
   "id": "task_a1b2c3",
   "status": "in_progress",
-  "message": "Searching for loadout guides, found 4 sources. Comparing now."
+  "message": "Found 3 sources on current meta. Comparing builds."
 }
 ```
 
-### 5.4 Error (Claude → Gaimer)
+### Error (Claude Code → Gaimer)
 
 ```json
 {
-  "protocol": "gaimer/v1",
-  "type": "task_result",
+  "type": "error",
   "id": "task_a1b2c3",
   "status": "error",
-  "response": "I couldn't find recent patch notes for that weapon. The game's wiki might be down.",
-  "error_code": "tool_failure",
-  "actions_taken": ["web_search: failed after 2 attempts"]
+  "response": "Couldn't find recent patch data. The API might be down.",
+  "error_code": "tool_failure"
 }
 ```
 
-## 6. Gaimer-Side Implementation
+### Permission Request (Claude Code → Gaimer)
 
-### 6.1 IGaimerTeamService
+```json
+{
+  "type": "permission_request",
+  "id": "perm_xyz",
+  "task_id": "task_a1b2c3",
+  "action": "Delete 3 replay segments older than 24h",
+  "risk": "low",
+  "timeout_seconds": 60
+}
+```
+
+### Permission Response (Gaimer → Claude Code)
+
+```json
+{
+  "type": "permission_response",
+  "id": "perm_xyz",
+  "approved": true
+}
+```
+
+### Health Check
+
+```json
+// Gaimer → Plugin
+{ "type": "ping" }
+
+// Plugin → Gaimer
+{ "type": "pong" }
+```
+
+### Design Notes
+
+- No `"protocol": "gaimer/v1"` header — the named pipe IS the protocol boundary. Unnecessary overhead removed.
+- Context is text-based (`l1_context`, `l2_context`, `recent_activity`), not structured game state. Claude Code needs narrative context for research tasks, not FEN strings.
+- `response_format` tells Claude Code whether to write 2-3 sentence voice answer or longer detailed response.
+- `artifacts` array is kept for URLs, code blocks, data. Gaming agent decides what to surface in timeline vs narrate.
+
+### What Gaimer Does NOT Send
+
+- Raw screen captures (brain pipeline rule: brain is sole image consumer)
+- User credentials or personal data
+- Full conversation history (only recent context summaries)
+- Structured game state objects (Claude Code gets text summaries)
+
+### Permission Request Defense-in-Depth
+
+Three layers coexist to minimize permission friction:
+
+```
+Layer 1: --dangerously-skip-permissions   (blocks most prompts)
+Layer 2: CLAUDE.md Core safety scoping    (catches more via rules)
+Layer 3: Permission Request UI            (handles whatever gets through)
+```
+
+`--dangerously-skip-permissions` reduces but does not eliminate permission prompts. CLAUDE.md scoping catches more. The Permission Request UI handles the rest gracefully. Not a phased replacement — a defense-in-depth stack.
+
+**Permission UI modes:**
+- **MainView:** Tap Allow/Deny buttons
+- **Ghost FAB (in-game):** Card appears with buttons + mic auto-activates for voice approval ("yes"/"no")
+- **Timeout:** 60s with no response → auto-deny. Agent narrates: "Team needed approval but you were busy."
+
+## 6. CLAUDE.md Template Structure
+
+### Layered Architecture
+
+```
+Claude Code Session Working Directory
+├── CLAUDE.md (Core)              ← Gaimer-owned, auto-deployed, never user-edited
+├── gaimer-overlays/
+│   ├── streaming.md              ← User-selected or custom overlay
+│   ├── obs-integration.md        ← Community template
+│   └── custom.md                 ← User's own additions
+```
+
+### CLAUDE.md Core (owned by Gaimer)
+
+Deployed by Gaimer during session setup. Defines the protocol contract.
+
+```markdown
+# Gaimer Team — Core Protocol
+
+## Your Role
+You are receiving tasks from Gaimer, a desktop gaming companion.
+The user does NOT see your responses directly — a gaming agent
+will narrate your findings in its own voice.
+
+## Response Format
+Return JSON matching the task_result schema:
+- response: concise, voice-ready text (2-3 sentences for voice format)
+- actions_taken: list of tools you used
+- follow_up: optional next step suggestion
+- artifacts: URLs, code, data worth saving
+
+## Rules
+1. Lead with the answer, not the process.
+2. For "voice" format: 2-3 sentences max, written for speech.
+3. For "detailed" format: full explanation, can be longer.
+4. Use your tools freely — search, file ops, scripts, MCP servers.
+5. If you can't complete a task, say so briefly.
+6. Send status_update for tasks taking >10 seconds.
+7. Never attempt to speak to the user directly or control Gaimer's UI.
+8. Never modify files in Gaimer's application directory.
+
+## Safety Boundaries
+- File operations: user's home directory only, no system paths
+- Network: web search and public APIs only, no authenticated services
+  unless user has configured them via MCP servers
+- Destructive actions (delete, overwrite): always request permission
+  via permission_request message, never auto-execute
+```
+
+### Overlay Templates (user-selected, community-authored)
+
+Overlays extend what Claude Code can do when handling Gaimer Team tasks. They don't modify the core protocol — they add domain knowledge and workflow patterns.
+
+**Example: `streaming.md`**
+```markdown
+# Streaming Workflow
+
+When the user asks about streaming, clips, or highlights:
+- Replay segments are in ~/Library/replays/{session-id}/
+- Use ffmpeg for video operations (installed via Homebrew)
+- Output clips to ~/Movies/Gaimer Clips/
+
+When asked to make a highlight reel:
+1. Find recent replay segments
+2. Identify key moments (kills, objectives, clutches)
+3. Extract and concatenate with ffmpeg
+4. Save to clips directory
+5. Report back with file path and duration
+```
+
+**Example: `obs-integration.md`**
+```markdown
+# OBS Studio Integration
+
+OBS WebSocket is available at localhost:4455
+Password is in ~/.config/obs-studio/websocket.json
+
+Available actions:
+- Switch scenes: use obs-websocket MCP server
+- Start/stop recording
+- Set stream title
+- Toggle sources
+
+When the user says "start streaming" or "go live":
+1. Switch to gaming scene
+2. Start recording
+3. Confirm via task_result
+```
+
+### Template Distribution
+
+| Source | How it gets there |
+|---|---|
+| Gaimer-shipped defaults | Bundled in app, deployed on session setup |
+| Community templates | Downloaded from Gaimer website, placed in overlays directory |
+| User custom | User creates their own .md files in overlays directory |
+
+### Overlay Management
+
+- Gaimer's ConnectorCard settings show active overlays with toggles
+- User can enable/disable overlays without deleting them
+- Gaimer concatenates Core + active overlays when deploying to Claude Code session
+- Core is always first, overlays appended in alphabetical order
+
+### Progressive Context Enrichment
+
+The CLAUDE.md Core can evolve over time to teach Claude Code more about Gaimer:
+
+- **Phase 1:** Claude Code knows it's receiving tasks from a gaming companion, responds in voice-ready format
+- **Phase 2:** Claude Code understands Gaimer's game packs, can reference them in file system
+- **Phase 3:** Claude Code understands the capture pipeline, replay segments, can search/analyze them
+- **Phase 4:** Claude Code understands the full Gaimer architecture — can suggest optimizations, debug issues, build custom workflows
+
+Each phase is a CLAUDE.md Core revision — no protocol changes needed. The thin pipe stays thin.
+
+## 7. Gaimer-Side Implementation
+
+### IGaimerTeamService
 
 ```csharp
 public interface IGaimerTeamService
 {
-    /// <summary>
     /// Submit a task to Gaimer Team. Fire-and-forget — returns task ID immediately.
-    /// Result arrives later via TaskCompleted event.
-    /// </summary>
     Task<string> SubmitTaskAsync(GaimerTeamTask task, CancellationToken ct = default);
 
-    /// <summary>
     /// Cancel a pending task.
-    /// </summary>
     Task CancelTaskAsync(string taskId, CancellationToken ct = default);
 
-    /// <summary>
+    /// Respond to a permission request from Claude Code.
+    Task RespondToPermissionAsync(string permissionId, bool approved, CancellationToken ct = default);
+
     /// Fired when a task completes (success or error).
-    /// Gaming agent subscribes to narrate results.
-    /// </summary>
     event EventHandler<GaimerTeamResultEventArgs> TaskCompleted;
 
-    /// <summary>
     /// Fired when a task sends a progress update.
-    /// Gaming agent can optionally relay to user.
-    /// </summary>
     event EventHandler<GaimerTeamProgressEventArgs> TaskProgress;
 
-    /// <summary>
-    /// Whether the messaging bridge to Claude is reachable.
-    /// </summary>
+    /// Fired when Claude Code requests permission for an action.
+    event EventHandler<GaimerTeamPermissionEventArgs> PermissionRequested;
+
+    /// Connection state.
     bool IsConnected { get; }
+    bool IsConfigured { get; }
 
-    /// <summary>
-    /// Discover and connect to the messaging bridge.
-    /// </summary>
-    Task ConnectAsync(CancellationToken ct = default);
+    /// Launch a new Claude Code session with channel plugin.
+    Task<bool> LaunchSessionAsync(CancellationToken ct = default);
 
-    /// <summary>
-    /// Disconnect from the messaging bridge.
-    /// </summary>
-    Task DisconnectAsync();
+    /// Connect to an existing Claude Code session.
+    Task<bool> ConnectExistingAsync(CancellationToken ct = default);
+
+    /// Disconnect and optionally terminate owned session.
+    Task DisconnectAsync(bool terminateOwnedSession = true);
 }
 ```
 
-### 6.2 Models
+### Models
 
 ```csharp
 public record GaimerTeamTask
@@ -245,14 +473,13 @@ public record GaimerTeamContext
     public string RecentActivity { get; init; }
     public string L1Context { get; init; }
     public string L2Context { get; init; }
-    public Dictionary<string, object> GameState { get; init; }
 }
 
 public record GaimerTeamResult
 {
     public string TaskId { get; init; }
     public string Status { get; init; }       // "complete" | "error"
-    public string Response { get; init; }      // Voice-ready text
+    public string Response { get; init; }
     public List<string> ActionsTaken { get; init; }
     public string FollowUp { get; init; }
     public string ErrorCode { get; init; }
@@ -266,6 +493,15 @@ public record GaimerTeamArtifact
     public string Content { get; init; }
 }
 
+public record GaimerTeamPermissionRequest
+{
+    public string Id { get; init; }
+    public string TaskId { get; init; }
+    public string Action { get; init; }
+    public string Risk { get; init; }      // "low" | "medium" | "high"
+    public int TimeoutSeconds { get; init; } = 60;
+}
+
 public class GaimerTeamResultEventArgs : EventArgs
 {
     public GaimerTeamResult Result { get; init; }
@@ -276,394 +512,307 @@ public class GaimerTeamProgressEventArgs : EventArgs
     public string TaskId { get; init; }
     public string Message { get; init; }
 }
+
+public class GaimerTeamPermissionEventArgs : EventArgs
+{
+    public GaimerTeamPermissionRequest Request { get; init; }
+}
 ```
 
-### 6.3 Gaming Agent Handoff (in MainViewModel or BrainEventRouter)
+### Gaming Agent Escalation (in BrainEventRouter or MainViewModel)
 
 ```csharp
-// Gaming agent decides to delegate
+// Gaming agent decides to escalate
 var task = new GaimerTeamTask
 {
     Task = userUtterance,
-    Context = BuildContextFromSession(),
-    ResponseFormat = "voice"
+    Context = new GaimerTeamContext
+    {
+        Game = _sessionManager.CurrentGame,
+        Agent = _sessionManager.ActiveAgent.Name,
+        SessionId = _sessionManager.SessionId,
+        RecentActivity = _contextEnvelope.L1Summary,
+        L1Context = _contextEnvelope.L1Summary,
+        L2Context = _contextEnvelope.L2Summary
+    }
 };
 
 var taskId = await _gaimerTeam.SubmitTaskAsync(task);
 
-// Tell user immediately
+// Agent tells user immediately
 await _voicePipeline.SpeakAsync(
     "Let me hand that to the team. I'll let you know what they find.");
+```
 
-// ... gaming continues normally ...
+### Result & Permission Handlers (wired once at initialization)
 
-// Callback handler (wired once in initialization)
-private void OnGaimerTeamTaskCompleted(object sender, GaimerTeamResultEventArgs e)
+```csharp
+_gaimerTeam.TaskCompleted += (s, e) =>
 {
-    var result = e.Result;
-
-    if (result.Status == "complete")
+    if (e.Result.Status == "complete")
     {
-        // Gaming agent narrates in its own voice
-        var narration = $"The team's back. {result.Response}";
+        var narration = $"The team's back. {e.Result.Response}";
         _ = _voicePipeline.SpeakAsync(narration);
-
-        // Optionally surface in timeline
-        _ = _timelineFeed.AddGaimerTeamResult(result);
+        _ = _timelineFeed.AddGaimerTeamResult(e.Result);
     }
     else
     {
         _ = _voicePipeline.SpeakAsync(
             "The team ran into an issue with that one. We can try again later.");
     }
-}
+};
+
+_gaimerTeam.PermissionRequested += (s, e) =>
+{
+    // Routes to Ghost Card (if in-game) or MainView alert
+    _ = _permissionPresenter.ShowPermissionRequest(e.Request);
+};
 ```
 
-### 6.4 Integration Point
+### DI Registration
 
 ```csharp
 // MauiProgram.cs
 services.AddSingleton<IGaimerTeamService, GaimerTeamService>();
 ```
 
-### 6.5 Relationship to Existing Services
+### Relationship to Existing Services
 
 ```
-IConversationProvider  → Voice chat (OpenAI Realtime)     — UNCHANGED
-IBrainService          → Visual analysis (OpenRouter)      — UNCHANGED
-IGaimerTeamService     → Background tasks (Claude via bridge) — NEW
+IConversationProvider  → Voice chat (OpenAI Realtime)        — UNCHANGED
+IBrainService          → Visual analysis (OpenRouter/Gemini)  — UNCHANGED
+IGaimerTeamService     → Background tasks (Claude Code)       — NEW
 
 All three are independent services in the DI container.
-The gaming agent (not a router) decides when to delegate to Gaimer Team.
+The gaming agent (not a router) decides when to escalate to Gaimer Team.
 Brain-voice pipeline rules remain inviolate.
 ```
 
-## 7. Communication Layer — Messaging Bridge
+## 8. Channel Plugin Design
 
-### 7.1 Why a Messaging Bridge
+The channel plugin is the technical core — but intentionally minimal. ~200 lines of Node/Bun.
 
-The user already has Claude running locally (Desktop, Code, or Cowork). Rather than Gaimer managing API keys, auth, and agent lifecycle, Gaimer connects to the existing Claude instance through a shared messaging channel. The messaging platform handles delivery, ordering, and persistence.
+### Responsibilities
 
-### 7.2 Transport Options
+1. Listen on named pipe/Unix domain socket for Gaimer messages
+2. Forward task messages to Claude Code as MCP notifications
+3. Relay Claude Code responses back to Gaimer through the pipe
+4. Forward permission requests from Claude Code to Gaimer
+5. Health ping/pong
 
-| Transport | Direction | Latency | Setup |
-|-----------|-----------|---------|-------|
-| **Discord** (primary) | Bidirectional | 3-8s | Bot + bridge (e.g., disclaude/app, claude-code-discord) |
-| **Telegram** (alternative) | Bidirectional | 3-8s | Bot + bridge (e.g., claude-code-telegram) |
-| **Direct Claude API** (fallback) | Request-response | 1-3s | API key in Gaimer settings |
+That's it. No validation, no state management, no retry logic. Dumb pipe.
 
-The messaging bridge is the primary path — it connects to the user's existing Claude instance. The direct API fallback exists for users who prefer simplicity or don't run Claude locally.
-
-### 7.3 Connection Flow
+### Plugin Structure (bundled in Gaimer repo)
 
 ```
-1. User launches Claude (Desktop/Code/Cowork)
-2. Claude connects to messaging bridge (Discord/Telegram bot)
-   — configured once, persists across sessions
-3. User launches Gaimer
-4. Gaimer discovers the messaging bridge
-   — checks for known bot/channel via stored config
-5. Gaimer sends a health ping through the channel
-6. Claude responds → IGaimerTeamService.IsConnected = true
-7. Gaming agent: "Team's online." (optional status indicator)
+src/gaimer-channel-plugin/
+├── .claude-plugin/
+│   └── plugin.json
+├── package.json
+├── src/
+│   └── index.ts              ← Entry point (~200 lines)
+├── .mcp.json                 ← Declares claude/channel capability
+└── CLAUDE.md                 ← Core protocol file (deployed to session)
 ```
 
-### 7.4 Gaimer Team Skill (Claude-Side)
-
-The Gaimer Team Skill is what teaches Claude how to respond to GaimerProtocol messages arriving through the messaging bridge. It ships bundled with Gaimer but is installed on the Claude side.
-
-```markdown
-# Gaimer Team Skill — System Context
-
-You are receiving tasks from Gaimer, a desktop gaming companion app.
-Tasks arrive as JSON following the GaimerProtocol (gaimer/v1).
-
-## Your Role
-
-You are the research and task execution team behind a gaming agent.
-The user does NOT see your responses directly — the gaming agent
-(named in context.agent) will narrate your findings in its own voice.
-
-## How to Respond
-
-Return JSON following the gaimer/v1 task_result format:
-- response: concise, voice-ready text (will be spoken aloud mid-game)
-- actions_taken: list of tools you used (for transparency)
-- follow_up: optional next step suggestion
-- artifacts: URLs, code, data the user might want saved
-
-## Rules
-
-1. Lead with the answer, not the process.
-2. Keep responses under 3 sentences for voice format.
-3. Use your tools freely — search, code, analyze.
-4. Respect game context (chess player asking "openings" = chess).
-5. If you can't complete a task, say so briefly.
-6. You may send status_update messages for tasks taking >10s.
-```
-
-### 7.5 Future: Direct Local Peer Connection
-
-When Claude's platform supports direct local peer connections (no messaging intermediary), swap the transport behind `IGaimerTeamService`. The interface, protocol, and gaming agent behavior remain unchanged.
-
-## 8. Gaimer Team Skill Packs
-
-### 8.1 What Is a Gaimer Team Skill Pack
-
-A portable, player-created bundle that gives Claude game-specific tools when handling Gaimer Team tasks. It consists of:
-
-1. **Manifest** — metadata, game binding, version, author
-2. **Tool definitions** — JSON schemas (Claude decides when to call them)
-3. **Executors** — code/endpoints that run when Claude calls a tool
-4. **Context fragment** — extra system prompt text for Claude
-5. **Assets** (optional) — reference data, lookup tables
-
-A Gaimer Team Skill Pack extends what Claude can do. It does NOT modify Gaimer's UI, capture pipeline, or brain.
-
-### 8.2 Manifest Format
+### plugin.json
 
 ```json
 {
-  "manifest_version": 1,
-  "id": "valorant-meta-tracker",
-  "name": "Valorant Meta Tracker",
-  "version": "1.2.0",
+  "name": "gaimer-channel",
+  "version": "1.0.0",
+  "description": "Gaimer gaming companion channel for Claude Code",
   "author": {
-    "name": "FragMaster42",
-    "gaimer_id": "usr_abc123"
-  },
-  "description": "Real-time agent win rates, team comp suggestions, and map-specific meta for Valorant.",
-  "game": "Valorant",
-  "tags": ["meta", "agent-select", "comp", "ranked"],
-  "compatibility": {
-    "gaimer_min_version": "2.0.0",
-    "protocol_version": "gaimer/v1"
-  },
-  "permissions": [
-    "network:api.tracker.gg",
-    "network:valorant-api.com"
-  ],
-  "tools": [ "..." ],
-  "context_file": "context.md",
-  "icon": "icon.png"
-}
-```
-
-### 8.3 Tool Definition
-
-Each tool follows the Claude tool use schema:
-
-```json
-{
-  "name": "get_agent_winrates",
-  "description": "Get current agent win rates by map and rank bracket from tracker.gg. Use when the player asks about the meta, best picks, or agent tier lists.",
-  "input_schema": {
-    "type": "object",
-    "properties": {
-      "map": {
-        "type": "string",
-        "description": "Map name (e.g., 'Ascent', 'Bind'). Optional — omit for all maps.",
-        "enum": ["Ascent", "Bind", "Breeze", "Fracture", "Haven", "Icebox", "Lotus", "Pearl", "Split", "Sunset"]
-      },
-      "rank_bracket": {
-        "type": "string",
-        "description": "Rank bracket. Defaults to player's rank if known.",
-        "enum": ["iron-bronze", "silver-gold", "platinum-diamond", "ascendant-immortal", "radiant"]
-      }
-    }
-  },
-  "executor": {
-    "type": "http",
-    "method": "GET",
-    "url_template": "https://api.tracker.gg/api/v2/valorant/standard/profile?map={map}&rank={rank_bracket}",
-    "headers": {
-      "TRN-Api-Key": "{{secrets.tracker_api_key}}"
-    },
-    "response_transform": "extract .data.agents | top 5 by winRate"
+    "name": "5DOF Studio"
   }
 }
 ```
 
-### 8.4 Executor Types
+### Core Logic (pseudocode)
 
-| Type | Description | Use Case |
-|------|------------|----------|
-| `http` | REST API call | Third-party game APIs, stat trackers |
-| `script` | Local script (sandboxed) | Data parsing, calculations |
-| `static` | Return bundled data | Lookup tables, callout maps, reference guides |
-| `webhook` | POST to external service | Discord bots, streaming tools, notifications |
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk";
 
-### 8.5 How Gaimer Loads Packs
+// 1. Declare channel capability
+const server = new McpServer({
+  capabilities: { "claude/channel": {} }
+});
 
-On each Gaimer Team task, Gaimer:
+// 2. Create named pipe listener
+const pipePath = platform === "darwin"
+  ? `${homedir}/Library/Application Support/Gaimer/gaimer-team.sock`
+  : "\\\\.\\pipe\\gaimer-team";
 
-1. Identifies the current game (from session context)
-2. Finds active skill packs matching that game (+ universal packs)
-3. Merges tool definitions and context fragments into the task payload
-4. Sends via messaging bridge — Claude now has pack tools available
+const pipeServer = createPipeServer(pipePath);
 
-### 8.6 Pack Lifecycle
+// 3. On message from Gaimer → forward to Claude Code
+pipeServer.on("message", (msg) => {
+  if (msg.type === "task_request") {
+    server.sendNotification("gaimer/task", msg);
+  }
+  if (msg.type === "permission_response") {
+    server.sendNotification("gaimer/permission_response", msg);
+  }
+  if (msg.type === "ping") {
+    pipeServer.send({ type: "pong" });
+  }
+});
 
-```
-Create → Test → Publish → Install → Activate → Update
-```
+// 4. On response from Claude Code → relay to Gaimer
+server.onNotification("gaimer/result", (msg) => {
+  pipeServer.send(msg);
+});
 
-- **Create:** Player authors locally (JSON manifest + tools + context)
-- **Test:** Local test mode — pack loads in sandbox, flagged as testing
-- **Publish:** Upload to Gaimer Skill Pack registry (automated validation + abuse scan)
-- **Install:** One tap from registry. Downloads to local skill pack directory
-- **Activate:** Auto-activates when matching game detected. Manual toggle in settings.
-- **Update:** Authors push versions. Breaking changes (new permissions) require re-approval.
+server.onNotification("gaimer/permission_request", (msg) => {
+  pipeServer.send(msg);
+});
 
-### 8.7 In-Game Pack Creation (Future)
-
-```
-Player: "Hey, I keep looking up smoke lineups for Bind. Can you make that a skill?"
-
-RASA: "Sure, I'll have the team set that up."
-      → Hands off to Gaimer Team
-
-Claude builds the skill pack:
-  1. Generates manifest and tool definition
-  2. Tests the executor against the API
-  3. Writes the context fragment
-  4. Saves to local skill pack directory
-
-RASA: "The team built a Smoke Lineup Finder. It covers all maps.
-       Want me to publish it or keep it private?"
+// 5. Start
+server.connect(process.stdin, process.stdout);  // MCP stdio to Claude Code
+pipeServer.listen();                             // Named pipe to Gaimer
 ```
 
-The player never touches JSON. They describe what they want while gaming.
+### How Gaimer Deploys It
 
-### 8.8 Security Model
+**During LaunchSessionAsync:**
+1. Gaimer locates the bundled plugin at `{app_resources}/gaimer-channel-plugin/`
+2. Deploys CLAUDE.md Core + active overlays to a working directory
+3. Launches Claude Code: `claude --channels {plugin_path} --dangerously-skip-permissions`
+4. Waits for pipe to become available
+5. Sends health ping, confirms connection
 
-| Layer | Protection |
-|-------|-----------|
-| **Permissions** | Each pack declares network domains. User approves on install. |
-| **Sandbox** | Executors cannot access filesystem, Gaimer internals, or other packs. |
-| **Secrets** | API keys stored encrypted per-pack. Resolved locally, never sent to Claude. |
-| **Review** | Published packs scanned for malicious patterns. Community flagging. |
-| **Revocation** | Gaimer can remotely disable a pack if abuse detected. |
-| **Transparency** | `actions_taken` in results shows which pack tools were used. |
+**During ConnectExistingAsync:**
+1. Checks if pipe exists at known path
+2. Connects, sends health ping
+3. If responsive → connected. If not → "No active session."
 
-### 8.9 Example Skill Packs
+## 9. Implementation Phases
 
-| Pack | Game | Tools | What It Does |
-|------|------|-------|-------------|
-| **Meta Tracker** | Valorant | `get_agent_winrates`, `suggest_comp` | Real-time meta from tracker.gg |
-| **Opening Explorer** | Chess | `explore_opening`, `get_gm_games` | ECO lookup, grandmaster game search |
-| **Build Optimizer** | Diablo IV | `get_build`, `compare_gear` | Build guides + gear stat comparison |
-| **Callout Coach** | CS2 | `get_callouts`, `get_smokes` | Map callouts + utility lineups |
-| **Patch Watcher** | League | `get_patch_notes`, `champion_changes` | Patch diffs + champion impact |
-| **Replay Analyst** | Any | `tag_moment`, `get_tagged_moments` | Mark moments during play, review later |
-| **Stream Assistant** | Any | `set_stream_title`, `run_poll` | OBS + Twitch integration |
+### Phase A: Interface + Mock (No Claude Code Yet)
 
-## 9. Boundaries
+- Define `IGaimerTeamService`, models, event args
+- Mock implementation returning canned responses after configurable delay
+- Gaming agent escalation wiring — agent prompt updated with "Gaimer Team" concept
+- Result handler — TaskCompleted → voice narration + timeline entry
+- Permission handler — PermissionRequested → alert UI (simple Allow/Deny)
+- Test full loop: user speaks → agent escalates → mock returns → agent narrates
 
-### What Gaimer Sends to Claude (via bridge)
+**Validates:** The handoff pattern works end-to-end without any Claude Code dependency.
 
-- Natural language task (user's words, relayed by gaming agent)
-- Game context (game name, agent, session state)
-- L1/L2 context summaries (text only — no raw images)
-- Response format preference
-- Active skill pack tool definitions + context fragments
+### Phase B: Channel Plugin + Connection
 
-### What Gaimer Does NOT Send
+- Build the channel plugin (Node/Bun, ~200 lines)
+- Named pipe / Unix domain socket IPC (macOS first, Windows later)
+- `LaunchSessionAsync` — spawn Claude Code with channel plugin
+- `ConnectExistingAsync` — discover and connect to running session
+- Process health management (restart, reconnect, ping/pong)
+- CLAUDE.md Core deployed to session
+- Live test: real Claude Code responses through the channel
 
-- Raw screen captures (brain pipeline rule: brain is sole image consumer)
-- User credentials or personal data
-- Full conversation history (only relevant recent context)
+> **Resolve before this phase:** Q11 — Node vs Bun for channel plugin runtime
 
-### What Claude Does NOT Do
+**Validates:** Gaimer can talk to Claude Code and get real results back.
 
-- Speak to the user directly (gaming agent narrates)
-- Control Gaimer's UI
-- Modify game state
-- Access the user's filesystem (unless tasked and permitted via skill pack)
-- Persist data between sessions (Gaimer owns persistence)
+### Phase C: Settings + ConnectorCard UX
+
+- Team section in Settings — provider selection (Claude Code)
+- Pre-flight checks (installation, authentication, browser OAuth flow)
+- ConnectorCard for Claude Code — New Session / Connect Existing
+- Connection state management in UI
+- "Configure in Settings" alert guard on MainView
+
+> **Resolve before this phase:** Q13 — Multiple concurrent sessions handling
+
+**Validates:** User can set up and manage the Claude Code connection without touching a terminal.
+
+### Phase D: Context Enrichment
+
+- Wire SharedContextEnvelope into GaimerTeamContext
+- L1/L2 context assembly from existing brain/session state
+- Game-specific context (active game pack name, recent journal entries)
+- Replay segment awareness (recent recordings listed in context)
+
+**Validates:** Claude Code has enough context to give game-relevant answers.
+
+### Phase E: CLAUDE.md Overlay System
+
+- Overlay directory structure and file management
+- Overlay toggle UI in ConnectorCard settings
+- Template concatenation (Core + active overlays) on session deploy
+- Ship 2-3 starter templates (general gaming, streaming/OBS, replay editing)
+- Community template download flow
+
+> **Resolve before this phase:** Q7 — Overlay size limits and token budget
+
+**Validates:** Users can extend Claude Code's gaming capabilities without writing code.
+
+### Phase F: Production Hardening
+
+- Error handling, timeout management
+- Task queue (multiple pending tasks)
+- Connection recovery (pipe drops, Claude Code crashes)
+- Telemetry (task latency, success rate, escalation frequency)
+- Rate limiting (prevent rapid-fire voice escalation)
+- Permission request timeout + auto-deny
+
+> **Resolve before this phase:** Q12 — Session resume after crash (resubmit vs fail pending tasks)
+
+**Validates:** Stable under real-world gaming session conditions.
+
+### Phase G: Permission Request UI (Full)
+
+- Ghost Card permission request display
+- Voice approval (mic hot for "yes"/"no" when in-game)
+- Permission history log
+- Risk-based presentation (low/medium/high styling)
+
+> **Resolve before this phase:** Q14 — Voice approval accuracy (existing pipeline vs keyword detection)
+
+**Validates:** Users can approve Claude Code actions without leaving the game.
+
+### Phase H: Windows Platform
+
+- Named pipes implementation for Windows
+- Claude Code installation/auth check for Windows
+- Cross-platform testing
+- Platform-specific socket paths and process management
+
+**Validates:** Full feature parity on Windows.
 
 ## 10. Open Questions
 
-1. **Messaging bridge selection:** Discord vs Telegram as primary. Discord has richer bot ecosystem; Telegram Bot API is simpler. Need to evaluate latency and reliability for both.
+### Resolved
 
-2. **Bridge discovery:** How does Gaimer find the messaging bridge on first launch? Options: QR code pairing, shared config file, mDNS/Bonjour discovery.
+| # | Original Question | Resolution |
+|---|---|---|
+| Q1 | Discord vs Telegram? | Neither — Claude Code Channels with custom plugin (D4) |
+| Q2 | Bridge discovery? | Named pipe at known path. ConnectorCard UI for new/existing session (D13) |
+| Q3 | Multi-turn tasks? | Deferred beyond V1. Each task is independent. |
+| Q4 | Status updates UX? | Gaming agent optionally relays progress. Ghost card can show "Team working..." |
+| Q5 | Offline fallback? | Agent says "Team's not available right now." No fallback transport in V1. |
+| Q6 | Rate limiting? | Phase F. Prevent rapid-fire voice escalation. |
+| Q8 | Pack conflicts? | N/A — CLAUDE.md overlays don't conflict the way tool packs did. Concatenation order is alphabetical. |
+| Q9 | Pack monetization? | N/A — overlays are markdown files. Community shares freely. |
+| Q10 | NanoClaw? | Unnecessary — Channels architecture eliminates the need for middleware. |
 
-3. **Multi-turn tasks:** User asks a follow-up about a Gaimer Team result. Does the gaming agent submit a new task with prior context, or does Claude maintain conversation state in the bridge channel?
+### Still Open (resolve at phase gate)
 
-4. **Status updates UX:** Should the gaming agent relay progress ("team's still working on it, found 3 sources so far") or stay silent until completion?
+| # | Question | Context | Resolve Before |
+|---|---|---|---|
+| Q7 | **Overlay size limits** | Concatenated CLAUDE.md (core + overlays) could get large. What's the practical token limit before Claude Code's context is impacted? | Phase E |
+| Q11 | **Channel plugin runtime** | Node vs Bun. Bun is recommended by Anthropic for channels, but adds a dependency. Node is more universal. | Phase B |
+| Q12 | **Session resume after crash** | If Claude Code crashes mid-task, does Gaimer resubmit pending tasks on reconnect, or treat them as failed? | Phase F |
+| Q13 | **Multiple concurrent sessions** | Can a user run multiple Claude Code sessions? How does Gaimer avoid interfering with a non-Gaimer session? | Phase C |
+| Q14 | **Voice approval accuracy** | "Yes"/"no" voice recognition for permission requests. Use existing voice pipeline or simple keyword detection? | Phase G |
 
-5. **Offline fallback:** When Claude/bridge is unreachable, gaming agent says "team's not available right now" and handles locally if possible.
+## 11. Deferred (Beyond V1)
 
-6. **Rate limiting:** How many Gaimer Team tasks per session? Prevent runaway costs from rapid-fire voice delegation.
+- **Codex provider** — alternative to Claude Code behind the same IGaimerTeamService interface
+- **Multi-turn task conversations** — Claude Code maintains conversation state across related tasks
+- **Skill Pack marketplace** — if CLAUDE.md overlays prove insufficient, revisit structured tool bundles
+- **Cross-session task persistence** — resume pending tasks after app restart
+- **Gaimer Team Skill Packs** — player-created tool bundles for Claude (original spec Sections 8.1-8.9). Deferred in favor of simpler CLAUDE.md overlay system. Revisit if overlays prove insufficient for complex tool integration.
 
-7. **Skill pack tool limit:** Cap active tools per request (15-20 recommended) to avoid prompt bloat.
+---
 
-8. **Pack conflicts:** Two packs for same game define similar tools. User sets priority order per game.
-
-9. **Pack monetization:** Free-only for Phase 1. Revisit when community grows.
-
-10. **NanoClaw integration:** NanoClaw (26K stars) already handles Claude Agent SDK + messaging channels. Could Gaimer be a NanoClaw channel adapter instead of building bridge infrastructure from scratch?
-
-## 11. Implementation Phases
-
-### Phase A: Interface + Mock (No Claude Yet)
-
-- Define `IGaimerTeamService`, models, event handlers
-- Mock implementation returning canned responses after a delay
-- Gaming agent handoff + narration wired up
-- Test full flow: user speaks -> agent delegates -> mock returns -> agent narrates
-- Timeline integration for Gaimer Team results
-
-### Phase B: Messaging Bridge
-
-- Select and configure messaging platform (Discord or Telegram)
-- Implement bridge adapter in `GaimerTeamService`
-- Gaimer Team Skill installed on Claude side
-- Connection discovery + health check
-- Live test: real Claude responses through bridge
-
-### Phase C: Context Enrichment
-
-- Wire SharedContextEnvelope into GaimerTeamTask
-- L1/L2/L3 context assembly for task payload
-- Game-specific context formatting (FEN, loadout, map data)
-- Journal integration (recent game history in context)
-
-### Phase D: Production Hardening
-
-- Error handling, retries, timeout management
-- Task queue (multiple pending tasks)
-- Connection recovery (bridge drops, Claude restarts)
-- Telemetry (task latency, success rate, tool usage)
-- Rate limiting
-
-### Phase E: Skill Pack Foundation
-
-- `IGaimerTeamSkillPackManager` — load, validate, activate/deactivate
-- Local skill pack directory structure
-- Manifest validation + schema checker
-- Tool merging into task payloads
-- Context fragment injection
-- Local test mode for pack development
-
-### Phase F: Skill Pack Registry + Distribution
-
-- Hosted registry (browse, search, install, rate)
-- Automated validation pipeline
-- Versioning + update checks
-- Direct share (link/file) support
-- Community moderation
-
-### Phase G: In-Game Pack Creation
-
-- Claude builds skill packs from voice conversation (via gaming agent handoff)
-- Manifest + tool + context generation
-- Local testing loop (create -> test -> iterate, all by voice)
-- Publish-from-game flow
-
-### Phase H: Direct Local Peer Connection (Future)
-
-- When Claude platform supports it: direct local communication
-- Swap transport behind `IGaimerTeamService`
-- No change to protocol, gaming agent behavior, or UI
-- Messaging bridge becomes optional/legacy
+*Previous version of this spec (2026-04-01) used Discord/Telegram messaging bridges as primary transport. Revised 2026-04-06 to use Claude Code Channels after research into Claude Code's remote access ecosystem revealed Channels as the native, event-driven integration path. See `WITNESS/gaimer_spec_docs/GAIMER_TEAM_ARCHITECTURE_DECISIONS.md` for the full decision narrative.*

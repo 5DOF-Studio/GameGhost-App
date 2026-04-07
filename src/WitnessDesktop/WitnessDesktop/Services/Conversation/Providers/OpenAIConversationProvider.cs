@@ -110,6 +110,9 @@ public sealed class OpenAIConversationProvider : IConversationProvider
     public Task SendContextualUpdateAsync(string contextText, CancellationToken ct = default) =>
         _openAiService.SendTextAsync($"[CONTEXT UPDATE] {contextText}", requestResponse: false, cancellationToken: ct);
 
+    public Task SendContextualUpdateWithResponseAsync(string contextText, CancellationToken ct = default) =>
+        _openAiService.SendTextAsync($"[CONTEXT UPDATE] {contextText}", requestResponse: true, cancellationToken: ct);
+
     public Task UpdateInstructionsAsync(string instructions) =>
         _openAiService.UpdateInstructionsAsync(instructions);
 

@@ -56,6 +56,12 @@ public sealed class LocalMiniCpmConversationProvider : IConversationProvider
     public Task SendContextualUpdateAsync(string contextText, CancellationToken ct = default) =>
         _client.SendContextualUpdateAsync(contextText, ct);
 
+    /// <summary>
+    /// Local provider — context update with response behaves identically to regular context update.
+    /// </summary>
+    public Task SendContextualUpdateWithResponseAsync(string contextText, CancellationToken ct = default) =>
+        _client.SendContextualUpdateAsync(contextText, ct);
+
     public Task SendImageAsync(byte[] imageData, string mimeType = "image/jpeg")
     {
         System.Diagnostics.Debug.WriteLine("[LocalMiniCPM] SendImageAsync called on voice provider; ignoring image input.");

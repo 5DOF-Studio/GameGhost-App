@@ -20,7 +20,7 @@ public class ToolDefinitionTests
     {
         var allTools = ToolDefinitions.All;
 
-        allTools.Count(t => !t.RequiresInGame).Should().Be(2);
+        allTools.Count(t => !t.RequiresInGame).Should().Be(3);
         allTools.Count(t => t.RequiresInGame).Should().Be(5);
     }
 

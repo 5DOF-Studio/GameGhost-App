@@ -22,6 +22,8 @@ public class BrainEventRouterVoiceGateTests
         _mockVoice.Setup(v => v.IsConnected).Returns(true);
         _mockVoice.Setup(v => v.SendContextualUpdateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
+        _mockVoice.Setup(v => v.SendContextualUpdateWithResponseAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 
     private BrainEventRouter CreateSut(IVoiceDeliveryGate? gate = null)

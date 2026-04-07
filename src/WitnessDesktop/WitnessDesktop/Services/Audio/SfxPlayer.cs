@@ -2,6 +2,7 @@
 using AVFoundation;
 using Foundation;
 #endif
+using WitnessDesktop.Services;
 
 namespace WitnessDesktop.Services.Audio;
 
@@ -11,6 +12,13 @@ namespace WitnessDesktop.Services.Audio;
 /// </summary>
 public sealed class SfxPlayer : ISfxPlayer
 {
+    private readonly ISessionTraceService? _sessionTrace;
+
+    public SfxPlayer(ISessionTraceService? sessionTrace = null)
+    {
+        _sessionTrace = sessionTrace;
+    }
+
 #if MACCATALYST
     private AVAudioPlayer? _player;
     private readonly object _lock = new();
@@ -43,10 +51,21 @@ public sealed class SfxPlayer : ISfxPlayer
                 _player.PrepareToPlay();
                 _player.Play();
             }
+
+            _sessionTrace?.TrackEvent("audio.sfx.played", new Dictionary<string, string>
+            {
+                ["file_name"] = Path.GetFileName(fileName),
+                ["trigger"] = "playback"
+            });
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"[SFX] PlayAsync failed: {ex.Message}");
+            _sessionTrace?.TrackEvent("audio.sfx.failed", new Dictionary<string, string>
+            {
+                ["file_name"] = Path.GetFileName(fileName),
+                ["error"] = ex.GetType().Name
+            });
         }
     }
 #else
@@ -54,6 +73,11 @@ public sealed class SfxPlayer : ISfxPlayer
     {
         // Windows/other platforms: stub for now
         System.Diagnostics.Debug.WriteLine($"[SFX] PlayAsync not implemented on this platform: {fileName}");
+        _sessionTrace?.TrackEvent("audio.sfx.played", new Dictionary<string, string>
+        {
+            ["file_name"] = Path.GetFileName(fileName),
+            ["trigger"] = "stub"
+        });
         return Task.CompletedTask;
     }
 #endif

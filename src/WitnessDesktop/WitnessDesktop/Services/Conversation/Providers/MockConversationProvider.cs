@@ -209,6 +209,48 @@ public sealed class MockConversationProvider : IConversationProvider
         return Task.CompletedTask;
     }
 
+    public async Task SendContextualUpdateWithResponseAsync(string contextText, CancellationToken ct = default)
+    {
+        ThrowIfDisposed();
+
+        if (string.IsNullOrWhiteSpace(contextText))
+            return;
+
+        lock (_gate)
+        {
+            _contextUpdates.Add(contextText.Trim());
+            TrimContext();
+        }
+
+        if (!IsConnected)
+            return;
+
+        // Simulate the AI auto-responding to the context update
+        try
+        {
+            await Task.Delay(SimulatedReplyDelayMs, ct).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { return; }
+
+        ChatMessage reply;
+        lock (_gate)
+        {
+            if (_disposed || State != ConnectionState.Connected)
+                return;
+
+            reply = new ChatMessage
+            {
+                Role = MessageRole.Assistant,
+                Intent = MessageIntent.LiveGameInfo,
+                Content = $"Mock auto-response: received context '{Summarize(contextText.Trim())}'.",
+                Source = ProviderName
+            };
+            _history.Add(reply);
+        }
+
+        EmitMessage(reply);
+    }
+
     public void Dispose()
     {
         if (_disposed) return;

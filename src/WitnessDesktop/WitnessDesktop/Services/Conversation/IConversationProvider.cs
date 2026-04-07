@@ -138,10 +138,20 @@ public interface IConversationProvider : IDisposable
     /// <summary>
     /// Sends a contextual update to the provider (e.g., brain hint for voice synthesis).
     /// Used by BrainEventRouter to inject live analysis into voice conversation.
+    /// The AI receives the context but is NOT prompted to generate a response.
     /// </summary>
     /// <param name="contextText">Formatted context string.</param>
     /// <param name="ct">Optional cancellation token.</param>
     Task SendContextualUpdateAsync(string contextText, CancellationToken ct = default);
+
+    /// <summary>
+    /// Sends a contextual update AND prompts the AI to generate a spoken response.
+    /// Used for deferred answers and urgent alerts where the voice must speak
+    /// without waiting for the user to talk first.
+    /// </summary>
+    /// <param name="contextText">Formatted context string.</param>
+    /// <param name="ct">Optional cancellation token.</param>
+    Task SendContextualUpdateWithResponseAsync(string contextText, CancellationToken ct = default);
 
     /// <summary>
     /// Update the provider's system instructions at runtime (e.g., on game state change).

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using WitnessDesktop.Models;
 using WitnessDesktop.Services.Chess;
 using WitnessDesktop.Services.Replay;
+using WitnessDesktop.Services;
 
 namespace WitnessDesktop.Services.Brain;
 
@@ -26,6 +27,7 @@ public sealed class ToolExecutor
     private readonly IVideoAnalysisTool? _videoAnalysisTool;
     private readonly IReplayRecordingService? _replayRecording;
     private readonly IGameSkillPackService? _packService;
+    private readonly IGaimerTeamService? _gaimerTeam;
 
     public ToolExecutor(
         IWindowCaptureService captureService,
@@ -40,7 +42,8 @@ public sealed class ToolExecutor
         ISegmentAnalysisStore? segmentAnalysisStore = null,
         IVideoAnalysisTool? videoAnalysisTool = null,
         IReplayRecordingService? replayRecording = null,
-        IGameSkillPackService? packService = null)
+        IGameSkillPackService? packService = null,
+        IGaimerTeamService? gaimerTeam = null)
     {
         _captureService = captureService;
         _sessionManager = sessionManager;
@@ -55,6 +58,7 @@ public sealed class ToolExecutor
         _videoAnalysisTool = videoAnalysisTool;
         _replayRecording = replayRecording;
         _packService = packService;
+        _gaimerTeam = gaimerTeam;
     }
 
     // ── Tool Dispatch ────────────────────────────────────────────────────────
@@ -90,6 +94,7 @@ public sealed class ToolExecutor
                 "game_journal" => ExecuteGameJournal(argumentsJson),
                 "web_search" => await ExecuteWebSearchAsync(argumentsJson, ct),
                 "search_replay" => await ExecuteSearchReplayAsync(argumentsJson, ct),
+                "delegate_to_team" => await ExecuteDelegateToTeamAsync(argumentsJson, ct),
                 _ => JsonSerializer.Serialize(new { error = "Unknown tool", tool_name = toolName })
             };
             sw.Stop();
@@ -805,6 +810,50 @@ public sealed class ToolExecutor
 
         // Unrecognized hint — don't filter, let search run against all data
         return (null, null);
+    }
+
+    // ── delegate_to_team ────────────────────────────────────────────────────
+
+    private async Task<string> ExecuteDelegateToTeamAsync(string argumentsJson, CancellationToken ct)
+    {
+        if (_gaimerTeam is null || !_gaimerTeam.IsConnected)
+        {
+            return JsonSerializer.Serialize(new
+            {
+                status = "unavailable",
+                reason = "Ghost Team is not connected"
+            });
+        }
+
+        using var doc = JsonDocument.Parse(argumentsJson);
+        var root = doc.RootElement;
+        var taskText = root.GetProperty("task").GetString() ?? "Unknown task";
+        var responseFormat = root.TryGetProperty("response_format", out var fmt)
+            ? fmt.GetString() ?? "voice"
+            : "voice";
+
+        var ctx = _sessionManager.Context;
+        var agent = ctx.AgentKey is not null ? Agents.GetByKey(ctx.AgentKey) : null;
+
+        var teamTask = new GaimerTeamTask
+        {
+            Task = taskText,
+            ResponseFormat = responseFormat,
+            Context = new GaimerTeamContext
+            {
+                Game = ctx.GameType ?? "Unknown",
+                Agent = agent?.Name ?? "Unknown",
+                SessionId = ctx.GameId ?? "no-session"
+            }
+        };
+
+        var taskId = await _gaimerTeam.SubmitTaskAsync(teamTask, ct);
+
+        return JsonSerializer.Serialize(new
+        {
+            status = "submitted",
+            task_id = taskId
+        });
     }
 
     // ── Tool Definition Mapping ──────────────────────────────────────────────

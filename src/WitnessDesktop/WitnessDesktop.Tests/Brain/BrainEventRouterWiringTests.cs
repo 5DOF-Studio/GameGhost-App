@@ -25,6 +25,8 @@ public class BrainEventRouterWiringTests
         _mockVoice.Setup(v => v.IsConnected).Returns(true);
         _mockVoice.Setup(v => v.SendContextualUpdateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
+        _mockVoice.Setup(v => v.SendContextualUpdateWithResponseAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 
     private BrainEventRouter CreateSut()
@@ -58,10 +60,15 @@ public class BrainEventRouterWiringTests
 
         sut.RouteBrainResultForTest(result);
 
-        // Deferred path delivers to voice directly (bypasses gate)
-        _mockVoice.Verify(v => v.SendContextualUpdateAsync(
+        // Deferred path delivers to voice with response trigger (bypasses gate)
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
             It.Is<string>(s => s.Contains("Nf3")),
             It.IsAny<CancellationToken>()), Times.Once);
+
+        // Should NOT use the non-response-triggering variant for deferred answers
+        _mockVoice.Verify(v => v.SendContextualUpdateAsync(
+            It.Is<string>(s => s.Contains("Nf3")),
+            It.IsAny<CancellationToken>()), Times.Never);
 
         // Reminder queue should NOT be called (exchange is active)
         _mockReminders.Verify(r => r.Supersede(
@@ -123,6 +130,8 @@ public class BrainEventRouterWiringTests
 
         // Neither voice delivery nor reminder queue from deferred path
         _mockVoice.Verify(v => v.SendContextualUpdateAsync(
+            It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
             It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         _mockReminders.Verify(r => r.Supersede(
             It.IsAny<BargeInCategory>(), It.IsAny<ReminderItem>()), Times.Never);
@@ -258,5 +267,92 @@ public class BrainEventRouterWiringTests
         _mockReminders.Verify(r => r.Supersede(
             It.IsAny<BargeInCategory>(), It.IsAny<ReminderItem>()), Times.Never);
         _mockReminders.Verify(r => r.Enqueue(It.IsAny<ReminderItem>()), Times.Never);
+    }
+
+    // ── Interrupt Priority → Uses Response-Triggering Delivery ──────
+
+    [Fact]
+    public void RouteBrainResult_InterruptPriority_UsesResponseTriggeringDelivery()
+    {
+        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.Interrupt, BrainResultType.ProactiveAlert))
+            .Returns(DeliveryDecision.Deliver);
+        var sut = CreateSut();
+
+        var result = new BrainResult
+        {
+            Type = BrainResultType.ProactiveAlert,
+            Priority = BrainResultPriority.Interrupt,
+            VoiceNarration = "Mate threat! Move your king!",
+            AnalysisText = "Critical danger",
+            Hint = new BrainHint { Signal = "danger", Urgency = "high", Summary = "Mate" },
+        };
+
+        sut.RouteBrainResultForTest(result);
+
+        // Interrupt priority should use the response-triggering variant
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
+            It.Is<string>(s => s.Contains("URGENT") && s.Contains("Mate threat")),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    // ── WhenIdle Priority → Uses Non-Response Context Update ────────
+
+    [Fact]
+    public void RouteBrainResult_WhenIdlePriority_UsesNonResponseDelivery()
+    {
+        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.WhenIdle, BrainResultType.ImageAnalysis))
+            .Returns(DeliveryDecision.Deliver);
+        var sut = CreateSut();
+
+        var result = new BrainResult
+        {
+            Type = BrainResultType.ImageAnalysis,
+            Priority = BrainResultPriority.WhenIdle,
+            VoiceNarration = "Position looks balanced",
+            AnalysisText = "Roughly equal position",
+        };
+
+        sut.RouteBrainResultForTest(result);
+
+        // WhenIdle should use the non-response-triggering variant (passive context)
+        _mockVoice.Verify(v => v.SendContextualUpdateAsync(
+            It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+
+        // Should NOT use the response-triggering variant
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
+            It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // ── Deferred Answer Guard: Gate=Deliver + IsDeferredAnswer → No Double Delivery ──
+
+    [Fact]
+    public void RouteBrainResult_DeferredAnswer_GateDeliver_DoesNotDoubleDeliver()
+    {
+        _mockExchange.Setup(e => e.IsExchangeActive).Returns(true);
+        // Gate returns Deliver — the general voice path WOULD fire for non-deferred results
+        _mockGate.Setup(g => g.ShouldDeliver(It.IsAny<BrainResultPriority>(), It.IsAny<BrainResultType>()))
+            .Returns(DeliveryDecision.Deliver);
+        var sut = CreateSut();
+
+        var result = new BrainResult
+        {
+            Type = BrainResultType.ToolResult,
+            IsDeferredAnswer = true,
+            VoiceNarration = "Engine says Nf3 is best",
+            AnalysisText = "Tool result",
+        };
+
+        sut.RouteBrainResultForTest(result);
+
+        // Deferred path delivers via response-triggering method — exactly once
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
+            It.Is<string>(s => s.Contains("Nf3")),
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        // General voice path must NOT also deliver (guarded by !result.IsDeferredAnswer)
+        // This verifies the double-delivery guard at line 772 of BrainEventRouter.cs
+        _mockVoice.Verify(v => v.SendContextualUpdateAsync(
+            It.Is<string>(s => s.Contains("Nf3")),
+            It.IsAny<CancellationToken>()), Times.Never);
     }
 }

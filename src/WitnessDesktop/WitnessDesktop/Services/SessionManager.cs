@@ -46,6 +46,7 @@ public class SessionManager : ISessionManager
         {
             ToolDefinitions.WebSearch,
             ToolDefinitions.SearchReplay,
+            ToolDefinitions.DelegateToTeam,
         };
 
         if (_context.State == SessionState.InGame)

@@ -216,6 +216,59 @@ public class MockConversationProviderTests
         provider.Dispose();
     }
 
+    [Fact]
+    public async Task SendContextualUpdateWithResponseAsync_EmitsAutoResponse()
+    {
+        using var provider = new MockConversationProvider();
+        await provider.ConnectAsync(CreateTestAgent());
+
+        ChatMessage? reply = null;
+        provider.MessageReceived += (_, message) => reply = message;
+
+        await provider.SendContextualUpdateWithResponseAsync("[CONTEXT UPDATE] Knight fork on e5.");
+
+        await WaitForAsync(() =>
+        {
+            reply.Should().NotBeNull();
+        });
+
+        reply!.Role.Should().Be(MessageRole.Assistant);
+        reply.Intent.Should().Be(MessageIntent.LiveGameInfo);
+        reply.Content.Should().Contain("Knight fork on e5");
+    }
+
+    [Fact]
+    public async Task SendContextualUpdateAsync_DoesNotEmitAutoResponse()
+    {
+        using var provider = new MockConversationProvider();
+        await provider.ConnectAsync(CreateTestAgent());
+
+        ChatMessage? reply = null;
+        provider.MessageReceived += (_, message) => reply = message;
+
+        await provider.SendContextualUpdateAsync("[CONTEXT UPDATE] Quiet position.");
+
+        // Give time for any potential (unwanted) auto-response
+        await Task.Delay(200);
+
+        reply.Should().BeNull("SendContextualUpdateAsync should NOT trigger a response");
+    }
+
+    [Fact]
+    public async Task SendContextualUpdateWithResponseAsync_WhenDisconnected_IsNoop()
+    {
+        using var provider = new MockConversationProvider();
+
+        ChatMessage? reply = null;
+        provider.MessageReceived += (_, message) => reply = message;
+
+        await provider.SendContextualUpdateWithResponseAsync("[CONTEXT UPDATE] Some context.");
+
+        await Task.Delay(200);
+
+        reply.Should().BeNull("should not emit when disconnected");
+    }
+
     private static async Task WaitForAsync(Action assertion, int attempts = 20, int delayMs = 25)
     {
         Exception? lastError = null;

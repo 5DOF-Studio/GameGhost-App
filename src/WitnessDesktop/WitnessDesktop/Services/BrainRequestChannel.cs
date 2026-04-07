@@ -10,9 +10,11 @@ namespace WitnessDesktop.Services;
 public sealed class BrainRequestChannel : IBrainRequestChannel
 {
     private readonly Channel<BrainRequest> _channel;
+    private readonly ISessionTraceService? _sessionTrace;
 
-    public BrainRequestChannel()
+    public BrainRequestChannel(ISessionTraceService? sessionTrace = null)
     {
+        _sessionTrace = sessionTrace;
         _channel = Channel.CreateBounded<BrainRequest>(new BoundedChannelOptions(8)
         {
             FullMode = BoundedChannelFullMode.DropOldest,
@@ -30,6 +32,11 @@ public sealed class BrainRequestChannel : IBrainRequestChannel
     public async ValueTask WriteAsync(BrainRequest request, CancellationToken ct = default)
     {
         await _channel.Writer.WriteAsync(request, ct);
+        _sessionTrace?.TrackEvent("brain.request_channel.write", new Dictionary<string, string>
+        {
+            ["request_id"] = request.RequestId.ToString(),
+            ["capability"] = request.LikelyCapability ?? "unknown"
+        });
     }
 
     public bool TryRead(out BrainRequest? request)
@@ -37,6 +44,12 @@ public sealed class BrainRequestChannel : IBrainRequestChannel
         if (_channel.Reader.TryRead(out var item))
         {
             request = item;
+            var waitMs = (long)(DateTime.UtcNow - item.RequestedAtUtc).TotalMilliseconds;
+            _sessionTrace?.TrackEvent("brain.request_channel.read", new Dictionary<string, string>
+            {
+                ["request_id"] = item.RequestId.ToString(),
+                ["wait_ms"] = waitMs.ToString()
+            });
             return true;
         }
         request = null;

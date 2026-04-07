@@ -27,7 +27,14 @@ public sealed class GeminiConversationProvider : IConversationProvider
             }
             ConnectionStateChanged?.Invoke(this, e);
         };
-        _geminiService.AudioReceived += (s, e) => AudioReceived?.Invoke(this, e);
+        _geminiService.AudioReceived += (s, pcmData) =>
+        {
+            // Gemini 3.1 outputs 24kHz PCM per API docs.
+            // Forward directly — matches AudioFormat.StandardOutputSampleRate.
+            // If future testing reveals 16kHz output, add:
+            //   var resampled = AudioResampler.Resample(pcmData, 16000, 24000);
+            AudioReceived?.Invoke(this, pcmData);
+        };
         _geminiService.TextReceived += (_, text) =>
         {
             TextReceived?.Invoke(this, text);
@@ -35,6 +42,8 @@ public sealed class GeminiConversationProvider : IConversationProvider
         };
         _geminiService.Interrupted += (s, e) => Interrupted?.Invoke(this, e);
         _geminiService.ErrorOccurred += (s, e) => ErrorOccurred?.Invoke(this, e);
+        _geminiService.InputTranscriptionReceived += (_, transcript) =>
+            UserTranscriptReceived?.Invoke(this, transcript);
     }
 
     public event EventHandler<ConnectionState>? ConnectionStateChanged;
@@ -66,6 +75,20 @@ public sealed class GeminiConversationProvider : IConversationProvider
 
     public Task SendContextualUpdateAsync(string contextText, CancellationToken ct = default) =>
         _geminiService.SendTextAsync($"[CONTEXT UPDATE] {contextText}", ct);
+
+    /// <summary>
+    /// Gemini Live is turn-based — sending text inherently triggers a response.
+    /// Both methods behave identically for this provider.
+    /// </summary>
+    public Task SendContextualUpdateWithResponseAsync(string contextText, CancellationToken ct = default) =>
+        _geminiService.SendTextAsync($"[CONTEXT UPDATE] {contextText}", ct);
+
+    public async Task UpdateInstructionsAsync(string instructions)
+    {
+        if (!IsConnected) return;
+        Console.WriteLine("[Gemini] UpdateInstructionsAsync: reconnecting with new instructions");
+        await _geminiService.ReconnectWithInstructionsAsync(instructions);
+    }
 
     public void Dispose()
     {

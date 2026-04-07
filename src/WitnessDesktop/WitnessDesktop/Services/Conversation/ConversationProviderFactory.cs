@@ -16,8 +16,8 @@ namespace WitnessDesktop.Services.Conversation;
 /// <item>If <c>VOICE_PROVIDER</c> env var is set, use that provider explicitly.</item>
 /// <item>If <c>USE_MOCK_SERVICES=true</c>, use mock provider.</item>
 /// <item>If <c>ISettingsService.VoiceProvider</c> is set and matching API key exists, use that provider.</item>
-/// <item>Auto-detect: if <c>GEMINI_APIKEY</c> (or variants) is present, use Gemini.</item>
 /// <item>Auto-detect: if <c>OPENAI_APIKEY</c> is present, use OpenAI.</item>
+/// <item>Auto-detect: if <c>GEMINI_APIKEY</c> (or variants) is present, use Gemini.</item>
 /// <item>Fall back to mock provider.</item>
 /// </list>
 /// </para>
@@ -105,17 +105,17 @@ public sealed class ConversationProviderFactory
             }
         }
 
-        // Auto-detect: prefer Gemini over OpenAI (OpenAI Realtime has empty response issues as of Mar 2026)
-        var geminiKey = GetGeminiApiKey();
-        if (!string.IsNullOrEmpty(geminiKey))
-        {
-            return CreateGeminiProvider();
-        }
-
+        // Auto-detect: prefer OpenAI over Gemini (Gemini is cheaper but less mature for voice)
         var openAiKey = GetOpenAiApiKey();
         if (!string.IsNullOrEmpty(openAiKey))
         {
             return CreateOpenAiProvider();
+        }
+
+        var geminiKey = GetGeminiApiKey();
+        if (!string.IsNullOrEmpty(geminiKey))
+        {
+            return CreateGeminiProvider();
         }
 
         // Fallback to mock

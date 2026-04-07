@@ -35,11 +35,11 @@ Keep `GameGhost-App` current with shared engine/features from `gaimer-desktop` w
 - Immediately for security/stability fixes.
 - Milestone-based for larger architectural changes.
 
-## Current Handoff (2026-04-06)
-- Previous baseline: `1940f13` on `main` (2026-03-02)
-- New baseline: `5992eea` on `gaimer-v2` (full overlay sync)
-- Sync method: Fresh overlay of gaimer-v2 source tree, replacing cherry-pick approach
-- Branding pass applied: ApplicationTitle, ApplicationId, UI strings, prompt identity
-- Native framework names (`GaimerGhostMode`, `GaimerScreenCapture`, `GaimerSpeech`) preserved for runtime interop
-- Internal debug log prefixes (`[Gaimer]`) preserved for log compatibility
-- Resume cherry-pick workflow from `5992eea` for future incremental syncs
+## Current Handoff (2026-04-07)
+- Previous baseline: `5992eea` on `gaimer-v2` (2026-04-06)
+- New baseline: `40163ce` on `gaimer-v2` (incremental overlay sync)
+- Sync method: Targeted overlay of 48 new commits (89 source files, +5,307 lines)
+- New features synced: Gaimer Team (Claude CLI integration), voice sprint (OpenAI migration, Gemini binary frame fix, wake phrase gate), telemetry (+28 trace events), GaimerSpeech xcframework, native build script
+- Branding pass applied: all previous branding + new "Ghost Team" user-facing references
+- Internal service/interface names (`IGaimerTeamService`, `GaimerPipeClient`, etc.) preserved as internal identifiers
+- Resume cherry-pick or overlay from `40163ce` for future syncs

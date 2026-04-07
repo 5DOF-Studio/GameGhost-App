@@ -25,6 +25,8 @@ public class BrainEventRouterTests
 
         _mockVoice.Setup(v => v.SendContextualUpdateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
+        _mockVoice.Setup(v => v.SendContextualUpdateWithResponseAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
         _mockVoiceGrounding.Setup(v => v.GetGroundingPrefix()).Returns("[GROUNDED BOARD STATE: White is slightly better]");
 
         // Default: validation passes (tests override as needed)
@@ -455,7 +457,7 @@ public class BrainEventRouterTests
 
         await RouteViaChannel(sut, result);
 
-        _mockVoice.Verify(v => v.SendContextualUpdateAsync(
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
             It.Is<string>(s => s.Contains("[URGENT]")),
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -476,7 +478,7 @@ public class BrainEventRouterTests
 
         await RouteViaChannel(sut, result);
 
-        _mockVoice.Verify(v => v.SendContextualUpdateAsync(
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
             It.Is<string>(s => s.Contains("[GROUNDED BOARD STATE: White is slightly better]") &&
                                s.Contains("[URGENT] You just blundered!")),
             It.IsAny<CancellationToken>()), Times.Once);
@@ -558,8 +560,14 @@ public class BrainEventRouterTests
         await RouteViaChannel(sut, idle);
         await RouteViaChannel(sut, urgent);
 
+        // Idle uses non-response SendContextualUpdateAsync (1 call)
+        // ProactiveAlert's OnProactiveAlert also calls SendContextualUpdateAsync (1 call)
         _mockVoice.Verify(v => v.SendContextualUpdateAsync(
-            It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+            It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+
+        // Interrupt priority uses response-triggering variant (1 call)
+        _mockVoice.Verify(v => v.SendContextualUpdateWithResponseAsync(
+            It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]

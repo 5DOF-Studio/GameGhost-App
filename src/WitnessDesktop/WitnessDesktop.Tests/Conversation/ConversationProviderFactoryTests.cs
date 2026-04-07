@@ -225,7 +225,7 @@ public class ConversationProviderFactoryTests : IDisposable
     }
 
     [Fact]
-    public void Create_AutoDetect_BothKeys_PrefersGemini()
+    public void Create_AutoDetect_BothKeys_PrefersOpenAI()
     {
         var config = BuildConfig(new()
         {
@@ -236,7 +236,7 @@ public class ConversationProviderFactoryTests : IDisposable
 
         var provider = CreateAndTrack(factory);
 
-        provider.Should().BeOfType<GeminiConversationProvider>();
+        provider.Should().BeOfType<OpenAIConversationProvider>();
     }
 
     [Fact]
@@ -348,9 +348,9 @@ public class ConversationProviderFactoryTests : IDisposable
     // ──────────────────────────────────────────────
 
     [Fact]
-    public void Create_AutoDetect_GeminiAndOpenRouterKeys_SelectsGemini()
+    public void Create_AutoDetect_GeminiAndOpenRouterKeys_SelectsOpenAI()
     {
-        // Explicit provider keys must be isolated from unrelated OPENROUTER_APIKEY.
+        // OpenAI is preferred over Gemini in auto-detect; OpenRouter is for brain, not voice.
         var config = BuildConfig(new()
         {
             ["OPENROUTER_APIKEY"] = "openrouter-key",
@@ -361,7 +361,7 @@ public class ConversationProviderFactoryTests : IDisposable
 
         var provider = CreateAndTrack(factory);
 
-        provider.Should().BeOfType<GeminiConversationProvider>();
+        provider.Should().BeOfType<OpenAIConversationProvider>();
     }
 
     [Fact]

@@ -25,7 +25,8 @@ public enum EventOutputType
     ToolCall,         // Tool invocation (engine analysis, web search, etc.)
     SystemError,      // Error message (chat fail, voice disconnect, brain error)
     Archived,         // Archive boundary marker — end of visible hot window
-    
+    TeamResult,       // Gaimer Team task result (background capability)
+
     // === AGENT-SPECIFIC MARKER ===
     AgentSpecific = 100
 }

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gaimer-channel": {
+      "command": "bun",
+      "args": ["run", "--silent", "--cwd", "${CLAUDE_PLUGIN_ROOT}", "start"]
+    }
+  }
+}

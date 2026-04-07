@@ -26,6 +26,12 @@ public sealed class GeminiLiveService : IDisposable
     private Agent? _currentAgent;
     private TaskCompletionSource? _setupCompleteTcs;
     private bool _disposed;
+
+    private string? _lastResumptionHandle;
+    public string? LastResumptionHandle => _lastResumptionHandle;
+
+    private string? _instructionsOverride;
+    public Agent? CurrentAgent => _currentAgent;
     
     private volatile ConnectionState _state = ConnectionState.Disconnected;
     private readonly object _stateLock = new();
@@ -37,7 +43,8 @@ public sealed class GeminiLiveService : IDisposable
     public event EventHandler<string>? TextReceived;
     public event EventHandler? Interrupted;
     public event EventHandler<string>? ErrorOccurred;
-    
+    public event EventHandler<string>? InputTranscriptionReceived;
+
     public GeminiLiveService(IConfiguration configuration, string voice = "Fenrir")
     {
         _apiKey = configuration["GeminiApiKey"]
@@ -140,7 +147,10 @@ public sealed class GeminiLiveService : IDisposable
     
     private async Task SendSetupMessageAsync(Agent agent)
     {
-        var json = GeminiLiveProtocol.BuildSetupMessageJson(agent.ComposedPersonality, _voice);
+        var instructions = _instructionsOverride ?? agent.ComposedPersonality;
+        var json = GeminiLiveProtocol.BuildSetupMessageJson(
+            instructions, _voice,
+            resumptionHandle: _lastResumptionHandle);
         await SendRawJsonAsync(json).ConfigureAwait(false);
     }
 
@@ -303,30 +313,33 @@ public sealed class GeminiLiveService : IDisposable
                     break;
                 }
                 
-                if (result.MessageType == WebSocketMessageType.Text)
+                // Gemini Live API sends JSON responses as Binary frames (not Text).
+                // Handle both frame types identically since the payload is always UTF-8 JSON.
+                if (result.MessageType == WebSocketMessageType.Text
+                    || result.MessageType == WebSocketMessageType.Binary)
                 {
                     // Append to message buffer
                     messageBuffer.Write(buffer, 0, result.Count);
-                    
+
                     // Only process when we have the complete message
                     if (result.EndOfMessage)
                     {
                         var count = Interlocked.Increment(ref _messageReceiveCount);
                         var json = Encoding.UTF8.GetString(
-                            messageBuffer.GetBuffer(), 
-                            0, 
+                            messageBuffer.GetBuffer(),
+                            0,
                             (int)messageBuffer.Length
                         );
-                        
+
                         // Log first few messages or every 10th
                         if (count <= 3 || count % 10 == 0)
                         {
                             Console.WriteLine($"[Gemini] Received message #{count}: {json.Length} chars");
                         }
-                        
+
                         // Reset buffer for next message
                         messageBuffer.SetLength(0);
-                        
+
                         ProcessMessage(json);
                     }
                 }
@@ -425,7 +438,28 @@ public sealed class GeminiLiveService : IDisposable
 
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
-            
+
+            if (kind == GeminiServerMessageKind.SessionResumptionUpdate)
+            {
+                if (root.TryGetProperty("sessionResumptionUpdate", out var update) &&
+                    update.TryGetProperty("newHandle", out var handleEl))
+                {
+                    _lastResumptionHandle = handleEl.GetString();
+                    Console.WriteLine("[Gemini] Session resumption handle updated");
+                }
+                return;
+            }
+
+            if (kind == GeminiServerMessageKind.GoAway)
+            {
+                Console.WriteLine($"[Gemini] Received GoAway — server will disconnect soon (handle={(_lastResumptionHandle != null ? "available" : "NONE")})");
+                if (!_disposed)
+                {
+                    _ = ReconnectWithBackoffAsync();
+                }
+                return;
+            }
+
             // Check for server content (audio/interruption)
             if (root.TryGetProperty("serverContent", out var serverContent))
             {
@@ -437,6 +471,20 @@ public sealed class GeminiLiveService : IDisposable
                     return;
                 }
                 
+                // Parse input transcription (user's speech-to-text)
+                if (serverContent.TryGetProperty("inputTranscription", out var inputTranscription))
+                {
+                    if (inputTranscription.TryGetProperty("text", out var transcriptText))
+                    {
+                        var transcript = transcriptText.GetString();
+                        if (!string.IsNullOrEmpty(transcript))
+                        {
+                            Console.WriteLine($"[Gemini] User said: {transcript}");
+                            InputTranscriptionReceived?.Invoke(this, transcript);
+                        }
+                    }
+                }
+
                 // Check for turn complete
                 if (serverContent.TryGetProperty("turnComplete", out var turnComplete) &&
                     turnComplete.GetBoolean())
@@ -505,6 +553,20 @@ public sealed class GeminiLiveService : IDisposable
         }
     }
     
+    /// <summary>
+    /// Reconnects with updated system instructions. Uses session resumption handle
+    /// for context continuity. This is the only way to update instructions on
+    /// Gemini Live (mid-session updates are not supported by the API).
+    /// </summary>
+    public async Task ReconnectWithInstructionsAsync(string instructions)
+    {
+        if (_disposed) return;
+        _instructionsOverride = instructions;
+        await DisconnectAsync().ConfigureAwait(false);
+        if (_currentAgent != null)
+            await ConnectAsync(_currentAgent).ConfigureAwait(false);
+    }
+
     public async Task DisconnectAsync()
     {
         await _connectLock.WaitAsync().ConfigureAwait(false);
@@ -569,6 +631,8 @@ public sealed class GeminiLiveService : IDisposable
         _cts = null;
         _receiveLoopTask = null;
         _setupCompleteTcs = null;
+        _lastResumptionHandle = null; // Clear stale handle — expired handles cause silent reconnect failures
+        _instructionsOverride = null; // Reset to agent's default personality on next connect
 
         setupCompleteTcs?.TrySetCanceled();
         try { cts?.Cancel(); } catch { /* best effort */ }
@@ -589,14 +653,15 @@ internal enum GeminiServerMessageKind
 
 internal static class GeminiLiveProtocol
 {
-    private const string Model = "models/gemini-2.5-flash-native-audio-preview-12-2025";
+    private const string Model = "models/gemini-3.1-flash-live-preview";
 
     private static readonly JsonSerializerOptions CamelCaseJson = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    internal static string BuildSetupMessageJson(string systemInstruction, string voice)
+    internal static string BuildSetupMessageJson(string systemInstruction, string voice,
+        string? resumptionHandle = null)
     {
         var payload = new
         {
@@ -623,6 +688,20 @@ internal static class GeminiLiveProtocol
                     {
                         new { text = systemInstruction }
                     }
+                },
+                inputAudioTranscription = new { },
+                outputAudioTranscription = new { },
+                sessionResumption = resumptionHandle != null
+                    ? (object)new { handle = resumptionHandle }
+                    : new { },
+                contextWindowCompression = new { slidingWindow = new { } },
+                realtimeInputConfig = new
+                {
+                    automaticActivityDetection = new
+                    {
+                        disabled = false
+                    },
+                    activityHandling = "START_OF_ACTIVITY_INTERRUPTS"
                 }
             }
         };

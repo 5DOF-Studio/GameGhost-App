@@ -58,11 +58,19 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
     private readonly IReminderQueue? _reminderQueue;
     private readonly IBargeInPolicyService? _bargeInPolicyService;
     private readonly IBrainRequestChannel? _brainRequestChannel;
+    private readonly IGaimerTeamService? _gaimerTeam;
     private readonly SemaphoreSlim _navigationLock = new(1, 1);
     private readonly SemaphoreSlim _stopSessionLock = new(1, 1);
     private CancellationTokenSource? _sessionCts;
     private DateTime _sessionStartedAt = DateTime.UtcNow;
     private ChatMessage? _pendingUserMessage;
+
+    /// <summary>
+    /// Suppresses auto-response audio when the user speaks without the wake phrase.
+    /// Set true on transcript without wake phrase, cleared when wake phrase detected
+    /// or exchange opens. Prevents the AI from responding to ambient speech.
+    /// </summary>
+    private volatile bool _suppressUnwokenResponse;
     private DateTime _pendingUserMessageAt = DateTime.MinValue;
     private static readonly TimeSpan PendingMessageTimeout = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan TypedLegacyBridgeDedupWindow = TimeSpan.FromMilliseconds(250);
@@ -281,7 +289,8 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         Services.Audio.ISfxPlayer? sfxPlayer = null,
         IReminderQueue? reminderQueue = null,
         IBargeInPolicyService? bargeInPolicyService = null,
-        IBrainRequestChannel? brainRequestChannel = null)
+        IBrainRequestChannel? brainRequestChannel = null,
+        IGaimerTeamService? gaimerTeam = null)
     {
         _audioService = audioService;
         _captureService = captureService;
@@ -315,6 +324,7 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         _reminderQueue = reminderQueue;
         _bargeInPolicyService = bargeInPolicyService;
         _brainRequestChannel = brainRequestChannel;
+        _gaimerTeam = gaimerTeam;
 
         // Wire replay analysis: forward completed segments to the orchestrator
         if (_replayRecording != null && _replayAnalysisOrchestrator != null)
@@ -388,6 +398,89 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
             _userSpeechDetector.UserSpeechStarted += (_, _) =>
             {
                 _exchangeManager?.OnUserSpeech();
+            };
+        }
+
+        // Wire Gaimer Team result handler (Phase A, C2/H1/M6 fixes)
+        if (_gaimerTeam != null)
+        {
+            _gaimerTeam.TaskCompleted += async (_, e) =>
+            {
+                try
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        if (e.Result.Status == "complete")
+                        {
+                            if (_conversationProvider?.IsConnected == true)
+                            {
+                                _ = _conversationProvider.SendContextualUpdateWithResponseAsync(
+                                    $"The team's back. {e.Result.Response}");
+                            }
+
+                            _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+                            {
+                                Type = Models.Timeline.EventOutputType.TeamResult,
+                                Summary = e.Result.Response,
+                                Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.TeamResult),
+                                CapsuleColorHex = Models.Timeline.EventIconMap.GetCapsuleColorHex(Models.Timeline.EventOutputType.TeamResult),
+                                CapsuleStrokeHex = Models.Timeline.EventIconMap.GetCapsuleStrokeHex(Models.Timeline.EventOutputType.TeamResult),
+                            });
+
+                            _sessionTrace?.TrackEvent("gaimer_team.task_completed", new Dictionary<string, string>
+                            {
+                                ["task_id"] = e.Result.TaskId,
+                                ["status"] = "complete"
+                            });
+                        }
+                        else
+                        {
+                            if (_conversationProvider?.IsConnected == true)
+                            {
+                                _ = _conversationProvider.SendContextualUpdateWithResponseAsync(
+                                    "The team ran into an issue with that one.");
+                            }
+
+                            _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+                            {
+                                Type = Models.Timeline.EventOutputType.TeamResult,
+                                Summary = $"Team error: {e.Result.Response}",
+                                Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.TeamResult),
+                                CapsuleColorHex = "#30808080",
+                                CapsuleStrokeHex = "#50808080",
+                            });
+
+                            _sessionTrace?.TrackEvent("gaimer_team.task_completed", new Dictionary<string, string>
+                            {
+                                ["task_id"] = e.Result.TaskId,
+                                ["status"] = "error",
+                                ["error_code"] = e.Result.ErrorCode ?? "unknown"
+                            });
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[GaimerTeam] TaskCompleted handler error: {ex.Message}");
+                }
+            };
+
+            _gaimerTeam.TaskProgress += (_, e) =>
+            {
+                try
+                {
+                    _sessionTrace?.TrackEvent("gaimer_team.task_progress", new Dictionary<string, string>
+                    {
+                        ["task_id"] = e.TaskId,
+                        ["message"] = e.Message
+                    });
+                    System.Diagnostics.Debug.WriteLine(
+                        $"[GaimerTeam] Progress on {e.TaskId}: {e.Message}");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[GaimerTeam] TaskProgress handler error: {ex.Message}");
+                }
             };
         }
 
@@ -717,6 +810,10 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         };
         _conversationProvider.AudioReceived += (_, pcmData) =>
         {
+            // Suppress auto-response audio when user spoke without wake phrase
+            if (_suppressUnwokenResponse)
+                return;
+
             // Queue audio for playback
             _ = _audioService.PlayAudioAsync(pcmData)
                 .ContinueWith(t => System.Diagnostics.Debug.WriteLine(
@@ -757,13 +854,30 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                 ["transcript_length"] = transcript.Length.ToString()
             });
 
-            // Exchange: wake phrase detection
+            // Exchange: wake phrase detection + unwoken response suppression
             if (_exchangeManager != null && _wakePhraseDetector != null
                 && !_exchangeManager.IsExchangeActive
-                && _selectedAgent != null
-                && _wakePhraseDetector.TryDetectWake(transcript, _selectedAgent.Name, out string? _))
+                && _selectedAgent != null)
             {
-                _exchangeManager.OnWakeDetected(_selectedAgent.Name);
+                if (_wakePhraseDetector.TryDetectWake(transcript, _selectedAgent.Name, out string? _))
+                {
+                    _suppressUnwokenResponse = false; // Wake phrase found — allow audio
+                    _exchangeManager.OnWakeDetected(_selectedAgent.Name);
+                }
+                else
+                {
+                    // No wake phrase, no active exchange — suppress the auto-response
+                    _suppressUnwokenResponse = true;
+                    _ = _audioService.InterruptPlaybackAsync() // Stop any audio that already started
+                        .ContinueWith(t => System.Diagnostics.Debug.WriteLine(
+                            $"[Voice] Unwoken response interrupt failed: {t.Exception?.GetBaseException().Message}"),
+                            TaskContinuationOptions.OnlyOnFaulted);
+                }
+            }
+            else if (_exchangeManager?.IsExchangeActive == true)
+            {
+                // Exchange is active — always allow audio
+                _suppressUnwokenResponse = false;
             }
 
             // Exchange: user speech resets silence timer
@@ -1304,10 +1418,28 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
             }
 #endif
 
+            // Launch Gaimer Team background session (C1 fix — fire-and-forget)
+            if (_gaimerTeam != null && !_gaimerTeam.IsConnected)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var launched = await _gaimerTeam.LaunchSessionAsync();
+                        System.Diagnostics.Debug.WriteLine(
+                            $"[GaimerTeam] LaunchSessionAsync: {(launched ? "connected" : "unavailable")}");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[GaimerTeam] Launch failed: {ex.Message}");
+                    }
+                });
+            }
+
             // Transition session to InGame state
             var gameId = CurrentTarget?.Handle.ToString() ?? "unknown";
-            var gameType = CurrentTarget?.WindowTitle?.Contains("chess", StringComparison.OrdinalIgnoreCase) == true 
-                ? "chess" 
+            var gameType = CurrentTarget?.WindowTitle?.Contains("chess", StringComparison.OrdinalIgnoreCase) == true
+                ? "chess"
                 : SelectedAgent?.Type.ToString().ToLowerInvariant() ?? "general";
             var connectorName = CurrentTarget?.WindowTitle ?? "Unknown";
             _sessionManager.TransitionToInGame(gameId, gameType, connectorName);

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using WitnessDesktop.Services;
 
 namespace WitnessDesktop.Services.Replay;
 
@@ -12,19 +13,30 @@ public class GeminiVideoClient
     private readonly string _apiKey;
     private readonly int _pollingTimeoutSeconds;
     private readonly int _pollingIntervalMs;
+    private readonly ISessionTraceService? _sessionTrace;
 
     public GeminiVideoClient(HttpClient httpClient, string apiKey,
-        int pollingTimeoutSeconds = 120, int pollingIntervalMs = 2000)
+        int pollingTimeoutSeconds = 120, int pollingIntervalMs = 2000,
+        ISessionTraceService? sessionTrace = null)
     {
         _httpClient = httpClient;
         _apiKey = apiKey;
         _pollingTimeoutSeconds = pollingTimeoutSeconds;
         _pollingIntervalMs = pollingIntervalMs;
+        _sessionTrace = sessionTrace;
     }
 
     public virtual async Task<GeminiFileMetadata> UploadVideoAsync(string filePath, CancellationToken ct)
     {
         var fileName = Path.GetFileName(filePath);
+        var fileSize = new FileInfo(filePath).Length;
+
+        _sessionTrace?.TrackEvent("replay.analysis.upload_started", new Dictionary<string, string>
+        {
+            ["file_size_bytes"] = fileSize.ToString()
+        });
+
+        var uploadStart = DateTimeOffset.UtcNow;
 
         using var content = new MultipartFormDataContent();
 
@@ -47,12 +59,21 @@ public class GeminiVideoClient
         using var doc = JsonDocument.Parse(json);
         var file = doc.RootElement.GetProperty("file");
 
-        return new GeminiFileMetadata
+        var result = new GeminiFileMetadata
         {
             Name = file.GetProperty("name").GetString()!,
             Uri = file.GetProperty("uri").GetString()!,
             State = file.GetProperty("state").GetString()!
         };
+
+        var durationMs = (long)(DateTimeOffset.UtcNow - uploadStart).TotalMilliseconds;
+        _sessionTrace?.TrackEvent("replay.analysis.upload_completed", new Dictionary<string, string>
+        {
+            ["duration_ms"] = durationMs.ToString(),
+            ["file_name"] = result.Name
+        });
+
+        return result;
     }
 
     public virtual async Task WaitForActiveAsync(string fileName, CancellationToken ct)
@@ -82,6 +103,8 @@ public class GeminiVideoClient
 
     public virtual async Task<string> GenerateContentAsync(string fileUri, string prompt, string model, CancellationToken ct)
     {
+        var genStart = DateTimeOffset.UtcNow;
+
         var request = new
         {
             contents = new[] {
@@ -103,11 +126,41 @@ public class GeminiVideoClient
         var json = JsonSerializer.Serialize(request);
         using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync(
-            $"v1beta/models/{model}:generateContent?key={_apiKey}", content, ct);
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.PostAsync(
+                $"v1beta/models/{model}:generateContent?key={_apiKey}", content, ct);
+        }
+        catch (Exception ex)
+        {
+            var failMs = (long)(DateTimeOffset.UtcNow - genStart).TotalMilliseconds;
+            _sessionTrace?.TrackEvent("replay.analysis.generation_failed", new Dictionary<string, string>
+            {
+                ["error"] = ex.GetType().Name,
+                ["status_code"] = "0"
+            });
+            throw;
+        }
 
         if (response.StatusCode == HttpStatusCode.TooManyRequests)
+        {
+            _sessionTrace?.TrackEvent("replay.analysis.generation_failed", new Dictionary<string, string>
+            {
+                ["error"] = "RateLimitExceeded",
+                ["status_code"] = ((int)response.StatusCode).ToString()
+            });
             throw new GeminiRateLimitException("Gemini rate limit exceeded");
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _sessionTrace?.TrackEvent("replay.analysis.generation_failed", new Dictionary<string, string>
+            {
+                ["error"] = response.ReasonPhrase ?? "Unknown",
+                ["status_code"] = ((int)response.StatusCode).ToString()
+            });
+        }
 
         response.EnsureSuccessStatusCode();
 
@@ -121,7 +174,29 @@ public class GeminiVideoClient
             .GetProperty("text")
             .GetString()!;
 
-        return RepairTruncatedJson(text);
+        var repaired = RepairTruncatedJson(text);
+
+        // Count beats for telemetry
+        var beatCount = 0;
+        try
+        {
+            using var beatDoc = JsonDocument.Parse(repaired);
+            if (beatDoc.RootElement.ValueKind == JsonValueKind.Object &&
+                beatDoc.RootElement.TryGetProperty("beats", out var beats))
+                beatCount = beats.GetArrayLength();
+            else if (beatDoc.RootElement.ValueKind == JsonValueKind.Array)
+                beatCount = beatDoc.RootElement.GetArrayLength();
+        }
+        catch { /* Best effort count */ }
+
+        var durationMs = (long)(DateTimeOffset.UtcNow - genStart).TotalMilliseconds;
+        _sessionTrace?.TrackEvent("replay.analysis.generation_completed", new Dictionary<string, string>
+        {
+            ["duration_ms"] = durationMs.ToString(),
+            ["beat_count"] = beatCount.ToString()
+        });
+
+        return repaired;
     }
 
     public virtual async Task DeleteFileAsync(string fileName, CancellationToken ct)

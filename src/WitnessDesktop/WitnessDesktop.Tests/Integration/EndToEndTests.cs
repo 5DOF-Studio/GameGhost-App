@@ -53,13 +53,13 @@ public class EndToEndTests
         // Start OutGame
         sut.CurrentState.Should().Be(SessionState.OutGame);
         var outGameTools = sut.GetAvailableTools();
-        outGameTools.Should().HaveCount(2);
+        outGameTools.Should().HaveCount(3);
 
         // Transition to InGame
         sut.TransitionToInGame("game-1", "chess", "lichess");
         sut.CurrentState.Should().Be(SessionState.InGame);
         var inGameTools = sut.GetAvailableTools();
-        inGameTools.Should().HaveCount(7);
+        inGameTools.Should().HaveCount(8);
         inGameTools.Select(t => t.Name).Should().Contain("capture_screen");
 
         // Back to OutGame
@@ -67,7 +67,7 @@ public class EndToEndTests
         sut.CurrentState.Should().Be(SessionState.OutGame);
         sut.Context.GameId.Should().BeNull();
         var backToOutGame = sut.GetAvailableTools();
-        backToOutGame.Should().HaveCount(2);
+        backToOutGame.Should().HaveCount(3);
         backToOutGame.Select(t => t.Name).Should().NotContain("capture_screen");
     }
 

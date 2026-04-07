@@ -2,20 +2,23 @@ using System.Globalization;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using WitnessDesktop.Models;
+using WitnessDesktop.Services;
 
 namespace WitnessDesktop.Services.Replay;
 
 public sealed class SqliteSegmentAnalysisStore : ISegmentAnalysisStore, IDisposable
 {
     private readonly string _connectionString;
+    private readonly ISessionTraceService? _sessionTrace;
     private bool _initialized;
     private readonly object _initLock = new();
 
-    public SqliteSegmentAnalysisStore(string dbPath)
+    public SqliteSegmentAnalysisStore(string dbPath, ISessionTraceService? sessionTrace = null)
     {
         var dir = Path.GetDirectoryName(dbPath);
         if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
         _connectionString = $"Data Source={dbPath}";
+        _sessionTrace = sessionTrace;
     }
 
     private SqliteConnection OpenConnection()
@@ -123,10 +126,17 @@ public sealed class SqliteSegmentAnalysisStore : ISegmentAnalysisStore, IDisposa
         await ftsInsert.ExecuteNonQueryAsync(ct);
 
         await txn.CommitAsync(ct);
+
+        _sessionTrace?.TrackEvent("replay.store.ingested", new Dictionary<string, string>
+        {
+            ["segment_id"] = result.SegmentId,
+            ["beat_count"] = result.Beats.Count.ToString()
+        });
     }
 
     public async Task<IReadOnlyList<AnalyzedBeat>> SearchAsync(string query, DateTimeOffset? startUtc = null, DateTimeOffset? endUtc = null, CancellationToken ct = default)
     {
+        var searchStart = DateTimeOffset.UtcNow;
         await using var conn = OpenConnection();
         await using var cmd = conn.CreateCommand();
 
@@ -171,6 +181,15 @@ public sealed class SqliteSegmentAnalysisStore : ISegmentAnalysisStore, IDisposa
                 });
             }
         }
+
+        var durationMs = (long)(DateTimeOffset.UtcNow - searchStart).TotalMilliseconds;
+        _sessionTrace?.TrackEvent("replay.store.searched", new Dictionary<string, string>
+        {
+            ["query"] = query.Length > 80 ? query[..80] : query,
+            ["hit_count"] = beats.Count.ToString(),
+            ["duration_ms"] = durationMs.ToString()
+        });
+
         return beats;
     }
 

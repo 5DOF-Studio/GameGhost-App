@@ -15,7 +15,7 @@ public class GeminiLiveProtocolTests
         using var doc = JsonDocument.Parse(json);
         var setup = doc.RootElement.GetProperty("setup");
 
-        setup.GetProperty("model").GetString().Should().Be("models/gemini-2.5-flash-native-audio-preview-12-2025");
+        setup.GetProperty("model").GetString().Should().Be("models/gemini-3.1-flash-live-preview");
         setup.GetProperty("generationConfig")
             .GetProperty("responseModalities")[0]
             .GetString()
@@ -78,6 +78,26 @@ public class GeminiLiveProtocolTests
         video.GetProperty("data").GetString().Should().Be(Convert.ToBase64String(payload));
     }
 
+    [Fact]
+    public void BuildSetupMessageJson_IncludesTranscriptionConfig()
+    {
+        var json = GeminiLiveProtocol.BuildSetupMessageJson("Brief.", "Fenrir");
+
+        using var doc = JsonDocument.Parse(json);
+        var setup = doc.RootElement.GetProperty("setup");
+
+        setup.TryGetProperty("inputAudioTranscription", out _).Should().BeTrue();
+        setup.TryGetProperty("outputAudioTranscription", out _).Should().BeTrue();
+    }
+
+    [Fact]
+    public void ClassifyServerMessage_InputTranscription_IsServerContent()
+    {
+        var json = """{"serverContent":{"inputTranscription":{"text":"Hey Leroy what should I play"}}}""";
+
+        GeminiLiveProtocol.ClassifyServerMessage(json).Should().Be(GeminiServerMessageKind.ServerContent);
+    }
+
     [Theory]
     [InlineData("{\"setupComplete\":{}}", "SetupComplete")]
     [InlineData("{\"serverContent\":{\"turnComplete\":true}}", "ServerContent")]
@@ -86,5 +106,46 @@ public class GeminiLiveProtocolTests
     public void ClassifyServerMessage_ReturnsExpectedKind(string json, string expected)
     {
         GeminiLiveProtocol.ClassifyServerMessage(json).ToString().Should().Be(expected);
+    }
+
+    [Fact]
+    public void BuildSetupMessageJson_IncludesSessionResumptionAndCompression()
+    {
+        var json = GeminiLiveProtocol.BuildSetupMessageJson("Brief.", "Fenrir");
+
+        using var doc = JsonDocument.Parse(json);
+        var setup = doc.RootElement.GetProperty("setup");
+
+        setup.TryGetProperty("sessionResumption", out _).Should().BeTrue();
+        setup.TryGetProperty("contextWindowCompression", out _).Should().BeTrue();
+
+        var compression = setup.GetProperty("contextWindowCompression");
+        compression.TryGetProperty("slidingWindow", out _).Should().BeTrue();
+    }
+
+    [Fact]
+    public void BuildSetupMessageJson_WithResumptionHandle_IncludesHandle()
+    {
+        var json = GeminiLiveProtocol.BuildSetupMessageJson("Brief.", "Fenrir",
+            resumptionHandle: "abc123");
+
+        using var doc = JsonDocument.Parse(json);
+        var resumption = doc.RootElement.GetProperty("setup").GetProperty("sessionResumption");
+
+        resumption.GetProperty("handle").GetString().Should().Be("abc123");
+    }
+
+    [Fact]
+    public void BuildSetupMessageJson_IncludesVadConfig()
+    {
+        var json = GeminiLiveProtocol.BuildSetupMessageJson("Brief.", "Fenrir");
+
+        using var doc = JsonDocument.Parse(json);
+        var setup = doc.RootElement.GetProperty("setup");
+
+        setup.TryGetProperty("realtimeInputConfig", out var inputConfig).Should().BeTrue();
+        var vad = inputConfig.GetProperty("automaticActivityDetection");
+        vad.TryGetProperty("disabled", out var disabled).Should().BeTrue();
+        disabled.GetBoolean().Should().BeFalse();
     }
 }

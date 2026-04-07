@@ -35,7 +35,34 @@ public enum GhostFabResources {
     }
 
     /// Loads a named image from the library's asset catalog.
+    /// Falls back to loading PNGs directly from uncompiled xcassets
+    /// (needed when running via `swift run` where actool doesn't compile the catalog).
     public static func image(named name: String) -> NSImage? {
-        bundle.image(forResource: name)
+        // Try compiled asset catalog first (framework / xcodebuild)
+        if let img = bundle.image(forResource: name) {
+            return img
+        }
+
+        // Fallback: SwiftPM copies raw xcassets — look for PNG inside imageset dirs
+        let candidates = [bundle.resourceURL, bundle.bundleURL]
+        for base in candidates.compactMap({ $0 }) {
+            let imagesetDir = base.appendingPathComponent("Assets.xcassets")
+                .appendingPathComponent("\(name).imageset")
+
+            // Try exact match first: {name}.png
+            let exactURL = imagesetDir.appendingPathComponent("\(name).png")
+            if let img = NSImage(contentsOf: exactURL) { return img }
+
+            // Imageset name may differ from PNG filename — find any .png in the dir
+            if let contents = try? FileManager.default.contentsOfDirectory(
+                at: imagesetDir, includingPropertiesForKeys: nil
+            ) {
+                for url in contents where url.pathExtension == "png" {
+                    if let img = NSImage(contentsOf: url) { return img }
+                }
+            }
+        }
+
+        return nil
     }
 }

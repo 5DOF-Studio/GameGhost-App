@@ -99,7 +99,7 @@ public class ApiKeyCollisionTests : IDisposable
     }
 
     [Fact]
-    public void Factory_WithCollision_BothGeminiAndOpenAI_StillPrefersGemini()
+    public void Factory_WithCollision_BothGeminiAndOpenAI_PrefersOpenAI()
     {
         var config = BuildConfigLikeMauiProgram(
             geminiApiKey: "gemini-real-key",
@@ -109,8 +109,8 @@ public class ApiKeyCollisionTests : IDisposable
         var factory = new ConversationProviderFactory(config);
         var provider = CreateAndTrack(factory);
 
-        provider.Should().BeOfType<GeminiConversationProvider>(
-            "Gemini should still be preferred when its explicit key is present");
+        provider.Should().BeOfType<OpenAIConversationProvider>(
+            "OpenAI should be preferred over Gemini in auto-detect when both keys present");
     }
 
     [Fact]

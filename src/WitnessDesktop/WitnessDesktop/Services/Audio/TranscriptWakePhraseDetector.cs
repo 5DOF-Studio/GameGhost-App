@@ -1,3 +1,5 @@
+using WitnessDesktop.Services;
+
 namespace WitnessDesktop.Services.Audio;
 
 /// <summary>
@@ -20,10 +22,12 @@ public sealed class TranscriptWakePhraseDetector : IWakePhraseDetector
     public const int DefaultMaxDistance = 2;
 
     private readonly int _maxDistance;
+    private readonly ISessionTraceService? _sessionTrace;
 
-    public TranscriptWakePhraseDetector(int maxDistance = DefaultMaxDistance)
+    public TranscriptWakePhraseDetector(int maxDistance = DefaultMaxDistance, ISessionTraceService? sessionTrace = null)
     {
         _maxDistance = maxDistance;
+        _sessionTrace = sessionTrace;
     }
 
     public bool TryDetectWake(string transcript, string agentName, out string? matchedPhrase)
@@ -34,12 +38,14 @@ public sealed class TranscriptWakePhraseDetector : IWakePhraseDetector
             return false;
 
         var wakePhrase = $"hey {agentName}";
+        int bestDistance = int.MaxValue;
 
         // Tier 1: Exact case-insensitive match (fast path)
         var idx = transcript.IndexOf(wakePhrase, StringComparison.OrdinalIgnoreCase);
         if (idx >= 0)
         {
             matchedPhrase = transcript.Substring(idx, wakePhrase.Length);
+            TraceWakeResult(matched: true, confidence: 1.0f, matchedPhrase);
             return true;
         }
 
@@ -49,9 +55,12 @@ public sealed class TranscriptWakePhraseDetector : IWakePhraseDetector
         {
             var candidate = $"{words[i]} {words[i + 1]}";
             var distance = LevenshteinDistance(candidate.ToLowerInvariant(), wakePhrase.ToLowerInvariant());
+            if (distance < bestDistance) bestDistance = distance;
             if (distance <= _maxDistance)
             {
                 matchedPhrase = candidate;
+                var confidence = 1.0f - ((float)distance / wakePhrase.Length);
+                TraceWakeResult(matched: true, confidence, matchedPhrase);
                 return true;
             }
         }
@@ -63,14 +72,28 @@ public sealed class TranscriptWakePhraseDetector : IWakePhraseDetector
         for (int i = 0; i < words.Length; i++)
         {
             var distance = LevenshteinDistance(words[i].ToLowerInvariant(), wakeMerged);
+            if (distance < bestDistance) bestDistance = distance;
             if (distance <= mergedThreshold)
             {
                 matchedPhrase = words[i];
+                var confidence = 1.0f - ((float)distance / wakeMerged.Length);
+                TraceWakeResult(matched: true, confidence, matchedPhrase);
                 return true;
             }
         }
 
+        // No match — skip tracing (high-volume, low-signal path)
         return false;
+    }
+
+    private void TraceWakeResult(bool matched, float confidence, string? phrase)
+    {
+        _sessionTrace?.TrackEvent("audio.wake.fuzzy_match", new Dictionary<string, string>
+        {
+            ["matched"] = matched.ToString(),
+            ["confidence"] = confidence.ToString("F2"),
+            ["phrase"] = phrase ?? ""
+        });
     }
 
     /// <summary>

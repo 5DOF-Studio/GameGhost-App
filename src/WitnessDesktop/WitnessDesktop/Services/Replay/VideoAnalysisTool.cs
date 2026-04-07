@@ -1,5 +1,6 @@
 using System.Text.Json;
 using WitnessDesktop.Models;
+using WitnessDesktop.Services;
 
 namespace WitnessDesktop.Services.Replay;
 
@@ -8,21 +9,36 @@ public sealed class VideoAnalysisTool : IVideoAnalysisTool
     private readonly GeminiVideoClient _client;
     private readonly string _flashModel;
     private readonly string _proModel;
+    private readonly ISessionTraceService? _sessionTrace;
     private int _consecutiveRateLimits;
 
     public bool IsCircuitBroken => _consecutiveRateLimits >= 3;
 
-    public VideoAnalysisTool(GeminiVideoClient client, string flashModel, string proModel)
+    public VideoAnalysisTool(GeminiVideoClient client, string flashModel, string proModel,
+        ISessionTraceService? sessionTrace = null)
     {
         _client = client;
         _flashModel = flashModel;
         _proModel = proModel;
+        _sessionTrace = sessionTrace;
     }
 
     public async Task<VideoAnalysisResult> AnalyzeAsync(ReplaySegment segment, GameSkillPack pack, CancellationToken ct = default)
     {
         if (IsCircuitBroken)
+        {
+            _sessionTrace?.TrackEvent("replay.tool.circuit_breaker", new Dictionary<string, string>
+            {
+                ["failure_count"] = _consecutiveRateLimits.ToString()
+            });
             throw new GeminiRateLimitException("Gemini analysis circuit breaker is open — automated analysis disabled for this session");
+        }
+
+        var segmentId = $"{segment.SessionId}-{segment.SegmentIndex}";
+        _sessionTrace?.TrackEvent("replay.tool.analyze", new Dictionary<string, string>
+        {
+            ["segment_id"] = segmentId
+        });
 
         var prompt = BuildAnalyzePrompt(pack);
         var (responseJson, model) = await ExecuteWithFileAsync(segment.FilePath, prompt, _flashModel, ct);
@@ -50,6 +66,12 @@ public sealed class VideoAnalysisTool : IVideoAnalysisTool
         // [W6] Guard for empty segments list
         if (segments.Count == 0)
             return new VideoSearchResult { Query = query, Hits = [], Summary = "No segments available for search" };
+
+        _sessionTrace?.TrackEvent("replay.tool.search", new Dictionary<string, string>
+        {
+            ["query"] = query.Length > 80 ? query[..80] : query,
+            ["time_hint"] = segments[0].StartUtc.ToString("O")
+        });
 
         // Search always uses pro model — no circuit breaker check (user-initiated)
         var segment = segments[0]; // For now, search first segment. Multi-segment deferred.

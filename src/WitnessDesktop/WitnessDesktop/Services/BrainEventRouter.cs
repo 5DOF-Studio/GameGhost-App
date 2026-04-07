@@ -435,11 +435,11 @@ public class BrainEventRouter : IBrainEventRouter
         {
             if (_exchangeManager?.IsExchangeActive == true)
             {
-                // Exchange still active (including AwaitingBrain) — deliver immediately
+                // Exchange still active (including AwaitingBrain) — deliver immediately + prompt voice to speak
                 if (_voiceAgent?.IsConnected == true)
                 {
                     var voiceText = PrefixWithGrounding(result.VoiceNarration);
-                    _ = _voiceAgent.SendContextualUpdateAsync(voiceText)
+                    _ = _voiceAgent.SendContextualUpdateWithResponseAsync(voiceText)
                         .ContinueWith(t => System.Diagnostics.Debug.WriteLine(
                             $"[BrainEventRouter] Deferred response delivery failed: {t.Exception?.GetBaseException().Message}"),
                             TaskContinuationOptions.OnlyOnFaulted);
@@ -777,7 +777,7 @@ public class BrainEventRouter : IBrainEventRouter
                 switch (result.Priority)
                 {
                     case BrainResultPriority.Interrupt:
-                        _ = _voiceAgent.SendContextualUpdateAsync(PrefixWithGrounding($"[URGENT] {result.VoiceNarration}"))
+                        _ = _voiceAgent.SendContextualUpdateWithResponseAsync(PrefixWithGrounding($"[URGENT] {result.VoiceNarration}"))
                             .ContinueWith(t => System.Diagnostics.Debug.WriteLine(
                                 $"[BrainEventRouter] Voice interrupt failed: {t.Exception?.GetBaseException().Message}"),
                                 TaskContinuationOptions.OnlyOnFaulted);

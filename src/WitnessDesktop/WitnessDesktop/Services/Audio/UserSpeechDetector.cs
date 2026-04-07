@@ -1,3 +1,5 @@
+using WitnessDesktop.Services;
+
 namespace WitnessDesktop.Services.Audio;
 
 /// <summary>
@@ -13,15 +15,19 @@ public sealed class UserSpeechDetector : IUserSpeechDetector
     private readonly float _threshold;
     private readonly int _debounceMs;
     private readonly object _lock = new();
+    private readonly ISessionTraceService? _sessionTrace;
     private bool _isSpeaking;
     private bool _disposed;
     private float _currentLevel;
     private Timer? _stopTimer;
+    private DateTimeOffset _speechStartedAt;
 
-    public UserSpeechDetector(float speechThreshold = DefaultSpeechThreshold, int debounceMs = DefaultDebounceMs)
+    public UserSpeechDetector(float speechThreshold = DefaultSpeechThreshold, int debounceMs = DefaultDebounceMs,
+        ISessionTraceService? sessionTrace = null)
     {
         _threshold = speechThreshold;
         _debounceMs = debounceMs;
+        _sessionTrace = sessionTrace;
     }
 
     public bool IsUserSpeaking { get { lock (_lock) return _isSpeaking; } }
@@ -43,6 +49,7 @@ public sealed class UserSpeechDetector : IUserSpeechDetector
                 if (!_isSpeaking)
                 {
                     _isSpeaking = true;
+                    _speechStartedAt = DateTimeOffset.UtcNow;
                     shouldFireStarted = true;
                 }
             }
@@ -53,7 +60,10 @@ public sealed class UserSpeechDetector : IUserSpeechDetector
             }
         }
         if (shouldFireStarted)
+        {
+            _sessionTrace?.TrackEvent("audio.user_speech.started");
             UserSpeechStarted?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     public void Dispose()
@@ -70,13 +80,20 @@ public sealed class UserSpeechDetector : IUserSpeechDetector
 
     private void OnStopTimerFired(object? state)
     {
+        DateTimeOffset startedAt;
         lock (_lock)
         {
             if (_disposed || !_isSpeaking) return;
+            startedAt = _speechStartedAt;
             _isSpeaking = false;
             _stopTimer?.Dispose();
             _stopTimer = null;
         }
+        var durationMs = (long)(DateTimeOffset.UtcNow - startedAt).TotalMilliseconds;
+        _sessionTrace?.TrackEvent("audio.user_speech.stopped", new Dictionary<string, string>
+        {
+            ["duration_ms"] = durationMs.ToString()
+        });
         UserSpeechStopped?.Invoke(this, EventArgs.Empty);
     }
 }

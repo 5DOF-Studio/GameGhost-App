@@ -140,11 +140,12 @@ public class SpineCardView: NSView {
         messageLabel.cell?.wraps = true
         messageLabel.cell?.isScrollable = false
 
-        // --- Content Image (full bounds, aspect fill) ---
+        // --- Content Image (full bounds, aspect fill via layer) ---
         contentImage = NSImageView()
         contentImage.wantsLayer = true
-        contentImage.imageScaling = .scaleProportionallyUpOrDown
+        contentImage.imageScaling = .scaleNone  // Let layer contentsGravity handle fill
         contentImage.layer?.contentsGravity = .resizeAspectFill
+        contentImage.layer?.masksToBounds = true
         contentImage.isHidden = true
 
         // --- Build view hierarchy ---

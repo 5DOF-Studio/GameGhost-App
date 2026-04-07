@@ -427,6 +427,79 @@ public class AgentPersonalityTests
         var ctx = new SessionContext { AgentKey = "chess" };
         ctx.AgentKey.Should().Be("chess");
     }
+
+    // ── Voice Discipline Block ──────────────────────────────────────────────
+
+    [Fact]
+    public void ComposedPersonality_ContainsVoiceDisciplineBlock()
+    {
+        var result = Agents.Chess.ComposedPersonality;
+
+        result.Should().Contain("[IN-GAME VOICE DISCIPLINE]");
+        result.Should().Contain("NEVER end your response with a question");
+        result.Should().Contain("Statements, not questions");
+        result.Should().Contain("FORBIDDEN closers");
+    }
+
+    [Fact]
+    public void VoiceDiscipline_AppearsBeforeSoulBlock()
+    {
+        var result = Agents.Chess.ComposedPersonality;
+
+        var disciplineIdx = result.IndexOf("[IN-GAME VOICE DISCIPLINE]");
+        var soulIdx = result.IndexOf("[WHO YOU ARE]");
+
+        disciplineIdx.Should().BeGreaterThan(-1);
+        soulIdx.Should().BeGreaterThan(-1);
+        disciplineIdx.Should().BeLessThan(soulIdx);
+    }
+
+    [Fact]
+    public void VoiceDiscipline_PresentOnAllAgents()
+    {
+        Agents.Chess.ComposedPersonality.Should().Contain("[IN-GAME VOICE DISCIPLINE]");
+        Agents.Wasp.ComposedPersonality.Should().Contain("[IN-GAME VOICE DISCIPLINE]");
+        Agents.General.ComposedPersonality.Should().Contain("[IN-GAME VOICE DISCIPLINE]");
+    }
+
+    // ── No Follow-Up Question Anti-Patterns ─────────────────────────────────
+
+    [Fact]
+    public void Leroy_AntiPatterns_ForbidsFollowUpQuestions()
+    {
+        Agents.Chess.AntiPatternsBlock.Should().Contain("NEVER end your response with a follow-up question");
+        Agents.Chess.AntiPatternsBlock.Should().Contain("want me to explain?");
+    }
+
+    [Fact]
+    public void Wasp_AntiPatterns_ForbidsFollowUpQuestions()
+    {
+        Agents.Wasp.AntiPatternsBlock.Should().Contain("NEVER end your response with a follow-up question");
+        Agents.Wasp.AntiPatternsBlock.Should().Contain("want me to explain?");
+    }
+
+    [Fact]
+    public void Rasa_AntiPatterns_ForbidsFollowUpQuestions()
+    {
+        Agents.General.AntiPatternsBlock.Should().Contain("NEVER end your response with a follow-up question");
+        Agents.General.AntiPatternsBlock.Should().Contain("want me to explain?");
+    }
+
+    [Fact]
+    public void Leroy_Behavior_DoesNotEncourageQuestions()
+    {
+        // "Often ask" pattern was removed
+        Agents.Chess.BehaviorBlock.Should().NotContain("Often ask");
+        Agents.Chess.BehaviorBlock.Should().NotContain("quick move or the why");
+    }
+
+    [Fact]
+    public void Rasa_Behavior_DoesNotEncourageFavoriteQuestion()
+    {
+        // "Your favorite question" and "Ask one good question" were removed
+        Agents.General.BehaviorBlock.Should().NotContain("Your favorite question");
+        Agents.General.BehaviorBlock.Should().NotContain("Ask one good question");
+    }
 }
 
 public class ChatPromptBuilderAgentAwarenessTests

@@ -21,7 +21,8 @@ public static class ToolDefinitions
         AnalyzePositionEngine,
         AnalyzePositionStrategic,
         GameJournal,
-        SearchReplay
+        SearchReplay,
+        DelegateToTeam
     ];
 
     public static ToolDefinition? FindByName(string? toolName)
@@ -138,6 +139,19 @@ public static class ToolDefinitions
         Icon = "tool_history.png",
         ActionLabel = "Searching footage",
         ParametersSchema = """{"type":"object","properties":{"query":{"type":"string","description":"What to search for in gameplay footage"},"time_hint":{"type":"string","description":"Optional time context like 'last 2 minutes' or 'round 3'"}},"required":["query"]}""",
+        RequiresInGame = false
+    };
+
+    // ── Gaimer Team (Phase A) ─────────────────────────────────────────────
+
+    public static readonly ToolDefinition DelegateToTeam = new()
+    {
+        Name = "delegate_to_team",
+        DisplayName = "Ghost Team",
+        Description = "Hand off a task to Ghost Team for background research, file operations, or anything beyond local game context. Fire-and-forget — result arrives later via voice narration.",
+        Icon = "tool_generic.png",
+        ActionLabel = "Handed to team",
+        ParametersSchema = """{"type":"object","properties":{"task":{"type":"string","description":"What to hand off"},"response_format":{"type":"string","description":"voice (2-3 sentences) or detailed (full explanation)"}},"required":["task"]}""",
         RequiresInGame = false
     };
 }

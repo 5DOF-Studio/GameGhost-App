@@ -89,9 +89,9 @@ public class SessionManagerTests
 
         var tools = sut.GetAvailableTools();
 
-        tools.Should().HaveCount(2);
+        tools.Should().HaveCount(3);
         tools.Select(t => t.Name).Should().BeEquivalentTo(
-            "web_search", "search_replay");
+            "web_search", "search_replay", "delegate_to_team");
     }
 
     [Fact]
@@ -102,12 +102,13 @@ public class SessionManagerTests
 
         var tools = sut.GetAvailableTools();
 
-        tools.Should().HaveCount(7);
+        tools.Should().HaveCount(8);
         tools.Select(t => t.Name).Should().Contain("capture_screen")
             .And.Contain("get_game_state")
             .And.Contain("analyze_position_engine")
             .And.Contain("analyze_position_strategic")
-            .And.Contain("game_journal");
+            .And.Contain("game_journal")
+            .And.Contain("delegate_to_team");
     }
 
     [Fact]
@@ -176,11 +177,12 @@ public class SessionManagerTests
 
         var tools = sut.GetAvailableTools();
 
-        tools.Should().HaveCount(7);
+        tools.Should().HaveCount(8);
         tools.Select(t => t.Name).Should().Contain("analyze_position_engine")
             .And.Contain("analyze_position_strategic")
             .And.Contain("capture_screen")
             .And.Contain("get_game_state")
-            .And.Contain("game_journal");
+            .And.Contain("game_journal")
+            .And.Contain("delegate_to_team");
     }
 }
