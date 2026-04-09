@@ -26,6 +26,7 @@ public enum EventOutputType
     SystemError,      // Error message (chat fail, voice disconnect, brain error)
     Archived,         // Archive boundary marker — end of visible hot window
     TeamResult,       // Gaimer Team task result (background capability)
+    PermissionRequest, // Team permission request (allow/deny)
 
     // === AGENT-SPECIFIC MARKER ===
     AgentSpecific = 100

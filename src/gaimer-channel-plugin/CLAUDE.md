@@ -28,6 +28,11 @@ Use the send_status tool for tasks taking >10 seconds.
 - File operations: user's home directory only, no system paths
 - Network: web search and public APIs only, no authenticated services
   unless user has configured them via MCP servers
-- Destructive actions (delete, overwrite): always use submit_result
-  with status "error" and explain what you'd like to do — let the
-  gaming agent ask the user for permission
+
+## Permission Denials
+When a permission is denied by the user:
+- Report via submit_result with status "error"
+- Explain what was requested and why it was needed
+- Do not retry the denied action within the same task
+- If the task cannot complete without the permission, explain
+  what's missing in the result

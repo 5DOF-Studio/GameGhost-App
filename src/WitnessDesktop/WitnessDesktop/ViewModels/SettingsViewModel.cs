@@ -10,6 +10,7 @@ public class SettingsViewModel : INotifyPropertyChanged
 {
     private readonly ISettingsService _settings;
     private readonly ILocalModelRuntime _localRuntime;
+    private readonly IBargeInPolicyService _bargeInPolicy;
 
     private string _localRuntimeStatus = "Unknown";
     private string _brainProvider = "Cloud";
@@ -19,10 +20,11 @@ public class SettingsViewModel : INotifyPropertyChanged
     private string _sttStatus = "Unknown";
     private string _ttsStatus = "Unknown";
 
-    public SettingsViewModel(ISettingsService settings, ILocalModelRuntime localRuntime)
+    public SettingsViewModel(ISettingsService settings, ILocalModelRuntime localRuntime, IBargeInPolicyService bargeInPolicy)
     {
         _settings = settings;
         _localRuntime = localRuntime;
+        _bargeInPolicy = bargeInPolicy;
     }
 
     public string VoiceProvider
@@ -50,6 +52,7 @@ public class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsMaleSelected));
             OnPropertyChanged(nameof(IsFemaleSelected));
             OnPropertyChanged(nameof(CurrentVoiceName));
+            OnPropertyChanged(nameof(VoiceGenderDisplay));
         }
     }
 
@@ -77,6 +80,99 @@ public class SettingsViewModel : INotifyPropertyChanged
     public bool IsLocalFirstSelected => InferenceMode == InferenceMode.LocalFirst;
 
     public string CurrentVoiceName => VoiceConfig.GetVoiceName(VoiceProvider, VoiceGender);
+
+    public string VoiceGenderDisplay => VoiceGender switch
+    {
+        "male" => "Male",
+        "female" => "Female",
+        _ => VoiceGender
+    };
+
+    public bool IsBargeInEnabled
+    {
+        get => _bargeInPolicy.IsBargeInEnabled;
+        set
+        {
+            if (_bargeInPolicy.IsBargeInEnabled == value) return;
+            _bargeInPolicy.SetEnabled(value);
+            OnPropertyChanged();
+        }
+    }
+
+    public string ClaudeCliPath
+    {
+        get => _settings.ClaudeCliPath;
+        set
+        {
+            if (_settings.ClaudeCliPath == value) return;
+            _settings.ClaudeCliPath = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string BunPath
+    {
+        get => _settings.BunPath;
+        set
+        {
+            if (_settings.BunPath == value) return;
+            _settings.BunPath = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool TeamAutoLaunch
+    {
+        get => _settings.TeamAutoLaunch;
+        set
+        {
+            if (_settings.TeamAutoLaunch == value) return;
+            _settings.TeamAutoLaunch = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string PluginDirPath
+    {
+        get => _settings.PluginDirPath;
+        set
+        {
+            if (_settings.PluginDirPath == value) return;
+            _settings.PluginDirPath = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string TeamPermissionMode
+    {
+        get => _settings.TeamPermissionMode;
+        set
+        {
+            if (_settings.TeamPermissionMode == value) return;
+            _settings.TeamPermissionMode = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(PermissionModeDisplay));
+        }
+    }
+
+    public List<string> PermissionModeOptions { get; } = new()
+    {
+        "default", "acceptEdits", "auto", "bypassPermissions", "plan"
+    };
+
+    /// <summary>Human-readable permission mode descriptions for settings UI.</summary>
+    public static readonly List<PermissionModeOption> PermissionModeDisplayOptions = new()
+    {
+        new("default",             "Ask for everything",  "Claude asks before every action"),
+        new("acceptEdits",         "Auto-approve edits",  "Claude edits freely, asks for other actions"),
+        new("plan",                "Plan only",           "Claude plans but waits for your approval to act"),
+        new("auto",                "Auto-approve most",   "Claude acts freely on most tasks"),
+        new("bypassPermissions",   "Full autonomy",       "Claude acts without asking"),
+    };
+
+    public string PermissionModeDisplay =>
+        PermissionModeDisplayOptions.FirstOrDefault(o => o.Key == TeamPermissionMode)?.Label
+        ?? "Ask for everything";
 
     public string BrainModel => "Gemini 2.5 Flash";
     public string CaptureRate => "On every board change + on demand";
@@ -165,3 +261,5 @@ public class SettingsViewModel : INotifyPropertyChanged
     protected void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
+
+public record PermissionModeOption(string Key, string Label, string Description);

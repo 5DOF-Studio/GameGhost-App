@@ -2,6 +2,7 @@
 #define HAS_MAUI_ESSENTIALS
 #endif
 
+using System.Collections.Concurrent;
 using WitnessDesktop.Models;
 
 namespace WitnessDesktop.Services;
@@ -13,9 +14,14 @@ public sealed class SettingsService : ISettingsService
     private const string InferenceModeKey = "inference_mode";
     private const string DeviceIdKey = "gaimer_device_id";
     private const string ApiKeyPrefix = "apikey_";
+    private const string ClaudeCliPathKey = "claude_cli_path";
+    private const string BunPathKey = "bun_path";
+    private const string TeamAutoLaunchKey = "team_auto_launch";
+    private const string PluginDirPathKey = "plugin_dir_path";
+    private const string TeamPermissionModeKey = "team_permission_mode";
 
-    // In-memory fallback for net8.0 library builds (tests)
-    private readonly Dictionary<string, string> _memStore = new();
+    // Thread-safe in-memory fallback for net8.0 library builds (tests) — H1
+    private readonly ConcurrentDictionary<string, string> _memStore = new();
     private string? _fallbackDeviceId;
 
     public event EventHandler<string>? SettingChanged;
@@ -25,6 +31,7 @@ public sealed class SettingsService : ISettingsService
         get => GetPref(VoiceProviderKey, "gemini");
         set
         {
+            if (GetPref(VoiceProviderKey, "gemini") == value) return; // H3
             SetPref(VoiceProviderKey, value);
             SettingChanged?.Invoke(this, nameof(VoiceProvider));
         }
@@ -35,6 +42,7 @@ public sealed class SettingsService : ISettingsService
         get => GetPref(VoiceGenderKey, "male");
         set
         {
+            if (GetPref(VoiceGenderKey, "male") == value) return; // H3
             SetPref(VoiceGenderKey, value);
             SettingChanged?.Invoke(this, nameof(VoiceGender));
         }
@@ -49,8 +57,65 @@ public sealed class SettingsService : ISettingsService
         }
         set
         {
+            if (GetPref(InferenceModeKey, nameof(InferenceMode.CloudOnly)) == value.ToString()) return; // H3
             SetPref(InferenceModeKey, value.ToString());
             SettingChanged?.Invoke(this, nameof(InferenceMode));
+        }
+    }
+
+    public string ClaudeCliPath
+    {
+        get => GetPref(ClaudeCliPathKey, "");
+        set
+        {
+            if (GetPref(ClaudeCliPathKey, "") == value) return; // H3
+            SetPref(ClaudeCliPathKey, value);
+            SettingChanged?.Invoke(this, nameof(ClaudeCliPath));
+        }
+    }
+
+    public string BunPath
+    {
+        get => GetPref(BunPathKey, "");
+        set
+        {
+            if (GetPref(BunPathKey, "") == value) return; // H3
+            SetPref(BunPathKey, value);
+            SettingChanged?.Invoke(this, nameof(BunPath));
+        }
+    }
+
+    public bool TeamAutoLaunch
+    {
+        get => GetPref(TeamAutoLaunchKey, "true") == "true";
+        set
+        {
+            var stringVal = value ? "true" : "false";
+            if (GetPref(TeamAutoLaunchKey, "true") == stringVal) return; // H3
+            SetPref(TeamAutoLaunchKey, stringVal);
+            SettingChanged?.Invoke(this, nameof(TeamAutoLaunch));
+        }
+    }
+
+    public string PluginDirPath
+    {
+        get => GetPref(PluginDirPathKey, "");
+        set
+        {
+            if (GetPref(PluginDirPathKey, "") == value) return; // H3
+            SetPref(PluginDirPathKey, value);
+            SettingChanged?.Invoke(this, nameof(PluginDirPath));
+        }
+    }
+
+    public string TeamPermissionMode
+    {
+        get => GetPref(TeamPermissionModeKey, "default");
+        set
+        {
+            if (GetPref(TeamPermissionModeKey, "default") == value) return; // H3 equality guard
+            SetPref(TeamPermissionModeKey, value);
+            SettingChanged?.Invoke(this, nameof(TeamPermissionMode));
         }
     }
 

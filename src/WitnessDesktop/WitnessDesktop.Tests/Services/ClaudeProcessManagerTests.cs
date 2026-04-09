@@ -6,12 +6,15 @@ namespace WitnessDesktop.Tests.Services;
 
 public class ClaudeProcessManagerTests : IDisposable
 {
+    private readonly Mock<ISettingsService> _mockSettings;
     private readonly ClaudeProcessManager _sut;
     private readonly string _tempDir;
 
     public ClaudeProcessManagerTests()
     {
-        _sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>());
+        _mockSettings = new Mock<ISettingsService>();
+        _mockSettings.Setup(s => s.TeamPermissionMode).Returns("bypassPermissions");
+        _sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>(), _mockSettings.Object);
         _tempDir = Path.Combine(Path.GetTempPath(), $"gaimer-cpm-test-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_tempDir);
     }
@@ -100,5 +103,87 @@ public class ClaudeProcessManagerTests : IDisposable
         {
             // Process already gone — expected
         }
+    }
+
+    // --- Permission mode flag tests ---
+
+    [Fact]
+    public void LaunchAsync_DefaultMode_PassesPermissionModeDefault()
+    {
+        var settings = new Mock<ISettingsService>();
+        settings.Setup(s => s.TeamPermissionMode).Returns("default");
+        var sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>(), settings.Object);
+
+        var args = sut.BuildArguments("/some/plugin");
+
+        args.Should().Contain("--permission-mode default");
+        args.Should().NotContain("--dangerously-skip-permissions");
+        sut.Dispose();
+    }
+
+    [Fact]
+    public void LaunchAsync_BypassMode_PassesBypassPermissions()
+    {
+        var settings = new Mock<ISettingsService>();
+        settings.Setup(s => s.TeamPermissionMode).Returns("bypassPermissions");
+        var sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>(), settings.Object);
+
+        var args = sut.BuildArguments("/some/plugin");
+
+        args.Should().Contain("--permission-mode bypassPermissions");
+        sut.Dispose();
+    }
+
+    [Fact]
+    public void LaunchAsync_PlanMode_PassesPlanPermission()
+    {
+        var settings = new Mock<ISettingsService>();
+        settings.Setup(s => s.TeamPermissionMode).Returns("plan");
+        var sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>(), settings.Object);
+
+        var args = sut.BuildArguments("/some/plugin");
+
+        args.Should().Contain("--permission-mode plan");
+        sut.Dispose();
+    }
+
+    [Fact]
+    public void BuildArguments_EmptyMode_FallsBackToDefault()
+    {
+        var settings = new Mock<ISettingsService>();
+        settings.Setup(s => s.TeamPermissionMode).Returns(string.Empty);
+        var sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>(), settings.Object);
+
+        var args = sut.BuildArguments("/some/plugin");
+
+        args.Should().Contain("--permission-mode default");
+        sut.Dispose();
+    }
+
+    [Fact]
+    public void BuildArguments_NullMode_FallsBackToDefault()
+    {
+        var settings = new Mock<ISettingsService>();
+        settings.Setup(s => s.TeamPermissionMode).Returns((string)null!);
+        var sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>(), settings.Object);
+
+        var args = sut.BuildArguments("/some/plugin");
+
+        args.Should().Contain("--permission-mode default");
+        sut.Dispose();
+    }
+
+    [Fact]
+    public void BuildArguments_InvalidMode_FallsBackToDefault()
+    {
+        var settings = new Mock<ISettingsService>();
+        settings.Setup(s => s.TeamPermissionMode).Returns("auto --dangerously-skip-permissions");
+        var sut = new ClaudeProcessManager(Mock.Of<ILogger<ClaudeProcessManager>>(), settings.Object);
+
+        var args = sut.BuildArguments("/some/plugin");
+
+        args.Should().Contain("--permission-mode default");
+        args.Should().NotContain("--dangerously-skip-permissions");
+        sut.Dispose();
     }
 }

@@ -9,6 +9,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
 {
     private readonly IGaimerPipeClient _pipe;
     private readonly IClaudeProcessManager _process;
+    private readonly ISettingsService _settings;
     private readonly ILogger<GaimerTeamService> _logger;
     private readonly ConcurrentDictionary<string, GaimerTeamTask> _pendingTasks = new();
 
@@ -34,8 +35,11 @@ public sealed class GaimerTeamService : IGaimerTeamService
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         "Library", "Application Support", "Gaimer", "gaimer-team.sock");
 
-    public bool IsConnected { get; private set; }
-    public bool IsConfigured => File.Exists(GetPluginPath() ?? "");
+    private volatile bool _isConnected; // PB-M3
+    private bool? _isConfiguredCache; // H2: avoid spawning 3 subprocesses per access
+    public bool IsConnected => _isConnected;
+    public bool IsConfigured => _isConfiguredCache ??= EvaluateIsConfigured();
+    public string? LastError { get; private set; }
 
     public event EventHandler<GaimerTeamResultEventArgs>? TaskCompleted;
     public event EventHandler<GaimerTeamProgressEventArgs>? TaskProgress;
@@ -44,11 +48,120 @@ public sealed class GaimerTeamService : IGaimerTeamService
     public GaimerTeamService(
         IGaimerPipeClient pipe,
         IClaudeProcessManager process,
+        ISettingsService settings,
         ILogger<GaimerTeamService> logger)
     {
         _pipe = pipe;
         _process = process;
+        _settings = settings;
         _logger = logger;
+
+        // Invalidate cached IsConfigured when team settings change (H2)
+        _settings.SettingChanged += (_, name) =>
+        {
+            if (name is nameof(ISettingsService.ClaudeCliPath)
+                or nameof(ISettingsService.BunPath)
+                or nameof(ISettingsService.PluginDirPath))
+                _isConfiguredCache = null;
+        };
+    }
+
+    private bool EvaluateIsConfigured() =>
+        ResolvePluginPath() != null
+        && ResolveClaudeCliPath() != null
+        && ResolveBunPath() != null;
+
+    // ── Pre-flight Checks ─────────────────────────────────────────
+
+    private bool RunPreFlightChecks()
+    {
+        LastError = null;
+
+        var pluginPath = ResolvePluginPath();
+        if (pluginPath == null || !File.Exists(Path.Combine(pluginPath, "server.ts")))
+        {
+            LastError = "Channel plugin not found — check plugin directory in Settings > Team";
+            _logger.LogError("[GaimerTeam] Pre-flight failed: {Error}", LastError);
+            return false;
+        }
+
+        var cliPath = ResolveClaudeCliPath();
+        if (cliPath == null)
+        {
+            LastError = "Claude CLI not found — install Claude Code or set path in Settings > Team";
+            _logger.LogError("[GaimerTeam] Pre-flight failed: {Error}", LastError);
+            return false;
+        }
+
+        var bunPath = ResolveBunPath();
+        if (bunPath == null)
+        {
+            LastError = "Bun runtime not found — install Bun or set path in Settings > Team";
+            _logger.LogError("[GaimerTeam] Pre-flight failed: {Error}", LastError);
+            return false;
+        }
+
+        var socketDir = Path.GetDirectoryName(SocketPath)!;
+        try { Directory.CreateDirectory(socketDir); }
+        catch
+        {
+            LastError = "Cannot write to application support directory";
+            _logger.LogError("[GaimerTeam] Pre-flight failed: {Error}", LastError);
+            return false;
+        }
+
+        return true;
+    }
+
+    private string? ResolveClaudeCliPath()
+    {
+        var configured = _settings.ClaudeCliPath;
+        if (!string.IsNullOrEmpty(configured) && File.Exists(configured))
+            return configured;
+        return DiscoverBinaryPath("claude");
+    }
+
+    private string? ResolveBunPath()
+    {
+        var configured = _settings.BunPath;
+        if (!string.IsNullOrEmpty(configured) && File.Exists(configured))
+            return configured;
+        return DiscoverBinaryPath("bun");
+    }
+
+    internal string? ResolvePluginPath()
+    {
+        var configured = _settings.PluginDirPath;
+        if (!string.IsNullOrEmpty(configured) && Directory.Exists(configured))
+            return configured;
+        return GetPluginPath();
+    }
+
+    private static string? DiscoverBinaryPath(string binary)
+    {
+        try
+        {
+            var discoveryCommand = System.Runtime.InteropServices.RuntimeInformation
+                .IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? "where.exe" : "which";
+            var psi = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = discoveryCommand,
+                Arguments = binary,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            using var proc = System.Diagnostics.Process.Start(psi);
+            if (proc == null) return null;
+            var output = proc.StandardOutput.ReadToEnd().Trim();
+            if (!proc.WaitForExit(3000)) // M4: timeout to avoid hanging on misconfigured env
+            {
+                try { proc.Kill(); } catch { /* best-effort */ }
+                return null;
+            }
+            return proc.ExitCode == 0 && File.Exists(output) ? output : null;
+        }
+        catch { return null; }
     }
 
     // ── Session Lifecycle ────────────────────────────────────────
@@ -59,6 +172,10 @@ public sealed class GaimerTeamService : IGaimerTeamService
 
         try
         {
+            // 0. Pre-flight checks
+            if (!RunPreFlightChecks())
+                return false;
+
             // 1. Create session directory
             Directory.CreateDirectory(SessionDir);
 
@@ -74,13 +191,8 @@ public sealed class GaimerTeamService : IGaimerTeamService
             if (File.Exists(SocketPath))
                 File.Delete(SocketPath);
 
-            // 4. Launch process
-            var pluginPath = GetPluginPath();
-            if (pluginPath == null)
-            {
-                _logger.LogError("[GaimerTeam] Plugin path not found");
-                return false;
-            }
+            // 4. Launch process (use resolved plugin path from pre-flight)
+            var pluginPath = ResolvePluginPath()!;
 
             var launched = await _process.LaunchAsync(SessionDir, pluginPath, ct);
             if (!launched)
@@ -110,26 +222,25 @@ public sealed class GaimerTeamService : IGaimerTeamService
                 return false;
             }
 
-            // 7. Ping/pong handshake
+            // 7. Wire events (before ping to avoid message drop window — PB-H3)
+            WireEvents();
+
+            // 8. Ping/pong handshake
             var pong = await PingPongAsync(ct);
             if (!pong)
             {
                 _logger.LogWarning("[GaimerTeam] Ping/pong handshake failed, proceeding anyway");
             }
 
-            // 8. Wire events
-            WireEvents();
-
-            // 9. Set state
+            // 9. Set state (_restartAttempts reset on pong, not here — PB-C3)
             _ownsProcess = true;
-            _restartAttempts = 0;
             Interlocked.Exchange(ref _missedPings, 0);
 
             // 10. Start health timer
             StartHealthTimer();
 
             // 11. IsConnected
-            IsConnected = true;
+            _isConnected = true;
             _logger.LogInformation("[GaimerTeam] Session launched and connected");
             return true;
         }
@@ -161,15 +272,15 @@ public sealed class GaimerTeamService : IGaimerTeamService
                 return false;
             }
 
-            // 3. Ping/pong
+            // 3. Wire events (before ping to avoid message drop window — PB-H3)
+            WireEvents();
+
+            // 4. Ping/pong
             var pong = await PingPongAsync(ct);
             if (!pong)
             {
                 _logger.LogWarning("[GaimerTeam] Ping/pong handshake failed on existing session");
             }
-
-            // 4. Wire events
-            WireEvents();
 
             // 5. Not owned
             _ownsProcess = false;
@@ -179,7 +290,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
             StartHealthTimer();
 
             // 7. IsConnected
-            IsConnected = true;
+            _isConnected = true;
             _logger.LogInformation("[GaimerTeam] Connected to existing session");
             return true;
         }
@@ -203,14 +314,14 @@ public sealed class GaimerTeamService : IGaimerTeamService
         if (_ownsProcess && terminateOwnedSession)
             await _process.TerminateAsync();
 
-        IsConnected = false;
+        _isConnected = false;
         _logger.LogInformation("[GaimerTeam] Disconnected (owned={Owned}, terminated={Terminated})",
             _ownsProcess, _ownsProcess && terminateOwnedSession);
     }
 
     // ── Task Operations ──────────────────────────────────────────
 
-    public Task<string> SubmitTaskAsync(GaimerTeamTask task, CancellationToken ct = default)
+    public async Task<string> SubmitTaskAsync(GaimerTeamTask task, CancellationToken ct = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         if (!IsConnected)
@@ -218,6 +329,8 @@ public sealed class GaimerTeamService : IGaimerTeamService
 
         _pendingTasks[task.Id] = task;
 
+        // Wire protocol: sends "id" here; plugin maps to "task_id" in channel
+        // message meta. Responses from plugin use "task_id" (see HandleTaskResult). (PB-M5)
         var wireMessage = JsonSerializer.Serialize(new
         {
             type = "task_request",
@@ -236,7 +349,8 @@ public sealed class GaimerTeamService : IGaimerTeamService
             response_format = task.ResponseFormat
         });
 
-        return _pipe.SendAsync(wireMessage, ct).ContinueWith(_ => task.Id, ct);
+        await _pipe.SendAsync(wireMessage, ct); // PB-M4: await instead of ContinueWith
+        return task.Id;
     }
 
     public Task CancelTaskAsync(string taskId, CancellationToken ct = default)
@@ -300,6 +414,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
 
                 case "pong":
                     Interlocked.Exchange(ref _missedPings, 0);
+                    _restartAttempts = 0; // Reset only on sustained healthy connection (PB-C3)
                     break;
 
                 default:
@@ -315,7 +430,12 @@ public sealed class GaimerTeamService : IGaimerTeamService
 
     private void HandleTaskResult(JsonElement root)
     {
-        var taskId = root.GetProperty("task_id").GetString()!;
+        // Wire protocol: plugin sends "task_id" (mapped from request "id") (PB-M5/M7)
+        if (!root.TryGetProperty("task_id", out var tidProp) || tidProp.GetString() is not { } taskId)
+        {
+            _logger.LogWarning("[GaimerTeam] task_result missing 'task_id' field");
+            return;
+        }
 
         // Drop results for cancelled/unknown tasks
         if (!_pendingTasks.TryRemove(taskId, out var originalTask))
@@ -324,11 +444,17 @@ public sealed class GaimerTeamService : IGaimerTeamService
             return;
         }
 
+        if (!root.TryGetProperty("status", out var statusProp) || !root.TryGetProperty("response", out var responseProp))
+        {
+            _logger.LogWarning("[GaimerTeam] task_result missing required fields for task: {TaskId}", taskId);
+            return;
+        }
+
         var result = new GaimerTeamResult
         {
             TaskId = taskId,
-            Status = root.GetProperty("status").GetString()!,
-            Response = root.GetProperty("response").GetString()!,
+            Status = statusProp.GetString()!,
+            Response = responseProp.GetString()!,
             ActionsTaken = root.TryGetProperty("actions_taken", out var actions)
                 ? actions.EnumerateArray().Select(a => a.GetString()!).ToList()
                 : [],
@@ -354,7 +480,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
     {
         var taskId = root.TryGetProperty("task_id", out var tid) ? tid.GetString() : null;
 
-        if (taskId == null || !_pendingTasks.TryRemove(taskId, out _))
+        if (taskId == null || !_pendingTasks.TryRemove(taskId, out var originalTask))
         {
             _logger.LogWarning("[GaimerTeam] Error for unknown/cancelled task: {TaskId}", taskId);
             return;
@@ -370,13 +496,21 @@ public sealed class GaimerTeamService : IGaimerTeamService
             ErrorCode = root.TryGetProperty("error_code", out var ec) ? ec.GetString() : null
         };
 
-        TaskCompleted?.Invoke(this, new GaimerTeamResultEventArgs { Result = result });
+        TaskCompleted?.Invoke(this, new GaimerTeamResultEventArgs
+        {
+            Result = result,
+            ResponseFormat = originalTask?.ResponseFormat ?? "voice" // NEW-1
+        });
     }
 
     private void HandleStatusUpdate(JsonElement root)
     {
-        var taskId = root.GetProperty("task_id").GetString()!;
-        var message = root.GetProperty("message").GetString()!;
+        if (!root.TryGetProperty("task_id", out var tidProp) || tidProp.GetString() is not { } taskId
+            || !root.TryGetProperty("message", out var msgProp) || msgProp.GetString() is not { } message)
+        {
+            _logger.LogWarning("[GaimerTeam] status_update missing required fields");
+            return;
+        }
 
         TaskProgress?.Invoke(this, new GaimerTeamProgressEventArgs
         {
@@ -387,12 +521,21 @@ public sealed class GaimerTeamService : IGaimerTeamService
 
     private void HandlePermissionRequest(JsonElement root)
     {
+        if (!root.TryGetProperty("id", out var idProp) || idProp.GetString() is not { } id
+            || !root.TryGetProperty("task_id", out var tidProp) || tidProp.GetString() is not { } taskId
+            || !root.TryGetProperty("action", out var actionProp) || actionProp.GetString() is not { } action
+            || !root.TryGetProperty("risk", out var riskProp) || riskProp.GetString() is not { } risk)
+        {
+            _logger.LogWarning("[GaimerTeam] permission_request missing required fields");
+            return;
+        }
+
         var request = new GaimerTeamPermissionRequest
         {
-            Id = root.GetProperty("id").GetString()!,
-            TaskId = root.GetProperty("task_id").GetString()!,
-            Action = root.GetProperty("action").GetString()!,
-            Risk = root.GetProperty("risk").GetString()!,
+            Id = id,
+            TaskId = taskId,
+            Action = action,
+            Risk = risk,
             TimeoutSeconds = root.TryGetProperty("timeout_seconds", out var ts) ? ts.GetInt32() : 60
         };
 
@@ -416,6 +559,9 @@ public sealed class GaimerTeamService : IGaimerTeamService
     {
         try
         {
+            // Skip ticks during active restart to prevent overlapping triggers (PB-H4)
+            if (Volatile.Read(ref _restarting) != 0) return;
+
             var missed = Interlocked.Increment(ref _missedPings);
 
             // Send ping
@@ -430,6 +576,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
 
             if (missed >= MaxMissedPings)
             {
+                StopHealthTimer(); // Stop before triggering restart (PB-H4)
                 _logger.LogWarning("[GaimerTeam] {Missed} missed pings, connection appears unhealthy", missed);
 
                 if (_ownsProcess)
@@ -479,8 +626,11 @@ public sealed class GaimerTeamService : IGaimerTeamService
                 _logger.LogWarning(ex, "[GaimerTeam] Error terminating process during restart");
             }
 
+            // Error-out pending tasks from the old session — new session has no memory of them
+            ErrorOutPendingTasks("Session restarted. Please retry.");
+
             // Re-launch
-            IsConnected = false;
+            _isConnected = false;
             Interlocked.Exchange(ref _missedPings, 0);
 
             var success = await LaunchSessionAsync();
@@ -521,7 +671,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
     private void MarkDisconnected()
     {
         StopHealthTimer();
-        IsConnected = false;
+        _isConnected = false;
         ErrorOutPendingTasks("Connection to Gaimer Team session lost.");
         _logger.LogWarning("[GaimerTeam] Marked as disconnected");
     }
@@ -638,7 +788,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
     internal void SetConnectedForTest(bool owned)
     {
         _ownsProcess = owned;
-        IsConnected = true;
+        _isConnected = true;
         Interlocked.Exchange(ref _missedPings, 0);
         WireEvents();
     }
@@ -656,12 +806,7 @@ public sealed class GaimerTeamService : IGaimerTeamService
 
         _pipe.Disconnect();
 
-        if (_ownsProcess)
-        {
-            try { _process.TerminateAsync().GetAwaiter().GetResult(); }
-            catch { /* best effort */ }
-        }
-
+        // ClaudeProcessManager.Dispose() handles Kill + WaitForExit(5000) synchronously (PB-H5)
         _pipe.Dispose();
         _process.Dispose();
     }

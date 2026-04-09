@@ -15,13 +15,15 @@ public sealed class GaimerPipeClient : IGaimerPipeClient
     private CancellationTokenSource? _readCts;
     private Task? _readLoop;
     private bool _disposed;
+    private const int MaxLineLength = 1_048_576; // 1MB (PB-M1)
 
     public GaimerPipeClient(ILogger<GaimerPipeClient> logger)
     {
         _logger = logger;
     }
 
-    public bool IsConnected { get; private set; }
+    private volatile bool _isConnected; // PB-M3
+    public bool IsConnected => _isConnected;
 
     public event EventHandler<string>? MessageReceived;
     public event EventHandler? ConnectionLost;
@@ -41,7 +43,7 @@ public sealed class GaimerPipeClient : IGaimerPipeClient
             _readCts = new CancellationTokenSource();
             _readLoop = Task.Run(() => ReadLoopAsync(_readCts.Token), CancellationToken.None);
 
-            IsConnected = true;
+            _isConnected = true;
             _logger.LogInformation("[GaimerPipe] Connected to {Path}", socketPath);
             return true;
         }
@@ -76,8 +78,13 @@ public sealed class GaimerPipeClient : IGaimerPipeClient
         if (!IsConnected) return;
         _logger.LogInformation("[GaimerPipe] Disconnecting");
         _readCts?.Cancel();
+        if (_readLoop != null)
+        {
+            try { _readLoop.Wait(TimeSpan.FromSeconds(2)); } catch { /* read loop should exit quickly after CTS cancel */ }
+            _readLoop = null;
+        }
         CleanupSocket();
-        IsConnected = false;
+        _isConnected = false;
     }
 
     public void Dispose()
@@ -99,14 +106,18 @@ public sealed class GaimerPipeClient : IGaimerPipeClient
                 if (line == null)
                 {
                     _logger.LogInformation("[GaimerPipe] Server closed connection");
-                    IsConnected = false;
+                    _isConnected = false;
                     ConnectionLost?.Invoke(this, EventArgs.Empty);
                     return;
                 }
-                if (!string.IsNullOrWhiteSpace(line))
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+                if (line.Length > MaxLineLength)
                 {
-                    MessageReceived?.Invoke(this, line);
+                    _logger.LogWarning("[GaimerPipe] Dropping oversized message ({Length} bytes)", line.Length);
+                    continue;
                 }
+                MessageReceived?.Invoke(this, line);
             }
         }
         catch (OperationCanceledException)
@@ -118,7 +129,7 @@ public sealed class GaimerPipeClient : IGaimerPipeClient
             if (!ct.IsCancellationRequested)
             {
                 _logger.LogWarning("[GaimerPipe] Read loop error: {Message}", ex.Message);
-                IsConnected = false;
+                _isConnected = false;
                 ConnectionLost?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -129,6 +140,7 @@ public sealed class GaimerPipeClient : IGaimerPipeClient
         try { _reader?.Dispose(); } catch { /* best-effort */ }
         try { _writer?.Dispose(); } catch { /* best-effort */ }
         try { _stream?.Dispose(); } catch { /* best-effort */ }
+        try { _socket?.Dispose(); } catch { /* best-effort */ }
         _reader = null;
         _writer = null;
         _stream = null;

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WitnessDesktop.Connectors.ConnectorCardView">
+
+    <!-- Outer card shell: 420 wide, rounded 28, gradient fill + stroke -->
+    <Border x:Name="CardShell"
+            WidthRequest="420"
+            MinimumHeightRequest="300"
+            StrokeThickness="1"
+            Padding="0"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="28" />
+        </Border.StrokeShape>
+        <Border.Shadow>
+            <Shadow Brush="Black" Opacity="0.35" Radius="30" Offset="0,16" />
+        </Border.Shadow>
+
+        <Grid RowDefinitions="*,Auto">
+
+            <!-- SEARCHING STATE -->
+            <VerticalStackLayout x:Name="SearchingBody"
+                                 Grid.Row="0"
+                                 IsVisible="False"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Spacing="18"
+                                 Padding="30,0">
+
+                <ActivityIndicator x:Name="SearchSpinner"
+                                   IsRunning="True"
+                                   WidthRequest="36"
+                                   HeightRequest="36"
+                                   HorizontalOptions="Center" />
+
+                <Label x:Name="SearchMessage"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- MATCH STATE -->
+            <VerticalStackLayout x:Name="MatchBody"
+                                 Grid.Row="0"
+                                 IsVisible="False"
+                                 Spacing="0">
+
+                <!-- Header: icon + text -->
+                <Grid Padding="20,22,60,0"
+                      ColumnDefinitions="80,*"
+                      ColumnSpacing="16">
+
+                    <!-- Game icon box -->
+                    <Border x:Name="GameIconBorder"
+                            Grid.Column="0"
+                            WidthRequest="80"
+                            HeightRequest="80"
+                            StrokeThickness="1"
+                            Padding="0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18" />
+                        </Border.StrokeShape>
+                        <Image x:Name="GameIconImage"
+                               WidthRequest="48"
+                               HeightRequest="48"
+                               Aspect="AspectFit"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                    </Border>
+
+                    <!-- Title / subtitle / detail -->
+                    <VerticalStackLayout Grid.Column="1"
+                                         Spacing="5"
+                                         VerticalOptions="Start">
+                        <Label x:Name="MatchTitle"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               MaxLines="2" />
+                        <Label x:Name="MatchSubtitle"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               MaxLines="1" />
+                        <Label x:Name="MatchDetail"
+                               FontSize="12"
+                               MaxLines="1" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- Preview tile -->
+                <Border x:Name="PreviewBorder"
+                        Margin="20,12,20,0"
+                        HeightRequest="184"
+                        StrokeThickness="0"
+                        Padding="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="18" />
+                    </Border.StrokeShape>
+
+                    <Grid>
+                        <Image x:Name="PreviewIcon"
+                               WidthRequest="72"
+                               HeightRequest="72"
+                               Aspect="AspectFit"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+
+                        <ActivityIndicator x:Name="ConnectingSpinner"
+                                           IsVisible="False"
+                                           IsRunning="False"
+                                           WidthRequest="48"
+                                           HeightRequest="48"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center" />
+
+                        <Border x:Name="BadgePill"
+                                IsVisible="False"
+                                HorizontalOptions="End"
+                                VerticalOptions="Start"
+                                Margin="0,14,14,0"
+                                Padding="10,8"
+                                StrokeThickness="0">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+                            <Label x:Name="BadgeLabel"
+                                   FontSize="11"
+                                   FontAttributes="Bold"
+                                   TextColor="#D0000000" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Metadata rows -->
+                <VerticalStackLayout x:Name="MetadataSection" Padding="20,12,20,0" Spacing="8">
+                    <Grid x:Name="MetaWindowRow" ColumnDefinitions="50,*" ColumnSpacing="8">
+                        <Label Text="Window" FontSize="11" FontAttributes="Bold"
+                               TextColor="#A3FFFFFF" Grid.Column="0" />
+                        <Label x:Name="MetaWindow" FontSize="13"
+                               TextColor="#E6FFFFFF" Grid.Column="1" />
+                    </Grid>
+                    <Grid x:Name="MetaSceneRow" ColumnDefinitions="50,*" ColumnSpacing="8">
+                        <Label Text="Scene" FontSize="11" FontAttributes="Bold"
+                               TextColor="#A3FFFFFF" Grid.Column="0" />
+                        <Label x:Name="MetaScene" FontSize="13"
+                               TextColor="#E6FFFFFF" Grid.Column="1" />
+                    </Grid>
+                    <Grid x:Name="MetaDetailsRow" ColumnDefinitions="50,*" ColumnSpacing="8">
+                        <Label Text="Details" FontSize="11" FontAttributes="Bold"
+                               TextColor="#A3FFFFFF" Grid.Column="0" />
+                        <Label x:Name="MetaDetails" FontSize="13"
+                               TextColor="#E6FFFFFF" Grid.Column="1" />
+                    </Grid>
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="16" Color="Transparent" />
+            </VerticalStackLayout>
+
+            <!-- EMPTY STATE -->
+            <VerticalStackLayout x:Name="EmptyBody"
+                                 Grid.Row="0"
+                                 IsVisible="False"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Padding="30,0">
+                <Label x:Name="EmptyMessage"
+                       FontSize="17"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- BADGE OVERLAY -->
+            <Image x:Name="BadgeOverlay"
+                   Grid.Row="0"
+                   IsVisible="False"
+                   WidthRequest="168"
+                   HeightRequest="168"
+                   Rotation="-45"
+                   Opacity="0.15"
+                   Aspect="AspectFit"
+                   HorizontalOptions="End"
+                   VerticalOptions="Start"
+                   TranslationX="50"
+                   TranslationY="-30"
+                   InputTransparent="True" />
+
+            <!-- FOOTER BUTTONS -->
+            <Grid x:Name="FooterGrid"
+                  Grid.Row="1"
+                  Padding="20,0,20,20"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="10">
+
+                <Button x:Name="BtnSearchDismiss"
+                        Grid.ColumnSpan="2"
+                        IsVisible="False"
+                        Text="Dismiss"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        HeightRequest="48"
+                        CornerRadius="14"
+                        BorderWidth="1"
+                        Clicked="OnDismissTapped" />
+
+                <Button x:Name="BtnConnect"
+                        Grid.ColumnSpan="2"
+                        IsVisible="False"
+                        Text="Connect"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        HeightRequest="48"
+                        CornerRadius="14"
+                        Clicked="OnConnectTapped" />
+
+                <Button x:Name="BtnEmptyDismiss"
+                        Grid.Column="0"
+                        IsVisible="False"
+                        Text="Dismiss"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        HeightRequest="48"
+                        CornerRadius="14"
+                        BorderWidth="1"
+                        BorderColor="#14FFFFFF"
+                        BackgroundColor="#14FFFFFF"
+                        TextColor="#CCFFFFFF"
+                        Clicked="OnDismissTapped" />
+
+                <Button x:Name="BtnRefresh"
+                        Grid.Column="1"
+                        IsVisible="False"
+                        Text="Refresh"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        HeightRequest="48"
+                        CornerRadius="14"
+                        Clicked="OnRefreshTapped" />
+            </Grid>
+
+        </Grid>
+    </Border>
+</ContentView>

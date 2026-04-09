@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -28,7 +29,9 @@ public class ToolExecutorDelegateToTeamTests
         });
     }
 
-    private ToolExecutor CreateSut(IGaimerTeamService? team = null)
+    private ToolExecutor CreateSut(
+        IGaimerTeamService? team = null,
+        IBrainContextService? brainContext = null)
     {
         var httpClient = new HttpClient(MockHttpHandler.FromJson("{}"));
         var orClient = new OpenRouterClient(httpClient, "test-key", "test-model");
@@ -39,7 +42,8 @@ public class ToolExecutorDelegateToTeamTests
             new MockStockfishService(),
             "openai/gpt-4o-mini",
             _mockLogger.Object,
-            gaimerTeam: team);
+            gaimerTeam: team,
+            brainContext: brainContext);
     }
 
     [Fact]
@@ -117,5 +121,175 @@ public class ToolExecutorDelegateToTeamTests
             """{"task":"Something"}""");
 
         captured!.ResponseFormat.Should().Be("voice");
+    }
+
+    // ── Brain Context Population Tests ─────────────────────────────────────
+
+    [Fact]
+    public async Task DelegateToTeam_PopulatesL1Context_FromImmediateEvents()
+    {
+        _mockTeam.Setup(t => t.IsConnected).Returns(true);
+        GaimerTeamTask? captured = null;
+        _mockTeam.Setup(t => t.SubmitTaskAsync(It.IsAny<GaimerTeamTask>(), It.IsAny<CancellationToken>()))
+            .Callback<GaimerTeamTask, CancellationToken>((task, _) => captured = task)
+            .ReturnsAsync("gt_ctx1");
+
+        var ts = new DateTime(2026, 4, 7, 14, 30, 0, DateTimeKind.Utc);
+        var events = new List<BrainEvent>
+        {
+            new() { TimestampUtc = ts, Category = "threat", Text = "Enemy flanking left" },
+            new() { TimestampUtc = ts.AddSeconds(5), Category = "objective", Text = "Plant bomb at A site" }
+        };
+
+        var mockBrainContext = new Mock<IBrainContextService>();
+        mockBrainContext.Setup(bc => bc.GetContextForChatAsync(
+                It.IsAny<DateTime>(),
+                It.Is<string>(s => s == "delegation"),
+                It.Is<int>(b => b == 2500),
+                It.IsAny<ContextAssemblyInputs?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SharedContextEnvelope
+            {
+                ImmediateEvents = events,
+                RollingSummary = "",
+                RecentChatSummary = "",
+                RecentVoiceTranscript = ""
+            });
+
+        var sut = CreateSut(_mockTeam.Object, mockBrainContext.Object);
+
+        await sut.ExecuteToolAsync("delegate_to_team",
+            """{"task":"Analyze the flank"}""");
+
+        captured.Should().NotBeNull();
+        captured!.Context.L1Context.Should().NotBeNull();
+        captured.Context.L1Context.Should().Contain("[14:30:00] threat: Enemy flanking left");
+        captured.Context.L1Context.Should().Contain("[14:30:05] objective: Plant bomb at A site");
+    }
+
+    [Fact]
+    public async Task DelegateToTeam_PopulatesL2Context_FromRollingSummary()
+    {
+        _mockTeam.Setup(t => t.IsConnected).Returns(true);
+        GaimerTeamTask? captured = null;
+        _mockTeam.Setup(t => t.SubmitTaskAsync(It.IsAny<GaimerTeamTask>(), It.IsAny<CancellationToken>()))
+            .Callback<GaimerTeamTask, CancellationToken>((task, _) => captured = task)
+            .ReturnsAsync("gt_ctx2");
+
+        var mockBrainContext = new Mock<IBrainContextService>();
+        mockBrainContext.Setup(bc => bc.GetContextForChatAsync(
+                It.IsAny<DateTime>(),
+                It.Is<string>(s => s == "delegation"),
+                It.Is<int>(b => b == 2500),
+                It.IsAny<ContextAssemblyInputs?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SharedContextEnvelope
+            {
+                ImmediateEvents = ImmutableArray<BrainEvent>.Empty,
+                RollingSummary = "Player has been aggressive, pushing mid control for 3 minutes",
+                RecentChatSummary = "",
+                RecentVoiceTranscript = ""
+            });
+
+        var sut = CreateSut(_mockTeam.Object, mockBrainContext.Object);
+
+        await sut.ExecuteToolAsync("delegate_to_team",
+            """{"task":"Suggest strategy change"}""");
+
+        captured.Should().NotBeNull();
+        captured!.Context.L2Context.Should().Be("Player has been aggressive, pushing mid control for 3 minutes");
+    }
+
+    [Fact]
+    public async Task DelegateToTeam_PopulatesRecentActivity_FromChatAndVoice()
+    {
+        _mockTeam.Setup(t => t.IsConnected).Returns(true);
+        GaimerTeamTask? captured = null;
+        _mockTeam.Setup(t => t.SubmitTaskAsync(It.IsAny<GaimerTeamTask>(), It.IsAny<CancellationToken>()))
+            .Callback<GaimerTeamTask, CancellationToken>((task, _) => captured = task)
+            .ReturnsAsync("gt_ctx3");
+
+        var mockBrainContext = new Mock<IBrainContextService>();
+        mockBrainContext.Setup(bc => bc.GetContextForChatAsync(
+                It.IsAny<DateTime>(),
+                It.Is<string>(s => s == "delegation"),
+                It.Is<int>(b => b == 2500),
+                It.IsAny<ContextAssemblyInputs?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SharedContextEnvelope
+            {
+                ImmediateEvents = ImmutableArray<BrainEvent>.Empty,
+                RollingSummary = "",
+                RecentChatSummary = "User asked about opening theory",
+                RecentVoiceTranscript = "User (voice): What should I play here?"
+            });
+
+        var sut = CreateSut(_mockTeam.Object, mockBrainContext.Object);
+
+        await sut.ExecuteToolAsync("delegate_to_team",
+            """{"task":"Research the opening"}""");
+
+        captured.Should().NotBeNull();
+        captured!.Context.RecentActivity.Should().NotBeNull();
+        captured.Context.RecentActivity.Should().Contain("--- Recent Chat ---");
+        captured.Context.RecentActivity.Should().Contain("User asked about opening theory");
+        captured.Context.RecentActivity.Should().Contain("--- Recent Voice ---");
+        captured.Context.RecentActivity.Should().Contain("What should I play here?");
+    }
+
+    [Fact]
+    public async Task DelegateToTeam_EmptyEnvelope_LeavesContextFieldsNull()
+    {
+        _mockTeam.Setup(t => t.IsConnected).Returns(true);
+        GaimerTeamTask? captured = null;
+        _mockTeam.Setup(t => t.SubmitTaskAsync(It.IsAny<GaimerTeamTask>(), It.IsAny<CancellationToken>()))
+            .Callback<GaimerTeamTask, CancellationToken>((task, _) => captured = task)
+            .ReturnsAsync("gt_ctx4");
+
+        var mockBrainContext = new Mock<IBrainContextService>();
+        mockBrainContext.Setup(bc => bc.GetContextForChatAsync(
+                It.IsAny<DateTime>(),
+                It.Is<string>(s => s == "delegation"),
+                It.Is<int>(b => b == 2500),
+                It.IsAny<ContextAssemblyInputs?>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new SharedContextEnvelope
+            {
+                ImmediateEvents = ImmutableArray<BrainEvent>.Empty,
+                RollingSummary = "",
+                RecentChatSummary = "",
+                RecentVoiceTranscript = ""
+            });
+
+        var sut = CreateSut(_mockTeam.Object, mockBrainContext.Object);
+
+        await sut.ExecuteToolAsync("delegate_to_team",
+            """{"task":"Do something"}""");
+
+        captured.Should().NotBeNull();
+        captured!.Context.L1Context.Should().BeNull();
+        captured.Context.L2Context.Should().BeNull();
+        captured.Context.RecentActivity.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task DelegateToTeam_NoBrainContextService_LeavesContextFieldsNull()
+    {
+        _mockTeam.Setup(t => t.IsConnected).Returns(true);
+        GaimerTeamTask? captured = null;
+        _mockTeam.Setup(t => t.SubmitTaskAsync(It.IsAny<GaimerTeamTask>(), It.IsAny<CancellationToken>()))
+            .Callback<GaimerTeamTask, CancellationToken>((task, _) => captured = task)
+            .ReturnsAsync("gt_ctx5");
+
+        // No brainContext passed — null
+        var sut = CreateSut(_mockTeam.Object, brainContext: null);
+
+        await sut.ExecuteToolAsync("delegate_to_team",
+            """{"task":"Do something"}""");
+
+        captured.Should().NotBeNull();
+        captured!.Context.L1Context.Should().BeNull();
+        captured.Context.L2Context.Should().BeNull();
+        captured.Context.RecentActivity.Should().BeNull();
     }
 }

@@ -68,17 +68,7 @@ public sealed class BrainPromptBuilder : IBrainPromptBuilder
         sb.AppendLine();
 
         sb.AppendLine("--- Recent Observations (last 30s) ---");
-        if (l1Events.Count == 0)
-        {
-            sb.AppendLine("No recent observations.");
-        }
-        else
-        {
-            foreach (var evt in l1Events.Take(MaxL1Events))
-            {
-                sb.AppendLine($"[{evt.TimestampUtc:HH:mm:ss}] {evt.Category}: {evt.Text}");
-            }
-        }
+        sb.AppendLine(BrainContextFormatter.FormatL1Events(l1Events, MaxL1Events));
         sb.AppendLine();
 
         sb.AppendLine("--- Rolling Summary (30s-5min) ---");

@@ -29,6 +29,7 @@ const server = new Server(
 // ── Pipe State ────────────────────────────────────────────────────
 
 let pipeSocket: NetSocket | null = null;
+const pendingPermissions = new Map<string, { resolve: (approved: boolean) => void }>();
 
 function writeToPipe(obj: Record<string, unknown>): void {
   if (!pipeSocket || pipeSocket.destroyed) return;
@@ -129,6 +130,10 @@ if (existsSync(SOCKET_PATH)) {
 }
 
 const pipeServer = createServer((socket) => {
+  // Destroy stale connection before accepting new one (PB-M6)
+  if (pipeSocket && !pipeSocket.destroyed) {
+    pipeSocket.destroy();
+  }
   pipeSocket = socket;
   let buffer = "";
 
@@ -190,10 +195,42 @@ function handlePipeMessage(msg: Record<string, unknown>): void {
   }
 
   if (type === "permission_response") {
-    // Phase G: forward to pending permission TCS
-    // For now, log and ignore
+    const id = msg.id as string;
+    const approved = msg.approved as boolean;
+    const pending = pendingPermissions.get(id);
+    if (pending) {
+      pending.resolve(approved);
+      pendingPermissions.delete(id);
+    }
     return;
   }
+}
+
+/** Infrastructure for future permission integration — will be called by MCP tool hooks
+ *  when Claude's session encounters a destructive action that needs user approval.
+ *  Currently no caller; wired in Phase G as the outbound half of the permission round-trip. */
+function requestPermission(taskId: string, action: string, risk: string, timeoutSeconds: number = 60): Promise<boolean> {
+  const id = `perm_${crypto.randomUUID().slice(0, 12)}`;
+  return new Promise<boolean>((resolve) => {
+    pendingPermissions.set(id, { resolve });
+
+    writeToPipe({
+      type: "permission_request",
+      id,
+      task_id: taskId,
+      action,
+      risk,
+      timeout_seconds: timeoutSeconds,
+    });
+
+    // Auto-deny on timeout
+    setTimeout(() => {
+      if (pendingPermissions.has(id)) {
+        pendingPermissions.delete(id);
+        resolve(false);
+      }
+    }, timeoutSeconds * 1000);
+  });
 }
 
 // ── Startup ───────────────────────────────────────────────────────

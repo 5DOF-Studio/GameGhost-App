@@ -1,12 +1,12 @@
-using WitnessDesktop.Models;
 using WitnessDesktop.ViewModels;
 
 namespace WitnessDesktop.Views;
 
 public partial class SettingsPage : ContentPage
 {
-    private string? _originalProvider;
-    private string? _originalGender;
+    // Permission mode key → (card border, check circle) for checklist UI
+    private readonly record struct PermissionRow(string Key, Border Card, Border Check);
+    private PermissionRow[] _permissionRows = [];
 
     public SettingsPage(SettingsViewModel viewModel)
     {
@@ -17,107 +17,94 @@ public partial class SettingsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        // Build permission row map after InitializeComponent
+        _permissionRows =
+        [
+            new("default",           PermDefault, PermDefaultCheck),
+            new("acceptEdits",       PermEdits,   PermEditsCheck),
+            new("plan",              PermPlan,    PermPlanCheck),
+            new("auto",              PermAuto,    PermAutoCheck),
+            new("bypassPermissions", PermBypass,  PermBypassCheck),
+        ];
+
         if (BindingContext is SettingsViewModel vm)
         {
-            _originalProvider = vm.VoiceProvider;
-            _originalGender = vm.VoiceGender;
             await vm.RefreshDiagnosticsAsync();
+            ApplyPermissionSelection(vm.TeamPermissionMode);
         }
     }
+
+    // ── Sidebar navigation ─────────────────────────────────
+
+    private void OnNavVision(object? sender, TappedEventArgs e) => SwitchSection("Vision");
+    private void OnNavVoice(object? sender, TappedEventArgs e)  => SwitchSection("Voice");
+    private void OnNavBrain(object? sender, TappedEventArgs e)  => SwitchSection("Brain");
+    private void OnNavTeam(object? sender, TappedEventArgs e)   => SwitchSection("Team");
+
+    private void SwitchSection(string section)
+    {
+        VisionPanel.IsVisible = section == "Vision";
+        VoicePanel.IsVisible  = section == "Voice";
+        BrainPanel.IsVisible  = section == "Brain";
+        TeamPanel.IsVisible   = section == "Team";
+
+        SetNavState(NavVision, NavVisionLabel, section == "Vision");
+        SetNavState(NavVoice,  NavVoiceLabel,  section == "Voice");
+        SetNavState(NavBrain,  NavBrainLabel,  section == "Brain");
+        SetNavState(NavTeam,   NavTeamLabel,   section == "Team");
+    }
+
+    private void SetNavState(Border nav, Label label, bool active)
+    {
+        nav.BackgroundColor = active
+            ? (Color)Resources["NavItemActive"]
+            : Colors.Transparent;
+        label.TextColor = active
+            ? (Color)Resources["TextPrimary"]
+            : (Color)Resources["TextSecondary"];
+        label.FontFamily = active ? "RajdhaniSemiBold" : "RajdhaniRegular";
+    }
+
+    // ── Back navigation ────────────────────────────────────
 
     private async void OnBackClicked(object? sender, TappedEventArgs e)
     {
-        await HandleNavigateBackAsync();
-    }
-
-    private async Task HandleNavigateBackAsync()
-    {
-        if (BindingContext is SettingsViewModel vm)
-        {
-            bool providerChanged = vm.VoiceProvider != _originalProvider;
-            bool genderChanged = vm.VoiceGender != _originalGender;
-
-            if (providerChanged || genderChanged)
-            {
-                // Check if currently connected via MainViewModel
-                var mainVm = Application.Current?.Handler?.MauiContext?.Services.GetService<MainViewModel>();
-                if (mainVm?.IsConnected == true)
-                {
-                    var restart = await DisplayAlert(
-                        "Session Restart Required",
-                        "Changing the voice configuration will restart your current session.",
-                        "Restart", "Cancel");
-
-                    if (!restart)
-                    {
-                        // Revert to original values
-                        vm.VoiceProvider = _originalProvider ?? "gemini";
-                        vm.VoiceGender = _originalGender ?? "male";
-
-                        if (Shell.Current is not null)
-                            await Shell.Current.GoToAsync("..");
-                        return;
-                    }
-
-                    // Confirmed: settings already saved (SettingsViewModel writes through),
-                    // trigger session restart
-                    _ = mainVm.RestartSessionAsync();
-                }
-            }
-        }
-
         if (Shell.Current is not null)
             await Shell.Current.GoToAsync("..");
     }
 
-    private void OnGeminiSelected(object? sender, TappedEventArgs e)
+    // ── Permission mode checklist ──────────────────────────
+
+    private void OnPermDefaultSelected(object? sender, TappedEventArgs e) => SelectPermission("default");
+    private void OnPermEditsSelected(object? sender, TappedEventArgs e)   => SelectPermission("acceptEdits");
+    private void OnPermPlanSelected(object? sender, TappedEventArgs e)    => SelectPermission("plan");
+    private void OnPermAutoSelected(object? sender, TappedEventArgs e)    => SelectPermission("auto");
+    private void OnPermBypassSelected(object? sender, TappedEventArgs e)  => SelectPermission("bypassPermissions");
+
+    private void SelectPermission(string key)
     {
         if (BindingContext is SettingsViewModel vm)
-            vm.VoiceProvider = "gemini";
+            vm.TeamPermissionMode = key;
+
+        ApplyPermissionSelection(key);
     }
 
-    private void OnOpenAiSelected(object? sender, TappedEventArgs e)
+    private void ApplyPermissionSelection(string activeKey)
     {
-        if (BindingContext is SettingsViewModel vm)
-            vm.VoiceProvider = "openai";
-    }
+        var accentCyan = (Color)Resources["AccentCyan"];
+        var cardBorder = (Color)Resources["CardBorder"];
+        var checkInactive = (Color)Resources["CheckInactive"];
 
-    private void OnMaleSelected(object? sender, TappedEventArgs e)
-    {
-        if (BindingContext is SettingsViewModel vm)
-            vm.VoiceGender = "male";
-    }
-
-    private void OnFemaleSelected(object? sender, TappedEventArgs e)
-    {
-        if (BindingContext is SettingsViewModel vm)
-            vm.VoiceGender = "female";
-    }
-
-    private async void OnCloudOnlySelected(object? sender, TappedEventArgs e)
-    {
-        if (BindingContext is SettingsViewModel vm)
+        foreach (var row in _permissionRows)
         {
-            vm.InferenceMode = InferenceMode.CloudOnly;
-            await vm.RefreshDiagnosticsAsync();
-        }
-    }
+            bool isActive = row.Key == activeKey;
+            row.Card.Stroke = new SolidColorBrush(isActive ? accentCyan : cardBorder);
+            row.Check.BackgroundColor = isActive ? accentCyan : checkInactive;
 
-    private async void OnLocalOnlySelected(object? sender, TappedEventArgs e)
-    {
-        if (BindingContext is SettingsViewModel vm)
-        {
-            vm.InferenceMode = InferenceMode.LocalOnly;
-            await vm.RefreshDiagnosticsAsync();
-        }
-    }
-
-    private async void OnLocalFirstSelected(object? sender, TappedEventArgs e)
-    {
-        if (BindingContext is SettingsViewModel vm)
-        {
-            vm.InferenceMode = InferenceMode.LocalFirst;
-            await vm.RefreshDiagnosticsAsync();
+            // Set checkmark text on the circle's child label
+            if (row.Check.Content is Label checkLabel)
+                checkLabel.Text = isActive ? "✓" : "";
         }
     }
 }

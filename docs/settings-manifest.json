@@ -1,0 +1,475 @@
+{
+  "$schema": "gaimer-settings-manifest-v1",
+  "generated": "2026-04-06",
+  "description": "Complete inventory of user-configurable settings for Gaimer Desktop. Use as binding contract for settings UI design.",
+
+  "categories": [
+    {
+      "id": "voice",
+      "name": "Voice & Conversation",
+      "icon": "mic",
+      "settings": [
+        {
+          "key": "voice_provider",
+          "label": "Voice Provider",
+          "type": "dropdown",
+          "default": "openai",
+          "options": [
+            { "value": "openai", "label": "OpenAI Realtime", "description": "gpt-realtime-1.5 — best instruction following, semantic VAD" },
+            { "value": "gemini", "label": "Gemini Live", "description": "gemini-3.1-flash-live — 3-10x cheaper, native multimodal" },
+            { "value": "mock", "label": "Mock (Debug)", "description": "Offline testing, no API calls" }
+          ],
+          "storage": "preferences",
+          "requiresRestart": true,
+          "owner": "SettingsService"
+        },
+        {
+          "key": "voice_gender",
+          "label": "Voice Gender",
+          "type": "dropdown",
+          "default": "male",
+          "options": [
+            { "value": "male", "label": "Male", "voiceMap": { "openai": "ash", "gemini": "Fenrir" } },
+            { "value": "female", "label": "Female", "voiceMap": { "openai": "shimmer", "gemini": "Kore" } }
+          ],
+          "storage": "preferences",
+          "requiresRestart": false,
+          "owner": "SettingsService"
+        },
+        {
+          "key": "barge_in_enabled",
+          "label": "Allow Unsolicited Agent Speech",
+          "description": "When enabled, the agent can speak without being asked — alerts, commentary, and reminders.",
+          "type": "toggle",
+          "default": false,
+          "storage": "preferences",
+          "requiresRestart": false,
+          "owner": "BargeInPolicyService",
+          "children": [
+            {
+              "key": "barge_in_cat_CallOut",
+              "label": "Danger Alerts",
+              "description": "Urgent warnings: mate threats, blunders, traps",
+              "type": "toggle",
+              "default": true,
+              "enabledWhen": "barge_in_enabled == true"
+            },
+            {
+              "key": "barge_in_cat_ToolExecution",
+              "label": "Tool Results",
+              "description": "Speak results from engine analysis, replay search, etc.",
+              "type": "toggle",
+              "default": true,
+              "enabledWhen": "barge_in_enabled == true"
+            },
+            {
+              "key": "barge_in_cat_Reminder",
+              "label": "Deferred Reminders",
+              "description": "Deliver results from earlier questions when you're free",
+              "type": "toggle",
+              "default": true,
+              "enabledWhen": "barge_in_enabled == true"
+            },
+            {
+              "key": "barge_in_cat_FreeCommentary",
+              "label": "Free Commentary",
+              "description": "Personality-driven observations and reactions",
+              "type": "toggle",
+              "default": true,
+              "enabledWhen": "barge_in_enabled == true"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "api_keys",
+      "name": "API Keys",
+      "icon": "key",
+      "description": "Keys are stored in platform-secure storage (Keychain on macOS).",
+      "settings": [
+        {
+          "key": "apikey_openai",
+          "label": "OpenAI API Key",
+          "description": "Required for OpenAI Realtime voice and GPT-4o chat",
+          "type": "secret",
+          "default": null,
+          "storage": "secure_storage",
+          "placeholder": "sk-...",
+          "envFallback": ["OPENAI_APIKEY", "OPENAI_API_KEY"],
+          "owner": "SettingsService"
+        },
+        {
+          "key": "apikey_gemini",
+          "label": "Gemini API Key",
+          "description": "Required for Gemini Live voice and video analysis",
+          "type": "secret",
+          "default": null,
+          "storage": "secure_storage",
+          "placeholder": "AIza...",
+          "envFallback": ["GEMINI_APIKEY", "GEMINI_API_KEY"],
+          "owner": "SettingsService"
+        },
+        {
+          "key": "apikey_openrouter",
+          "label": "OpenRouter API Key",
+          "description": "Required for brain analysis (vision model)",
+          "type": "secret",
+          "default": null,
+          "storage": "secure_storage",
+          "placeholder": "sk-or-...",
+          "envFallback": ["OPENROUTER_APIKEY"],
+          "owner": "SettingsService"
+        }
+      ]
+    },
+    {
+      "id": "inference",
+      "name": "Inference Mode",
+      "icon": "cpu",
+      "settings": [
+        {
+          "key": "inference_mode",
+          "label": "Inference Mode",
+          "description": "Controls whether AI runs in the cloud, locally, or local-first with cloud fallback.",
+          "type": "dropdown",
+          "default": "CloudOnly",
+          "options": [
+            { "value": "CloudOnly", "label": "Cloud Only", "description": "All AI runs in the cloud (recommended)" },
+            { "value": "LocalOnly", "label": "Local Only", "description": "All AI runs locally via Ollama (experimental)" },
+            { "value": "LocalFirst", "label": "Local First", "description": "Prefer local, fall back to cloud" }
+          ],
+          "storage": "preferences",
+          "requiresRestart": true,
+          "owner": "SettingsService"
+        },
+        {
+          "key": "OLLAMA_BASE_URL",
+          "label": "Ollama Server URL",
+          "description": "Local inference server endpoint",
+          "type": "text",
+          "default": "http://127.0.0.1:11434",
+          "storage": "env_var",
+          "visibleWhen": "inference_mode != CloudOnly",
+          "owner": "MauiProgram"
+        },
+        {
+          "key": "GAIMER_LOCAL_BRAIN_MODEL",
+          "label": "Local Brain Model",
+          "description": "Ollama model name for local vision analysis",
+          "type": "text",
+          "default": "minicpm-v",
+          "storage": "env_var",
+          "visibleWhen": "inference_mode != CloudOnly",
+          "owner": "MauiProgram"
+        }
+      ]
+    },
+    {
+      "id": "brain",
+      "name": "Brain & Analysis",
+      "icon": "brain",
+      "settings": [
+        {
+          "key": "brain_vision_model",
+          "label": "Vision Model",
+          "description": "Model used for screen capture analysis (OpenRouter)",
+          "type": "readonly",
+          "default": "google/gemini-2.5-flash",
+          "storage": "hardcoded",
+          "note": "Guard: NEVER change without explicit user approval (feedback_brain_model_guard.md)",
+          "owner": "MauiProgram"
+        },
+        {
+          "key": "GEMINI_FLASH_MODEL",
+          "label": "Video Analysis Model (Flash)",
+          "description": "Gemini model for replay video analysis",
+          "type": "text",
+          "default": "gemini-2.5-flash",
+          "storage": "env_var",
+          "owner": "MauiProgram"
+        },
+        {
+          "key": "GEMINI_PRO_MODEL",
+          "label": "Video Analysis Model (Pro)",
+          "description": "Gemini model for deep replay analysis fallback",
+          "type": "text",
+          "default": "gemini-3-pro-preview",
+          "storage": "env_var",
+          "owner": "MauiProgram"
+        }
+      ]
+    },
+    {
+      "id": "agent",
+      "name": "Agent Selection",
+      "icon": "users",
+      "description": "Agent is selected from the agent selection screen, not settings. These are read-only reference values.",
+      "settings": [
+        {
+          "key": "selected_agent",
+          "label": "Active Agent",
+          "type": "agent_selector",
+          "default": "chess",
+          "options": [
+            {
+              "value": "general",
+              "label": "RASA",
+              "description": "Frenemy adventure companion — any game",
+              "voiceId": "echo",
+              "available": true
+            },
+            {
+              "value": "chess",
+              "label": "Leroy",
+              "description": "Cocky chess genius with drill-sergeant energy",
+              "voiceId": null,
+              "available": true
+            },
+            {
+              "value": "chess-wasp",
+              "label": "Wasp",
+              "description": "Composed positional chess strategist",
+              "voiceId": null,
+              "available": true
+            }
+          ],
+          "storage": "runtime",
+          "owner": "MainViewModel"
+        }
+      ]
+    },
+    {
+      "id": "capture",
+      "name": "Screen Capture",
+      "icon": "monitor",
+      "description": "Per-agent capture configuration. These are set by the agent's profile, not user-editable (yet).",
+      "settings": [
+        {
+          "key": "capture_interval_ms",
+          "label": "Capture Interval",
+          "description": "Milliseconds between automated screen captures",
+          "type": "readonly",
+          "default": 5000,
+          "unit": "ms",
+          "storage": "agent_config",
+          "owner": "Agent.CaptureConfig"
+        },
+        {
+          "key": "diff_threshold",
+          "label": "Change Detection Threshold",
+          "description": "Perceptual hash difference threshold (0=any change, 255=never detect change)",
+          "type": "readonly",
+          "default": 10,
+          "range": [0, 255],
+          "storage": "agent_config",
+          "owner": "Agent.CaptureConfig"
+        },
+        {
+          "key": "diff_hash_width",
+          "label": "Hash Grid Width",
+          "description": "dHash grid size for change detection (9=coarse 64-bit, 33=fine 1024-bit)",
+          "type": "readonly",
+          "default": 9,
+          "storage": "agent_config",
+          "owner": "Agent.CaptureConfig"
+        }
+      ]
+    },
+    {
+      "id": "replay",
+      "name": "Replay Recording",
+      "icon": "film",
+      "description": "Screen recording for replay search. Currently hardcoded.",
+      "settings": [
+        {
+          "key": "replay_segment_duration_s",
+          "label": "Segment Duration",
+          "description": "Duration of each replay segment before rotation",
+          "type": "readonly",
+          "default": 150,
+          "unit": "seconds",
+          "storage": "hardcoded",
+          "owner": "ReplayRecordingService"
+        },
+        {
+          "key": "replay_max_segments",
+          "label": "Max Segments Kept",
+          "description": "Number of segments kept on disk (rolling buffer)",
+          "type": "readonly",
+          "default": 2,
+          "storage": "hardcoded",
+          "owner": "ReplayRecordingService"
+        },
+        {
+          "key": "replay_min_disk_space_mb",
+          "label": "Minimum Free Disk Space",
+          "description": "Recording stops if free disk space drops below this",
+          "type": "readonly",
+          "default": 500,
+          "unit": "MB",
+          "storage": "hardcoded",
+          "owner": "ReplayRecordingService"
+        }
+      ]
+    },
+    {
+      "id": "audio",
+      "name": "Audio",
+      "icon": "volume",
+      "description": "Audio format is fixed to match provider requirements. Not user-configurable.",
+      "settings": [
+        {
+          "key": "audio_input_sample_rate",
+          "label": "Input Sample Rate",
+          "type": "readonly",
+          "default": 16000,
+          "unit": "Hz",
+          "storage": "hardcoded"
+        },
+        {
+          "key": "audio_output_sample_rate",
+          "label": "Output Sample Rate",
+          "type": "readonly",
+          "default": 24000,
+          "unit": "Hz",
+          "storage": "hardcoded"
+        }
+      ]
+    },
+    {
+      "id": "team",
+      "name": "Team",
+      "icon": "people",
+      "description": "Configure the Gaimer Team — a Claude CLI agent that handles delegated tasks from your voice agent during gameplay.",
+      "settings": [
+        {
+          "key": "claude_cli_path",
+          "label": "Claude CLI Path",
+          "description": "Path to the Claude CLI binary. Empty = auto-discover via `which claude` on macOS / `where.exe claude` on Windows. Override if Claude is installed in a non-standard location.",
+          "type": "text",
+          "default": "",
+          "storage": "preferences",
+          "placeholder": "/usr/local/bin/claude",
+          "requiresRestart": false,
+          "owner": "SettingsService"
+        },
+        {
+          "key": "bun_path",
+          "label": "Bun Runtime Path",
+          "description": "Path to the Bun runtime binary. Empty = auto-discover via `which bun`. Required to run the Gaimer channel plugin that bridges tasks to Claude.",
+          "type": "text",
+          "default": "",
+          "storage": "preferences",
+          "placeholder": "/usr/local/bin/bun",
+          "requiresRestart": false,
+          "owner": "SettingsService"
+        },
+        {
+          "key": "team_auto_launch",
+          "label": "Auto-Launch Team Session",
+          "description": "Automatically launch a Claude team session when the app connects to a game. Disable to manage team sessions manually via the Team ConnectorCard.",
+          "type": "toggle",
+          "default": true,
+          "storage": "preferences",
+          "requiresRestart": false,
+          "owner": "SettingsService"
+        },
+        {
+          "key": "plugin_dir_path",
+          "label": "Channel Plugin Directory",
+          "description": "Path to the Gaimer channel plugin directory. Empty = use the bundled plugin at the default location. Override for development or custom plugin builds.",
+          "type": "text",
+          "default": "",
+          "storage": "preferences",
+          "placeholder": "src/gaimer-channel-plugin",
+          "requiresRestart": false,
+          "owner": "SettingsService"
+        },
+        {
+          "key": "team_permission_mode",
+          "label": "Permission Mode",
+          "description": "Controls what Claude can do without asking during team sessions. 'default' asks before risky actions, 'acceptEdits' auto-approves file edits, 'auto' auto-approves most actions, 'bypassPermissions' skips all checks, 'plan' is read-only.",
+          "type": "select",
+          "default": "default",
+          "options": [
+            { "value": "default", "label": "Default — ask before risky actions" },
+            { "value": "acceptEdits", "label": "Accept Edits — auto-approve file changes" },
+            { "value": "auto", "label": "Auto — auto-approve most actions" },
+            { "value": "bypassPermissions", "label": "Bypass — skip all permission checks" },
+            { "value": "plan", "label": "Plan — read-only, research only" }
+          ],
+          "storage": "preferences",
+          "requiresRestart": false,
+          "owner": "SettingsService"
+        }
+      ]
+    },
+    {
+      "id": "debug",
+      "name": "Developer",
+      "icon": "terminal",
+      "description": "Debug and development settings. Only visible in debug builds.",
+      "visibleWhen": "DEBUG",
+      "settings": [
+        {
+          "key": "USE_MOCK_SERVICES",
+          "label": "Use Mock Services",
+          "description": "Force mock implementations for all AI services (no API calls)",
+          "type": "toggle",
+          "default": false,
+          "storage": "env_var",
+          "owner": "MauiProgram"
+        },
+        {
+          "key": "VOICE_PROVIDER",
+          "label": "Voice Provider Override",
+          "description": "Force a specific voice provider (overrides all other selection logic)",
+          "type": "dropdown",
+          "default": null,
+          "options": [
+            { "value": null, "label": "Auto-detect" },
+            { "value": "openai", "label": "OpenAI" },
+            { "value": "gemini", "label": "Gemini" },
+            { "value": "local", "label": "Local" },
+            { "value": "mock", "label": "Mock" }
+          ],
+          "storage": "env_var",
+          "owner": "ConversationProviderFactory"
+        },
+        {
+          "key": "PICOVOICE_ACCESS_KEY",
+          "label": "Porcupine Wake Word Key",
+          "description": "Picovoice access key for hardware wake word detection",
+          "type": "secret",
+          "default": null,
+          "storage": "env_var",
+          "placeholder": "pv_...",
+          "owner": "MauiProgram"
+        }
+      ]
+    }
+  ],
+
+  "metadata": {
+    "totalUserConfigurable": 22,
+    "totalReadOnly": 12,
+    "totalApiKeys": 3,
+    "requiresRestartCount": 2,
+    "storageTypes": {
+      "preferences": "MAUI Preferences (platform-specific persistent storage)",
+      "secure_storage": "SecureStorage / Keychain (encrypted, platform-backed)",
+      "env_var": "Environment variable (set in shell or .env file)",
+      "hardcoded": "Compiled into the app (not user-changeable)",
+      "agent_config": "Per-agent configuration (set by agent profile)",
+      "runtime": "In-memory only (resets on app restart)"
+    },
+    "configPriority": [
+      "1. Environment variables (highest)",
+      "2. .env file (dev convenience)",
+      "3. SecureStorage (API keys)",
+      "4. MAUI Preferences (user settings)",
+      "5. Hardcoded defaults (lowest)"
+    ]
+  }
+}

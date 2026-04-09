@@ -59,6 +59,7 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
     private readonly IBargeInPolicyService? _bargeInPolicyService;
     private readonly IBrainRequestChannel? _brainRequestChannel;
     private readonly IGaimerTeamService? _gaimerTeam;
+    private readonly ISettingsService? _settingsService;
     private readonly SemaphoreSlim _navigationLock = new(1, 1);
     private readonly SemaphoreSlim _stopSessionLock = new(1, 1);
     private CancellationTokenSource? _sessionCts;
@@ -90,6 +91,17 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
     private CancellationTokenSource? _ghostNotificationCts;
     private Task? _ghostNotificationTask;
     private static readonly TimeSpan GhostAudioToggleDedupWindow = TimeSpan.FromMilliseconds(250);
+
+    private string _teamStatusText = "Not Configured";
+    private bool _isTeamConnected;
+
+    // Permission request state
+    private bool _hasPendingPermission;
+    private string? _pendingPermissionId;
+    private string _pendingPermissionAction = string.Empty;
+    private string _pendingPermissionRisk = string.Empty;
+    private int _permissionTimeRemaining;
+    private CancellationTokenSource? _permissionTimeoutCts;
 
     [ObservableProperty]
     private Agent? _selectedAgent;
@@ -228,6 +240,80 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
     public bool HasSelectedTarget => SelectedTarget != null;
     public bool IsConnected => ConnectionState == ConnectionState.Connected;
     public bool IsConnecting => ConnectionState == ConnectionState.Connecting;
+
+    public bool IsTeamConnected
+    {
+        get => _isTeamConnected;
+        private set
+        {
+            if (_isTeamConnected == value) return;
+            _isTeamConnected = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string TeamStatusText
+    {
+        get => _teamStatusText;
+        private set
+        {
+            if (_teamStatusText == value) return;
+            _teamStatusText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsTeamConfigured => _gaimerTeam?.IsConfigured ?? false;
+
+    public IAsyncRelayCommand ToggleTeamConnectionCommand { get; private set; } = null!;
+
+    public bool HasPendingPermission
+    {
+        get => _hasPendingPermission;
+        private set
+        {
+            if (_hasPendingPermission == value) return;
+            _hasPendingPermission = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string PendingPermissionAction
+    {
+        get => _pendingPermissionAction;
+        private set
+        {
+            if (_pendingPermissionAction == value) return;
+            _pendingPermissionAction = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string PendingPermissionRisk
+    {
+        get => _pendingPermissionRisk;
+        private set
+        {
+            if (_pendingPermissionRisk == value) return;
+            _pendingPermissionRisk = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int PermissionTimeRemaining
+    {
+        get => _permissionTimeRemaining;
+        private set
+        {
+            if (_permissionTimeRemaining == value) return;
+            _permissionTimeRemaining = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public IAsyncRelayCommand ApprovePermissionCommand { get; private set; } = null!;
+    public IAsyncRelayCommand DenyPermissionCommand { get; private set; } = null!;
+
     public bool RequiresAppRebootstrap => _structuralSettingsTracker.RequiresRebootstrap;
     public bool CanRestartSessionShallow => !RequiresAppRebootstrap;
 
@@ -290,7 +376,8 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         IReminderQueue? reminderQueue = null,
         IBargeInPolicyService? bargeInPolicyService = null,
         IBrainRequestChannel? brainRequestChannel = null,
-        IGaimerTeamService? gaimerTeam = null)
+        IGaimerTeamService? gaimerTeam = null,
+        ISettingsService? settingsService = null)
     {
         _audioService = audioService;
         _captureService = captureService;
@@ -325,6 +412,11 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         _bargeInPolicyService = bargeInPolicyService;
         _brainRequestChannel = brainRequestChannel;
         _gaimerTeam = gaimerTeam;
+        _settingsService = settingsService;
+
+        ToggleTeamConnectionCommand = new AsyncRelayCommand(ToggleTeamConnectionAsync);
+        ApprovePermissionCommand = new AsyncRelayCommand(ApprovePermissionAsync);
+        DenyPermissionCommand = new AsyncRelayCommand(DenyPermissionAsync);
 
         // Wire replay analysis: forward completed segments to the orchestrator
         if (_replayRecording != null && _replayAnalysisOrchestrator != null)
@@ -482,7 +574,88 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                     System.Diagnostics.Debug.WriteLine($"[GaimerTeam] TaskProgress handler error: {ex.Message}");
                 }
             };
+
+            _gaimerTeam.PermissionRequested += async (_, e) =>
+            {
+                try
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        // Single-active guard: auto-deny existing pending permission
+                        if (HasPendingPermission && _pendingPermissionId != null)
+                        {
+                            await AutoDenyPendingPermissionAsync();
+                        }
+
+                        var request = e.Request;
+
+                        // Set new pending state
+                        _pendingPermissionId = request.Id;
+                        PendingPermissionAction = request.Action;
+                        PendingPermissionRisk = request.Risk;
+                        PermissionTimeRemaining = request.TimeoutSeconds;
+                        HasPendingPermission = true;
+
+                        // Add timeline event
+                        _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+                        {
+                            Type = Models.Timeline.EventOutputType.PermissionRequest,
+                            Summary = $"[Team] Requesting permission: {request.Action}",
+                            Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.PermissionRequest),
+                            CapsuleColorHex = Models.Timeline.EventIconMap.GetCapsuleColorHex(Models.Timeline.EventOutputType.PermissionRequest),
+                            CapsuleStrokeHex = Models.Timeline.EventIconMap.GetCapsuleStrokeHex(Models.Timeline.EventOutputType.PermissionRequest),
+                        });
+
+                        _sessionTrace?.TrackEvent("gaimer_team.permission_requested", new Dictionary<string, string>
+                        {
+                            ["permission_id"] = request.Id,
+                            ["action"] = request.Action,
+                            ["risk"] = request.Risk
+                        });
+
+                        // Start timeout countdown — capture the permission ID so timeout
+                        // only fires for the permission it was created for (race guard)
+                        var timeoutCts = new CancellationTokenSource();
+                        _permissionTimeoutCts = timeoutCts;
+                        var timeoutPermissionId = request.Id;
+
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                while (!timeoutCts.Token.IsCancellationRequested)
+                                {
+                                    await Task.Delay(1000, timeoutCts.Token);
+                                    if (timeoutCts.Token.IsCancellationRequested) break;
+
+                                    await MainThread.InvokeOnMainThreadAsync(() =>
+                                    {
+                                        var remaining = PermissionTimeRemaining - 1;
+                                        PermissionTimeRemaining = remaining;
+
+                                        if (remaining <= 0 && !timeoutCts.Token.IsCancellationRequested)
+                                        {
+                                            _ = AutoDenyPendingPermissionAsync(timeoutPermissionId);
+                                        }
+                                    });
+
+                                    if (PermissionTimeRemaining <= 0) break;
+                                }
+                            }
+                            catch (OperationCanceledException) { /* expected on CTS cancel */ }
+                        });
+                    });
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[GaimerTeam] PermissionRequested handler error: {ex.Message}");
+                }
+            };
         }
+
+        // Initialize team status text based on configuration
+        if (_gaimerTeam != null)
+            TeamStatusText = _gaimerTeam.IsConfigured ? "Not Connected" : "Not Configured";
 
         _structuralSettingsTracker.StateChanged += OnStructuralSettingsStateChanged;
 
@@ -903,7 +1076,8 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
 
                     if (_conversationProvider?.IsConnected == true)
                     {
-                        _ = _conversationProvider.SendContextualUpdateAsync(ackText)
+                        // Must use WithResponse so voice actually speaks the ack (LESSONS: silent vs spoken)
+                        _ = _conversationProvider.SendContextualUpdateWithResponseAsync(ackText)
                             .ContinueWith(t => System.Diagnostics.Debug.WriteLine(
                                 $"[Voice] Deferral ack failed: {t.Exception?.GetBaseException().Message}"),
                                 TaskContinuationOptions.OnlyOnFaulted);
@@ -1353,6 +1527,152 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         await ToggleConnectionAsync();
     }
 
+    private async Task ToggleTeamConnectionAsync()
+    {
+        if (_gaimerTeam == null) return;
+
+        if (_gaimerTeam.IsConnected)
+        {
+            await _gaimerTeam.DisconnectAsync();
+            IsTeamConnected = false;
+            TeamStatusText = "Not Connected";
+            return;
+        }
+
+        if (!IsTeamConfigured)
+        {
+            TeamStatusText = "Not Configured — go to Settings > Team";
+            return;
+        }
+
+        TeamStatusText = "Connecting...";
+        try
+        {
+            var launched = await _gaimerTeam.LaunchSessionAsync();
+            if (launched)
+            {
+                IsTeamConnected = true;
+                TeamStatusText = "Connected";
+            }
+            else
+            {
+                IsTeamConnected = false;
+                TeamStatusText = _gaimerTeam.LastError ?? "Connection failed";
+            }
+        }
+        catch (Exception ex)
+        {
+            IsTeamConnected = false;
+            TeamStatusText = $"Error: {ex.Message}";
+        }
+    }
+
+    private async Task ApprovePermissionAsync()
+    {
+        var id = _pendingPermissionId;
+        if (id == null || _gaimerTeam == null) return;
+
+        ClearPendingPermission();
+        try
+        {
+            await _gaimerTeam.RespondToPermissionAsync(id, true);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GaimerTeam] Permission approve error for {id}: {ex.Message}");
+        }
+
+        _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+        {
+            Type = Models.Timeline.EventOutputType.PermissionRequest,
+            Summary = "[Team] Permission approved",
+            Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.PermissionRequest),
+            CapsuleColorHex = "#3022c55e", // green for approved
+            CapsuleStrokeHex = "#5022c55e",
+        });
+
+        _sessionTrace?.TrackEvent("gaimer_team.permission_approved", new Dictionary<string, string>
+        {
+            ["permission_id"] = id
+        });
+    }
+
+    private async Task DenyPermissionAsync()
+    {
+        var id = _pendingPermissionId;
+        if (id == null || _gaimerTeam == null) return;
+
+        ClearPendingPermission();
+        try
+        {
+            await _gaimerTeam.RespondToPermissionAsync(id, false);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GaimerTeam] Permission deny error for {id}: {ex.Message}");
+        }
+
+        _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+        {
+            Type = Models.Timeline.EventOutputType.PermissionRequest,
+            Summary = "[Team] Permission denied",
+            Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.PermissionRequest),
+            CapsuleColorHex = "#30ef4444", // red for denied
+            CapsuleStrokeHex = "#50ef4444",
+        });
+
+        _sessionTrace?.TrackEvent("gaimer_team.permission_denied", new Dictionary<string, string>
+        {
+            ["permission_id"] = id
+        });
+    }
+
+    private void ClearPendingPermission()
+    {
+        _permissionTimeoutCts?.Cancel();
+        _permissionTimeoutCts?.Dispose();
+        _permissionTimeoutCts = null;
+        _pendingPermissionId = null;
+        PendingPermissionAction = string.Empty;
+        PendingPermissionRisk = string.Empty;
+        PermissionTimeRemaining = 0;
+        HasPendingPermission = false;
+    }
+
+    private async Task AutoDenyPendingPermissionAsync(string? expectedId = null)
+    {
+        var id = _pendingPermissionId;
+        if (id == null || _gaimerTeam == null) return;
+
+        // Guard: if the permission was already resolved (user approved/denied, or replaced
+        // by single-active guard), skip the stale auto-deny to prevent duplicate timeline events
+        if (expectedId != null && id != expectedId) return;
+
+        var isTimeout = expectedId != null; // timeout path passes expectedId, single-active guard does not
+
+        ClearPendingPermission();
+        try
+        {
+            await _gaimerTeam.RespondToPermissionAsync(id, false);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[GaimerTeam] Auto-deny failed for {id}: {ex.Message}");
+        }
+
+        if (isTimeout)
+        {
+            _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+            {
+                Type = Models.Timeline.EventOutputType.PermissionRequest,
+                Summary = "[Team] Permission timed out — denied",
+                Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.PermissionRequest),
+                CapsuleColorHex = "#30808080",
+                CapsuleStrokeHex = "#50808080",
+            });
+        }
+    }
+
     [RelayCommand]
     private void CloseWindowPicker()
     {
@@ -1419,18 +1739,29 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
 #endif
 
             // Launch Gaimer Team background session (C1 fix — fire-and-forget)
-            if (_gaimerTeam != null && !_gaimerTeam.IsConnected)
+            if (_gaimerTeam != null && !_gaimerTeam.IsConnected
+                && (_settingsService?.TeamAutoLaunch ?? true) && _gaimerTeam.IsConfigured)
             {
                 _ = Task.Run(async () =>
                 {
                     try
                     {
                         var launched = await _gaimerTeam.LaunchSessionAsync();
+                        await MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            IsTeamConnected = launched;
+                            TeamStatusText = launched ? "Connected" : (_gaimerTeam.LastError ?? "Connection failed");
+                        });
                         System.Diagnostics.Debug.WriteLine(
                             $"[GaimerTeam] LaunchSessionAsync: {(launched ? "connected" : "unavailable")}");
                     }
                     catch (Exception ex)
                     {
+                        await MainThread.InvokeOnMainThreadAsync(() =>
+                        {
+                            IsTeamConnected = false;
+                            TeamStatusText = $"Error: {ex.Message}";
+                        });
                         System.Diagnostics.Debug.WriteLine($"[GaimerTeam] Launch failed: {ex.Message}");
                     }
                 });
@@ -1499,6 +1830,9 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                 _ = _historyService?.FinalizeSessionAsync(sessionId);
 
             _sessionTrace?.EndSession();
+
+            // Clear any pending permission request (stops timeout timer, prevents stale UI)
+            ClearPendingPermission();
 
             // Cancel in-flight brain work (consumer loop keeps running for next session)
             _brainService.CancelAll();

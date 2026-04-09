@@ -191,4 +191,11 @@ public class MockGaimerTeamServiceTests : IDisposable
         await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.SubmitTaskAsync(CreateTask()));
     }
+
+    [Fact]
+    public void PermissionProbability_DefaultsTo015()
+    {
+        var sut = new MockGaimerTeamService(Mock.Of<ILogger<MockGaimerTeamService>>());
+        sut.PermissionProbability.Should().BeApproximately(0.15, 0.001);
+    }
 }

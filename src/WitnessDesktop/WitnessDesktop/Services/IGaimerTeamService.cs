@@ -14,6 +14,7 @@ public interface IGaimerTeamService : IDisposable
 
     bool IsConnected { get; }
     bool IsConfigured { get; }
+    string? LastError { get; }
 
     Task<bool> LaunchSessionAsync(CancellationToken ct = default);
     Task<bool> ConnectExistingAsync(CancellationToken ct = default);

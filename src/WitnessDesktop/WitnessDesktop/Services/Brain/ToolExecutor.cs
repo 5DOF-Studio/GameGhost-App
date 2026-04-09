@@ -28,6 +28,7 @@ public sealed class ToolExecutor
     private readonly IReplayRecordingService? _replayRecording;
     private readonly IGameSkillPackService? _packService;
     private readonly IGaimerTeamService? _gaimerTeam;
+    private readonly IBrainContextService? _brainContext;
 
     public ToolExecutor(
         IWindowCaptureService captureService,
@@ -43,7 +44,8 @@ public sealed class ToolExecutor
         IVideoAnalysisTool? videoAnalysisTool = null,
         IReplayRecordingService? replayRecording = null,
         IGameSkillPackService? packService = null,
-        IGaimerTeamService? gaimerTeam = null)
+        IGaimerTeamService? gaimerTeam = null,
+        IBrainContextService? brainContext = null)
     {
         _captureService = captureService;
         _sessionManager = sessionManager;
@@ -59,6 +61,7 @@ public sealed class ToolExecutor
         _replayRecording = replayRecording;
         _packService = packService;
         _gaimerTeam = gaimerTeam;
+        _brainContext = brainContext;
     }
 
     // ── Tool Dispatch ────────────────────────────────────────────────────────
@@ -835,6 +838,33 @@ public sealed class ToolExecutor
         var ctx = _sessionManager.Context;
         var agent = ctx.AgentKey is not null ? Agents.GetByKey(ctx.AgentKey) : null;
 
+        // Build context for team delegation
+        string? l1Context = null;
+        string? l2Context = null;
+        string? recentActivity = null;
+
+        if (_brainContext != null)
+        {
+            try
+            {
+                var envelope = await _brainContext.GetContextForChatAsync(
+                    DateTime.UtcNow, intent: "delegation", budgetTokens: 2500, ct: ct);
+
+                if (envelope.ImmediateEvents.Count > 0)
+                    l1Context = BrainContextFormatter.FormatL1Events(envelope.ImmediateEvents);
+
+                if (!string.IsNullOrEmpty(envelope.RollingSummary))
+                    l2Context = envelope.RollingSummary;
+
+                recentActivity = BrainContextFormatter.FormatRecentActivity(
+                    envelope.RecentChatSummary, envelope.RecentVoiceTranscript);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "[ToolExecutor] Failed to build team context, proceeding without");
+            }
+        }
+
         var teamTask = new GaimerTeamTask
         {
             Task = taskText,
@@ -843,7 +873,10 @@ public sealed class ToolExecutor
             {
                 Game = ctx.GameType ?? "Unknown",
                 Agent = agent?.Name ?? "Unknown",
-                SessionId = ctx.GameId ?? "no-session"
+                SessionId = ctx.GameId ?? "no-session",
+                L1Context = l1Context,
+                L2Context = l2Context,
+                RecentActivity = recentActivity
             }
         };
 

@@ -312,6 +312,60 @@
                 </Grid>
             </Border>
 
+            <!-- Team Connector Pill -->
+            <Border BackgroundColor="{StaticResource BgSecondary}"
+                    Stroke="#2a2d32"
+                    StrokeThickness="1"
+                    Padding="12"
+                    Margin="0,4,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ToggleTeamConnectionCommand}"/>
+                </Border.GestureRecognizers>
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding IsTeamConnected}" Value="True">
+                        <Setter Property="Stroke" Value="#00cc66"/>
+                        <Setter Property="BackgroundColor" Value="#1a00cc66"/>
+                    </DataTrigger>
+                </Border.Triggers>
+
+                <Grid ColumnDefinitions="32,*,Auto" ColumnSpacing="10">
+                    <Image Grid.Column="0"
+                           Source="connectors.png"
+                           WidthRequest="28"
+                           HeightRequest="28"
+                           VerticalOptions="Center"/>
+
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="Team"
+                               FontFamily="RajdhaniSemiBold"
+                               TextColor="{StaticResource TextPrimary}"
+                               FontSize="16"/>
+                        <Label Text="{Binding TeamStatusText}"
+                               FontFamily="RajdhaniRegular"
+                               TextColor="{StaticResource TextMuted}"
+                               FontSize="13">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsTeamConnected}" Value="True">
+                                    <Setter Property="TextColor" Value="#00cc66"/>
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </VerticalStackLayout>
+
+                    <controls:HorizontalIndustrialToggle
+                        Grid.Column="2"
+                        IsToggled="{Binding IsTeamConnected, Mode=OneWay}"
+                        IsInteractive="False"
+                        InputTransparent="True"
+                        LedOnColor="#22c55e"
+                        LedOffColor="#1a2a1e"
+                        VerticalOptions="Center"/>
+                </Grid>
+            </Border>
+
         </VerticalStackLayout>
 
         <!-- ========== TOP: Live Message (Row 0, Col 1) ========== -->

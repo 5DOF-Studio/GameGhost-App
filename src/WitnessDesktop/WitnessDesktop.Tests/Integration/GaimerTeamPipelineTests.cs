@@ -26,6 +26,7 @@ public class GaimerTeamPipelineTests
     public void DI_ResolvesClaudeProcessManager()
     {
         var services = new ServiceCollection();
+        services.AddSingleton<ISettingsService>(Mock.Of<ISettingsService>());
         services.AddSingleton<IClaudeProcessManager, ClaudeProcessManager>();
         services.AddLogging();
         var sp = services.BuildServiceProvider();
@@ -40,6 +41,7 @@ public class GaimerTeamPipelineTests
         var services = new ServiceCollection();
         services.AddSingleton<IGaimerPipeClient, GaimerPipeClient>();
         services.AddSingleton<IClaudeProcessManager, ClaudeProcessManager>();
+        services.AddSingleton<ISettingsService>(Mock.Of<ISettingsService>());
         services.AddSingleton<IGaimerTeamService, GaimerTeamService>();
         services.AddLogging();
         var sp = services.BuildServiceProvider();

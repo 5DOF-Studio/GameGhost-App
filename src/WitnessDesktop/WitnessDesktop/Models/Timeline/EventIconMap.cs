@@ -19,6 +19,7 @@ public static class EventIconMap
         [EventOutputType.SystemError] = "alert.png",
         [EventOutputType.Archived] = "history_clock.png",
         [EventOutputType.TeamResult] = "tool_generic.png",
+        [EventOutputType.PermissionRequest] = "alert.png",
     };
 
     private static readonly Dictionary<EventOutputType, string> CapsuleColors = new()
@@ -38,6 +39,7 @@ public static class EventIconMap
         [EventOutputType.SystemError] = "#30808080",
         [EventOutputType.Archived] = "#18808080",
         [EventOutputType.TeamResult] = "#3000CC66",
+        [EventOutputType.PermissionRequest] = "#30FFA726",
     };
 
     private static readonly Dictionary<EventOutputType, string> CapsuleStrokes = new()
@@ -57,6 +59,7 @@ public static class EventIconMap
         [EventOutputType.SystemError] = "#50808080",
         [EventOutputType.Archived] = "#28808080",
         [EventOutputType.TeamResult] = "#5000CC66",
+        [EventOutputType.PermissionRequest] = "#50FFA726",
     };
 
     private static readonly Dictionary<ChessEventType, string> ChessIcons = new()

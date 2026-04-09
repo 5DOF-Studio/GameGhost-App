@@ -13,6 +13,21 @@ public interface ISettingsService
     /// <summary>Inference mode: CloudOnly, LocalOnly, or LocalFirst. Persisted independently from voice provider.</summary>
     InferenceMode InferenceMode { get; set; }
 
+    /// <summary>Path to Claude CLI binary. Empty = auto-discover.</summary>
+    string ClaudeCliPath { get; set; }
+
+    /// <summary>Path to Bun runtime binary. Empty = auto-discover.</summary>
+    string BunPath { get; set; }
+
+    /// <summary>Auto-launch team session on game connection.</summary>
+    bool TeamAutoLaunch { get; set; }
+
+    /// <summary>Path to channel plugin directory. Empty = bundled default.</summary>
+    string PluginDirPath { get; set; }
+
+    /// <summary>Permission mode for team sessions: default, acceptEdits, auto, bypassPermissions, plan.</summary>
+    string TeamPermissionMode { get; set; }
+
     /// <summary>Get an API key from secure storage (Keychain-backed).</summary>
     Task<string?> GetApiKeyAsync(string provider);
 

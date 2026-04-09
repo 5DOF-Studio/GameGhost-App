@@ -2,9 +2,9 @@
 
 ## Current Position
 - **Phase:** Post-sync — gaimer-v2 overlay complete, build verified
-- **Branch:** `main` (pushed to origin)
-- **Last Activity:** 2026-04-06
-- **Baseline:** gaimer-v2 @ `5992eea` (full overlay sync)
+- **Branch:** `sync/gaimer-v2-april-07`
+- **Last Activity:** 2026-04-09
+- **Baseline:** gaimer-v2 @ `643b680` (incremental overlay sync)
 
 ## Project Identity
 - **Product Name:** Game Ghost
@@ -41,7 +41,7 @@ Same as gaimer-desktop (WitnessDesktop namespace):
 ```bash
 dotnet build src/WitnessDesktop/WitnessDesktop/WitnessDesktop.csproj -f net8.0-maccatalyst -p:EnableCodeSigning=false
 ```
-- Last build: 2026-04-06 — **0 errors**, 22 warnings (pre-existing)
+- Last build: 2026-04-09 — **0 errors**, 22 warnings (pre-existing)
 
 ## Test Count
 - Tests project: `src/WitnessDesktop/WitnessDesktop.Tests/`
@@ -49,9 +49,10 @@ dotnet build src/WitnessDesktop/WitnessDesktop/WitnessDesktop.csproj -f net8.0-m
 
 ## Sync Model
 - Source: `/Users/tonynlemadim/Developer/gAImer_desktop` (gaimer remote)
-- Method: Full overlay (replaced cherry-pick model on 2026-04-06)
-- Baseline: `5992eea` on `gaimer-v2`
-- Future syncs: Resume cherry-picking from this baseline
+- Method: Targeted overlay (replaced full-overlay model with selective source sync)
+- Baseline: `643b680` on `gaimer-v2`
+- Future syncs: Resume overlay from this baseline
+- Branding: automated via `scripts/apply_branding.sh`
 - See: `SYNC_NOTES.md` for workflow details
 
 ## Known Issues
@@ -64,6 +65,6 @@ dotnet build src/WitnessDesktop/WitnessDesktop/WitnessDesktop.csproj -f net8.0-m
 - Consider establishing CI for build verification on push
 
 ## Session Continuity
-- **Last session:** 2026-04-06
-- **Stopping point:** Full overlay sync complete, build verified, pushed to main
+- **Last session:** 2026-04-09
+- **Stopping point:** Incremental overlay sync (643b680), branding applied, build verified
 - **Next session start:** Read `chronicles/HANDOFF.md`

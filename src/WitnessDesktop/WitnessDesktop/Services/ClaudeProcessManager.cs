@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 
 namespace WitnessDesktop.Services;
@@ -6,13 +7,15 @@ namespace WitnessDesktop.Services;
 public sealed class ClaudeProcessManager : IClaudeProcessManager
 {
     private readonly ILogger<ClaudeProcessManager> _logger;
+    private readonly ISettingsService _settings;
     private Process? _process;
     private bool _intentionalTermination;
     private bool _disposed;
 
-    public ClaudeProcessManager(ILogger<ClaudeProcessManager> logger)
+    public ClaudeProcessManager(ILogger<ClaudeProcessManager> logger, ISettingsService settings)
     {
         _logger = logger;
+        _settings = settings;
     }
 
     public bool IsRunning => _process is { HasExited: false };
@@ -37,7 +40,8 @@ public sealed class ClaudeProcessManager : IClaudeProcessManager
         // Verify CLI is on PATH
         try
         {
-            var which = new ProcessStartInfo("which", cliName)
+            var discoveryCommand = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "where.exe" : "which";
+            var which = new ProcessStartInfo(discoveryCommand, cliName)
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -60,8 +64,7 @@ public sealed class ClaudeProcessManager : IClaudeProcessManager
             return false;
         }
 
-        var arguments = argsOverride ??
-            $"--plugin-dir \"{pluginPath}\" --dangerously-skip-permissions -p \"You are operating as the Gaimer Team agent. Wait for channel messages and respond using the submit_result and send_status tools.\"";
+        var arguments = argsOverride ?? BuildArguments(pluginPath);
 
         var psi = new ProcessStartInfo
         {
@@ -109,6 +112,23 @@ public sealed class ClaudeProcessManager : IClaudeProcessManager
         }
     }
 
+    /// <summary>
+    /// Builds the CLI arguments string for launching Claude. Internal for testability.
+    /// </summary>
+    private static readonly HashSet<string> ValidPermissionModes = new()
+    {
+        "default", "acceptEdits", "auto", "bypassPermissions", "plan"
+    };
+
+    internal string BuildArguments(string pluginPath)
+    {
+        var permissionMode = _settings.TeamPermissionMode;
+        if (string.IsNullOrEmpty(permissionMode) || !ValidPermissionModes.Contains(permissionMode))
+            permissionMode = "default";
+
+        return $"--plugin-dir \"{pluginPath}\" --permission-mode {permissionMode} -p \"You are operating as the Gaimer Team agent. Wait for channel messages and respond using the submit_result and send_status tools.\"";
+    }
+
     public async Task TerminateAsync()
     {
         if (_process is not { HasExited: false }) return;
@@ -117,8 +137,13 @@ public sealed class ClaudeProcessManager : IClaudeProcessManager
         try
         {
             _process.Kill(entireProcessTree: true);
-            await _process.WaitForExitAsync();
+            using var cts = new CancellationTokenSource(5000);
+            await _process.WaitForExitAsync(cts.Token);
             _logger.LogInformation("[ClaudeProcess] Terminated PID {Pid}", _process.Id);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("[ClaudeProcess] WaitForExitAsync timed out after 5s for PID {Pid}", _process?.Id);
         }
         catch (Exception ex) when (ex is InvalidOperationException or SystemException)
         {

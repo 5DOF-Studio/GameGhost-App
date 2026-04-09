@@ -485,7 +485,8 @@ public static class MauiProgram
                             videoAnalysisTool: sp.GetService<IVideoAnalysisTool>(),
                             replayRecording: sp.GetService<IReplayRecordingService>(),
                             packService: sp.GetService<IGameSkillPackService>(),
-                            gaimerTeam: sp.GetService<IGaimerTeamService>());
+                            gaimerTeam: sp.GetService<IGaimerTeamService>(),
+                            brainContext: sp.GetService<IBrainContextService>());
                         return new OpenRouterBrainService(
                             client, toolExecutor, sp.GetRequiredService<ISessionManager>(),
                             brainPromptBuilder: sp.GetRequiredService<IBrainPromptBuilder>(),
@@ -558,7 +559,8 @@ public static class MauiProgram
         services.AddSingleton<MainViewModel>();
         services.AddTransient<SettingsViewModel>(sp => new SettingsViewModel(
             sp.GetRequiredService<ISettingsService>(),
-            sp.GetRequiredService<ILocalModelRuntime>()));
+            sp.GetRequiredService<ILocalModelRuntime>(),
+            sp.GetRequiredService<IBargeInPolicyService>()));
     }
 
     private static void RegisterViews(IServiceCollection services)

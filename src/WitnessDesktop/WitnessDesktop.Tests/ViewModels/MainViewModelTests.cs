@@ -1299,3 +1299,146 @@ public class MainViewModel_VoiceChatDecoupled_Tests : MainViewModelTestBase
             It.IsAny<bool>(), It.IsAny<bool>()), Times.Never);
     }
 }
+
+// ==========================================================================
+// PERMISSION WIRING
+// ==========================================================================
+
+public class MainViewModel_Permission_Tests : MainViewModelTestBase
+{
+    private void SetupGaimerTeam()
+    {
+        MockGaimerTeam = new Mock<IGaimerTeamService>();
+        MockGaimerTeam.Setup(t => t.IsConfigured).Returns(true);
+        MockGaimerTeam.Setup(t => t.IsConnected).Returns(true);
+        MockGaimerTeam.Setup(t => t.RespondToPermissionAsync(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+    }
+
+    private GaimerTeamPermissionEventArgs CreatePermissionArgs(
+        string id = "perm-1",
+        string action = "Write file config.json",
+        string risk = "medium",
+        int timeoutSeconds = 30)
+    {
+        return new GaimerTeamPermissionEventArgs
+        {
+            Request = new GaimerTeamPermissionRequest
+            {
+                Id = id,
+                TaskId = "task-1",
+                Action = action,
+                Risk = risk,
+                TimeoutSeconds = timeoutSeconds
+            }
+        };
+    }
+
+    [Fact]
+    public void PermissionRequested_SetsHasPendingPermission()
+    {
+        SetupGaimerTeam();
+        var sut = CreateSut();
+
+        MockGaimerTeam!.Raise(t => t.PermissionRequested += null, this, CreatePermissionArgs());
+
+        sut.HasPendingPermission.Should().BeTrue();
+        sut.PendingPermissionAction.Should().Contain("Write file config.json");
+        sut.PendingPermissionRisk.Should().Be("medium");
+    }
+
+    [Fact]
+    public async Task ApprovePermissionCommand_CallsRespondTrue()
+    {
+        SetupGaimerTeam();
+        var sut = CreateSut();
+
+        MockGaimerTeam!.Raise(t => t.PermissionRequested += null, this, CreatePermissionArgs(id: "perm-42"));
+
+        sut.HasPendingPermission.Should().BeTrue();
+
+        await sut.ApprovePermissionCommand.ExecuteAsync(null);
+
+        MockGaimerTeam.Verify(t => t.RespondToPermissionAsync("perm-42", true, It.IsAny<CancellationToken>()), Times.Once);
+        sut.HasPendingPermission.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task DenyPermissionCommand_CallsRespondFalse()
+    {
+        SetupGaimerTeam();
+        var sut = CreateSut();
+
+        MockGaimerTeam!.Raise(t => t.PermissionRequested += null, this, CreatePermissionArgs(id: "perm-99"));
+
+        sut.HasPendingPermission.Should().BeTrue();
+
+        await sut.DenyPermissionCommand.ExecuteAsync(null);
+
+        MockGaimerTeam.Verify(t => t.RespondToPermissionAsync("perm-99", false, It.IsAny<CancellationToken>()), Times.Once);
+        sut.HasPendingPermission.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task NewPermission_AutoDeniesOldPending()
+    {
+        SetupGaimerTeam();
+        var sut = CreateSut();
+
+        // First permission
+        MockGaimerTeam!.Raise(t => t.PermissionRequested += null, this, CreatePermissionArgs(id: "old-perm"));
+        sut.HasPendingPermission.Should().BeTrue();
+
+        // Second permission auto-denies the first
+        MockGaimerTeam.Raise(t => t.PermissionRequested += null, this, CreatePermissionArgs(id: "new-perm"));
+
+        // Wait briefly for the async auto-deny to complete
+        await Task.Delay(100);
+
+        MockGaimerTeam.Verify(t => t.RespondToPermissionAsync("old-perm", false, It.IsAny<CancellationToken>()), Times.Once);
+        sut.HasPendingPermission.Should().BeTrue();
+        sut.PendingPermissionAction.Should().Contain("Write file config.json");
+    }
+
+    [Fact]
+    public async Task Timeout_AutoDeniesAndClearsPendingPermission()
+    {
+        SetupGaimerTeam();
+        var sut = CreateSut();
+
+        // Permission with 2-second timeout
+        MockGaimerTeam!.Raise(t => t.PermissionRequested += null, this, CreatePermissionArgs(id: "timeout-perm", timeoutSeconds: 2));
+
+        sut.HasPendingPermission.Should().BeTrue();
+        sut.PermissionTimeRemaining.Should().Be(2);
+
+        // Wait for timeout to expire (2s countdown + margin)
+        await Task.Delay(3500);
+
+        MockGaimerTeam.Verify(t => t.RespondToPermissionAsync("timeout-perm", false, It.IsAny<CancellationToken>()), Times.Once);
+        sut.HasPendingPermission.Should().BeFalse();
+        sut.PermissionTimeRemaining.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Timeout_DoesNotFireIfAlreadyApproved()
+    {
+        SetupGaimerTeam();
+        var sut = CreateSut();
+
+        // Permission with 2-second timeout
+        MockGaimerTeam!.Raise(t => t.PermissionRequested += null, this, CreatePermissionArgs(id: "race-perm", timeoutSeconds: 2));
+        sut.HasPendingPermission.Should().BeTrue();
+
+        // Approve immediately (before timeout)
+        await sut.ApprovePermissionCommand.ExecuteAsync(null);
+        sut.HasPendingPermission.Should().BeFalse();
+
+        // Wait past the timeout period
+        await Task.Delay(3500);
+
+        // Approve should have been called once, deny (from timeout) should NOT have been called
+        MockGaimerTeam.Verify(t => t.RespondToPermissionAsync("race-perm", true, It.IsAny<CancellationToken>()), Times.Once);
+        MockGaimerTeam.Verify(t => t.RespondToPermissionAsync("race-perm", false, It.IsAny<CancellationToken>()), Times.Never);
+    }
+}

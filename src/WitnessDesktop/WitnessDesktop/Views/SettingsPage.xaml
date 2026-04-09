@@ -4,695 +4,667 @@
              xmlns:vm="clr-namespace:WitnessDesktop.ViewModels"
              x:Class="WitnessDesktop.Views.SettingsPage"
              x:DataType="vm:SettingsViewModel"
-             BackgroundColor="#0a0610"
-             Title="Settings">
+             BackgroundColor="#080b10"
+             Title="Settings"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <Color x:Key="CardBg">#12101e</Color>
-            <Color x:Key="CardBorder">#2d1a4e</Color>
-            <Color x:Key="CardBgHover">#1a1525</Color>
-            <Color x:Key="AccentPurple">#7c3aed</Color>
+            <Color x:Key="PageBg">#080b10</Color>
+            <Color x:Key="SidebarBg">#0c0f14</Color>
+            <Color x:Key="SidebarBorder">#1e2128</Color>
+            <Color x:Key="NavItemActive">#1a1d21</Color>
+            <Color x:Key="CardBg">#1a1d21</Color>
+            <Color x:Key="CardBorder">#2a2d32</Color>
+            <Color x:Key="RowDivider">#22252a</Color>
+            <Color x:Key="TextPrimary">#f0f0f0</Color>
+            <Color x:Key="TextSecondary">#999999</Color>
+            <Color x:Key="TextMuted">#6b6b6b</Color>
             <Color x:Key="AccentCyan">#00d4ff</Color>
-            <Color x:Key="TagBg">#1a1525</Color>
-            <Color x:Key="IconBg">#1a1525</Color>
-            <Color x:Key="BadgeBg">#1a1525</Color>
-            <Color x:Key="TextPrimary">#f2eef7</Color>
-            <Color x:Key="TextSecondary">#aaaaaa</Color>
-            <Color x:Key="TextMuted">#666666</Color>
+            <Color x:Key="AccentPurple">#7c3aed</Color>
+            <Color x:Key="ToggleActive">#0d2a3a</Color>
+            <Color x:Key="ToggleInactive">#14101f</Color>
+            <Color x:Key="CheckActive">#00d4ff</Color>
+            <Color x:Key="CheckInactive">#2a2d32</Color>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="16" Padding="40,32" MaximumWidthRequest="720" HorizontalOptions="Center">
+    <Grid ColumnDefinitions="220,*" BackgroundColor="{StaticResource PageBg}">
 
-            <!-- Header -->
-            <HorizontalStackLayout Spacing="16" Margin="0,0,0,8">
-                <Border BackgroundColor="{StaticResource CardBg}"
-                        Stroke="{StaticResource CardBorder}"
-                        StrokeThickness="1"
-                        WidthRequest="40"
-                        HeightRequest="40">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="20"/>
-                    </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnBackClicked"/>
-                    </Border.GestureRecognizers>
-                    <Label Text="&#x2190;" FontSize="20" TextColor="#ffffff" HorizontalOptions="Center" VerticalOptions="Center"/>
-                </Border>
-                <Label Text="SETTINGS"
-                       FontFamily="OrbitronBold"
-                       FontSize="24"
-                       TextColor="#ffffff"
-                       VerticalOptions="Center"
-                       CharacterSpacing="3"/>
-            </HorizontalStackLayout>
+        <!-- ═══ SIDEBAR ═══ -->
+        <Border Grid.Column="0"
+                BackgroundColor="{StaticResource SidebarBg}"
+                Stroke="{StaticResource SidebarBorder}"
+                StrokeThickness="0,0,1,0"
+                Padding="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0"/>
+            </Border.StrokeShape>
 
-            <!-- ═══ BENTO GRID ═══ -->
-            <Grid ColumnDefinitions="*,*,*"
-                  RowDefinitions="Auto,Auto,Auto"
-                  ColumnSpacing="12"
-                  RowSpacing="12">
+            <Grid RowDefinitions="*,Auto">
 
-                <!-- ───────────────────────────────────────────── -->
-                <!-- Card 1: Voice Configuration (spans 2 cols)   -->
-                <!-- ───────────────────────────────────────────── -->
-                <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                        BackgroundColor="{StaticResource CardBg}"
-                        Stroke="{StaticResource CardBorder}"
-                        StrokeThickness="1"
-                        Padding="20">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12"/>
-                    </Border.StrokeShape>
+                <VerticalStackLayout Grid.Row="0" Spacing="4" Padding="12,24">
 
-                    <VerticalStackLayout Spacing="16">
-                        <!-- Card Header: Icon + Title + Status Badge -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource IconBg}"
-                                    WidthRequest="32" HeightRequest="32"
-                                    HorizontalOptions="Start">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8"/>
-                                </Border.StrokeShape>
-                                <Label Text="&#x266A;" FontSize="14" TextColor="{StaticResource AccentPurple}"
-                                       HorizontalOptions="Center" VerticalOptions="Center"/>
-                            </Border>
-                            <Border Grid.Column="2"
-                                    BackgroundColor="{StaticResource BadgeBg}"
-                                    Padding="10,4"
-                                    HorizontalOptions="End">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="6"/>
-                                </Border.StrokeShape>
-                                <Label Text="Configurable"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                        </Grid>
-
-                        <!-- Title -->
-                        <Label FontFamily="RajdhaniSemiBold" FontSize="15" TextColor="{StaticResource TextPrimary}" CharacterSpacing="0.5">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="VOICE CONFIGURATION" FontFamily="RajdhaniSemiBold"/>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-
-                        <!-- Voice Provider Toggle -->
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="Voice Provider"
-                                   FontFamily="RajdhaniRegular"
-                                   FontSize="13"
-                                   TextColor="{StaticResource TextMuted}"/>
-                            <HorizontalStackLayout Spacing="8">
-                                <Border BackgroundColor="{Binding IsGeminiSelected, Converter={StaticResource BoolToSettingsColor}}"
-                                        Stroke="{StaticResource CardBorder}"
-                                        StrokeThickness="1"
-                                        Padding="16,8">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnGeminiSelected"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="Gemini Live"
-                                           FontFamily="RajdhaniSemiBold"
-                                           FontSize="13"
-                                           TextColor="{Binding IsGeminiSelected, Converter={StaticResource BoolToSettingsTextColor}}"/>
-                                </Border>
-                                <Border BackgroundColor="{Binding IsOpenAiSelected, Converter={StaticResource BoolToSettingsColor}}"
-                                        Stroke="{StaticResource CardBorder}"
-                                        StrokeThickness="1"
-                                        Padding="16,8">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnOpenAiSelected"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="OpenAI Realtime"
-                                           FontFamily="RajdhaniSemiBold"
-                                           FontSize="13"
-                                           TextColor="{Binding IsOpenAiSelected, Converter={StaticResource BoolToSettingsTextColor}}"/>
-                                </Border>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
-
-                        <!-- Voice Gender Toggle -->
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="Voice Gender"
-                                   FontFamily="RajdhaniRegular"
-                                   FontSize="13"
-                                   TextColor="{StaticResource TextMuted}"/>
-                            <HorizontalStackLayout Spacing="8">
-                                <Border BackgroundColor="{Binding IsMaleSelected, Converter={StaticResource BoolToSettingsColor}}"
-                                        Stroke="{StaticResource CardBorder}"
-                                        StrokeThickness="1"
-                                        Padding="16,8">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnMaleSelected"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="Male"
-                                           FontFamily="RajdhaniSemiBold"
-                                           FontSize="13"
-                                           TextColor="{Binding IsMaleSelected, Converter={StaticResource BoolToSettingsTextColor}}"/>
-                                </Border>
-                                <Border BackgroundColor="{Binding IsFemaleSelected, Converter={StaticResource BoolToSettingsColor}}"
-                                        Stroke="{StaticResource CardBorder}"
-                                        StrokeThickness="1"
-                                        Padding="16,8">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnFemaleSelected"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="Female"
-                                           FontFamily="RajdhaniSemiBold"
-                                           FontSize="13"
-                                           TextColor="{Binding IsFemaleSelected, Converter={StaticResource BoolToSettingsTextColor}}"/>
-                                </Border>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
-
-                        <!-- Restart Warning -->
-                        <Border BackgroundColor="#0d0a16"
+                    <!-- App identity -->
+                    <HorizontalStackLayout Spacing="10" Padding="12,0,0,20">
+                        <Border BackgroundColor="{StaticResource NavItemActive}"
                                 Stroke="{StaticResource CardBorder}"
-                                StrokeThickness="0.5"
-                                Padding="12,8">
+                                StrokeThickness="1"
+                                WidthRequest="32" HeightRequest="32">
                             <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="6"/>
+                                <RoundRectangle CornerRadius="8"/>
                             </Border.StrokeShape>
-                            <Label Text="Changing voice settings during a session will restart the connection."
-                                   FontFamily="RajdhaniRegular"
-                                   FontSize="12"
-                                   TextColor="{StaticResource TextMuted}"/>
+                            <Label Text="G" FontSize="16" FontAttributes="Bold"
+                                   TextColor="White"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
                         </Border>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- ───────────────────────────────────── -->
-                <!-- Card 2: Active Voice (1 col)          -->
-                <!-- ───────────────────────────────────── -->
-                <Border Grid.Row="0" Grid.Column="2"
-                        BackgroundColor="{StaticResource CardBg}"
-                        Stroke="{StaticResource CardBorder}"
-                        StrokeThickness="1"
-                        Padding="20">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12"/>
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout Spacing="14">
-                        <!-- Card Header -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource IconBg}"
-                                    WidthRequest="32" HeightRequest="32"
-                                    HorizontalOptions="Start">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8"/>
-                                </Border.StrokeShape>
-                                <Label Text="&#x25B6;" FontSize="12" TextColor="{StaticResource AccentCyan}"
-                                       HorizontalOptions="Center" VerticalOptions="Center"/>
-                            </Border>
-                            <Border Grid.Column="2"
-                                    BackgroundColor="{StaticResource BadgeBg}"
-                                    Padding="10,4"
-                                    HorizontalOptions="End">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="6"/>
-                                </Border.StrokeShape>
-                                <Label Text="Live"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="11"
-                                       TextColor="#10b981"/>
-                            </Border>
-                        </Grid>
-
-                        <!-- Title -->
-                        <Label Text="ACTIVE VOICE"
-                               FontFamily="RajdhaniSemiBold"
-                               FontSize="15"
-                               TextColor="{StaticResource TextPrimary}"
-                               CharacterSpacing="0.5"/>
-
-                        <!-- Large Voice Name -->
-                        <Label Text="{Binding CurrentVoiceName}"
-                               FontFamily="OrbitronBold"
-                               FontSize="28"
-                               TextColor="{StaticResource AccentCyan}"
-                               VerticalOptions="CenterAndExpand"/>
-
-                        <!-- Tags -->
-                        <HorizontalStackLayout Spacing="6">
-                            <Border BackgroundColor="{StaticResource TagBg}"
-                                    Padding="8,4">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="4"/>
-                                </Border.StrokeShape>
-                                <Label Text="{Binding VoiceEngine}"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                            <Border BackgroundColor="{StaticResource TagBg}"
-                                    Padding="8,4">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="4"/>
-                                </Border.StrokeShape>
-                                <Label Text="{Binding VoiceGender}"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- ───────────────────────────────────────────── -->
-                <!-- Card 3: System Info (spans 2 cols)            -->
-                <!-- ───────────────────────────────────────────── -->
-                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                        BackgroundColor="{StaticResource CardBg}"
-                        Stroke="{StaticResource CardBorder}"
-                        StrokeThickness="1"
-                        Padding="20">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12"/>
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout Spacing="14">
-                        <!-- Card Header -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource IconBg}"
-                                    WidthRequest="32" HeightRequest="32"
-                                    HorizontalOptions="Start">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8"/>
-                                </Border.StrokeShape>
-                                <Label Text="&#x26A1;" FontSize="14" TextColor="#f2a900"
-                                       HorizontalOptions="Center" VerticalOptions="Center"/>
-                            </Border>
-                            <Border Grid.Column="2"
-                                    BackgroundColor="{StaticResource BadgeBg}"
-                                    Padding="10,4"
-                                    HorizontalOptions="End">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="6"/>
-                                </Border.StrokeShape>
-                                <Label Text="Active"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                        </Grid>
-
-                        <!-- Title -->
-                        <Label Text="SYSTEM INFO"
-                               FontFamily="RajdhaniSemiBold"
-                               FontSize="15"
-                               TextColor="{StaticResource TextPrimary}"
-                               CharacterSpacing="0.5"/>
-
-                        <!-- 2x2 Info Grid -->
-                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="12" ColumnSpacing="16">
-                            <!-- Brain Model -->
-                            <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="2">
-                                <Label Text="Brain Model"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding BrainModel}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="14"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-
-                            <!-- Capture Rate -->
-                            <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="2">
-                                <Label Text="Capture Rate"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding CaptureRate}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="14"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-
-                            <!-- Voice Engine -->
-                            <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="2">
-                                <Label Text="Voice Engine"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding VoiceEngine}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="14"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-
-                            <!-- App Version -->
-                            <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="2">
-                                <Label Text="App Version"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding AppVersion}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="14"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-                        </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- ───────────────────────────── -->
-                <!-- Card 4: About (1 col)         -->
-                <!-- ───────────────────────────── -->
-                <Border Grid.Row="1" Grid.Column="2"
-                        BackgroundColor="{StaticResource CardBg}"
-                        Stroke="{StaticResource CardBorder}"
-                        StrokeThickness="1"
-                        Padding="20">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12"/>
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout Spacing="14">
-                        <!-- Card Header -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource IconBg}"
-                                    WidthRequest="32" HeightRequest="32"
-                                    HorizontalOptions="Start">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8"/>
-                                </Border.StrokeShape>
-                                <Label Text="&#x2139;" FontSize="14" TextColor="{StaticResource AccentPurple}"
-                                       HorizontalOptions="Center" VerticalOptions="Center"/>
-                            </Border>
-                            <Border Grid.Column="2"
-                                    BackgroundColor="{StaticResource BadgeBg}"
-                                    Padding="10,4"
-                                    HorizontalOptions="End">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="6"/>
-                                </Border.StrokeShape>
-                                <Label Text="{Binding AppVersion}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                        </Grid>
-
-                        <!-- Title -->
-                        <Label Text="ABOUT"
-                               FontFamily="RajdhaniSemiBold"
-                               FontSize="15"
-                               TextColor="{StaticResource TextPrimary}"
-                               CharacterSpacing="0.5"/>
-
-                        <!-- Studio Name -->
-                        <VerticalStackLayout Spacing="4" VerticalOptions="CenterAndExpand">
-                            <Label Text="5DOF AI Studio"
-                                   FontFamily="OrbitronBold"
-                                   FontSize="16"
-                                   TextColor="{StaticResource AccentPurple}"/>
-                            <Label Text="(c) 2026"
-                                   FontFamily="RajdhaniRegular"
-                                   FontSize="12"
+                        <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                            <Label Text="Game Ghost" FontFamily="RajdhaniSemiBold" FontSize="14"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Settings" FontFamily="RajdhaniRegular" FontSize="12"
                                    TextColor="{StaticResource TextMuted}"/>
                         </VerticalStackLayout>
+                    </HorizontalStackLayout>
 
-                        <!-- Tag -->
-                        <HorizontalStackLayout Spacing="6">
-                            <Border BackgroundColor="{StaticResource TagBg}"
-                                    Padding="8,4">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="4"/>
-                                </Border.StrokeShape>
-                                <Label Text="#Gaming"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                            <Border BackgroundColor="{StaticResource TagBg}"
-                                    Padding="8,4">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="4"/>
-                                </Border.StrokeShape>
-                                <Label Text="#AI"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
+                    <!-- Nav: Vision -->
+                    <Border x:Name="NavVision"
+                            BackgroundColor="{StaticResource NavItemActive}"
+                            Padding="12,12" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNavVision"/>
+                        </Border.GestureRecognizers>
+                        <Label x:Name="NavVisionLabel"
+                               Text="Vision" FontFamily="RajdhaniSemiBold" FontSize="14"
+                               TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                    </Border>
+
+                    <!-- Nav: Voice -->
+                    <Border x:Name="NavVoice"
+                            BackgroundColor="Transparent"
+                            Padding="12,12" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNavVoice"/>
+                        </Border.GestureRecognizers>
+                        <Label x:Name="NavVoiceLabel"
+                               Text="Voice" FontFamily="RajdhaniRegular" FontSize="14"
+                               TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                    </Border>
+
+                    <!-- Nav: Brain -->
+                    <Border x:Name="NavBrain"
+                            BackgroundColor="Transparent"
+                            Padding="12,12" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNavBrain"/>
+                        </Border.GestureRecognizers>
+                        <Label x:Name="NavBrainLabel"
+                               Text="Brain" FontFamily="RajdhaniRegular" FontSize="14"
+                               TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                    </Border>
+
+                    <!-- Nav: Team -->
+                    <Border x:Name="NavTeam"
+                            BackgroundColor="Transparent"
+                            Padding="12,12" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNavTeam"/>
+                        </Border.GestureRecognizers>
+                        <Label x:Name="NavTeamLabel"
+                               Text="Team" FontFamily="RajdhaniRegular" FontSize="14"
+                               TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                    </Border>
+
+                </VerticalStackLayout>
+
+                <!-- Sidebar footer: About + Back -->
+                <VerticalStackLayout Grid.Row="1" Spacing="8" Padding="12,0,12,20">
+
+                    <!-- About line -->
+                    <HorizontalStackLayout Spacing="6" Padding="12,0">
+                        <Label Text="5DOF AI Studio" FontFamily="RajdhaniRegular" FontSize="12"
+                               TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
+                        <Label Text="·" FontSize="12" TextColor="{StaticResource TextMuted}"
+                               VerticalOptions="Center"/>
+                        <Label Text="{Binding AppVersion}" FontFamily="RajdhaniRegular" FontSize="12"
+                               TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Back button -->
+                    <Border BackgroundColor="Transparent"
+                            Padding="12,12" StrokeThickness="0">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnBackClicked"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="&#x2190;" FontSize="16"
+                                   TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
+                            <Label Text="Back" FontFamily="RajdhaniRegular" FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
+                    </Border>
 
-                <!-- ───────────────────────────────────────────── -->
-                <!-- Card 5: Inference Mode (spans 2 cols, row 2) -->
-                <!-- ───────────────────────────────────────────── -->
-                <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                        BackgroundColor="{StaticResource CardBg}"
-                        Stroke="{StaticResource CardBorder}"
-                        StrokeThickness="1"
-                        Padding="20">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12"/>
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout Spacing="16">
-                        <!-- Card Header -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource IconBg}"
-                                    WidthRequest="32" HeightRequest="32"
-                                    HorizontalOptions="Start">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8"/>
-                                </Border.StrokeShape>
-                                <Label Text="&#x2699;" FontSize="14" TextColor="{StaticResource AccentCyan}"
-                                       HorizontalOptions="Center" VerticalOptions="Center"/>
-                            </Border>
-                            <Border Grid.Column="2"
-                                    BackgroundColor="{StaticResource BadgeBg}"
-                                    Padding="10,4"
-                                    HorizontalOptions="End">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="6"/>
-                                </Border.StrokeShape>
-                                <Label Text="Inference"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                        </Grid>
-
-                        <!-- Title -->
-                        <Label Text="INFERENCE MODE"
-                               FontFamily="RajdhaniSemiBold"
-                               FontSize="15"
-                               TextColor="{StaticResource TextPrimary}"
-                               CharacterSpacing="0.5"/>
-
-                        <!-- Mode Toggle -->
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="Provider Strategy"
-                                   FontFamily="RajdhaniRegular"
-                                   FontSize="13"
-                                   TextColor="{StaticResource TextMuted}"/>
-                            <HorizontalStackLayout Spacing="8">
-                                <Border BackgroundColor="{Binding IsCloudOnlySelected, Converter={StaticResource BoolToSettingsColor}}"
-                                        Stroke="{StaticResource CardBorder}"
-                                        StrokeThickness="1"
-                                        Padding="16,8">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnCloudOnlySelected"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="Cloud Only"
-                                           FontFamily="RajdhaniSemiBold"
-                                           FontSize="13"
-                                           TextColor="{Binding IsCloudOnlySelected, Converter={StaticResource BoolToSettingsTextColor}}"/>
-                                </Border>
-                                <!-- Local Only / Local First: not active in this build -->
-                                <Border BackgroundColor="{StaticResource CardBg}"
-                                        Stroke="{StaticResource CardBorder}"
-                                        StrokeThickness="1"
-                                        Padding="16,8"
-                                        IsVisible="false">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnLocalOnlySelected"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="Local Only"
-                                           FontFamily="RajdhaniSemiBold"
-                                           FontSize="13"
-                                           TextColor="{StaticResource TextMuted}"/>
-                                </Border>
-                                <Border BackgroundColor="{StaticResource CardBg}"
-                                        Stroke="{StaticResource CardBorder}"
-                                        StrokeThickness="1"
-                                        Padding="16,8"
-                                        IsVisible="false">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnLocalFirstSelected"/>
-                                    </Border.GestureRecognizers>
-                                    <Label Text="Local First"
-                                           FontFamily="RajdhaniSemiBold"
-                                           FontSize="13"
-                                           TextColor="{StaticResource TextMuted}"/>
-                                </Border>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
-
-                        <!-- Fallback Warning: not active in this build (local modes hidden) -->
-                        <Border BackgroundColor="#0d0a16"
-                                Stroke="{StaticResource CardBorder}"
-                                StrokeThickness="0.5"
-                                Padding="12,8"
-                                IsVisible="false">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="6"/>
-                            </Border.StrokeShape>
-                            <HorizontalStackLayout Spacing="8">
-                                <Label Text="&#x26A0;" FontSize="12" TextColor="#f59e0b" VerticalOptions="Center"/>
-                                <Label Text="{Binding FallbackReason, StringFormat='Fallback active: {0}'}"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="#f59e0b"/>
-                            </HorizontalStackLayout>
-                        </Border>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- ───────────────────────────────────── -->
-                <!-- Card 6: Diagnostics (1 col, row 2)    -->
-                <!-- ───────────────────────────────────── -->
-                <Border Grid.Row="2" Grid.Column="2"
-                        BackgroundColor="{StaticResource CardBg}"
-                        Stroke="{StaticResource CardBorder}"
-                        StrokeThickness="1"
-                        Padding="20">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="12"/>
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout Spacing="14">
-                        <!-- Card Header -->
-                        <Grid ColumnDefinitions="Auto,*,Auto">
-                            <Border Grid.Column="0"
-                                    BackgroundColor="{StaticResource IconBg}"
-                                    WidthRequest="32" HeightRequest="32"
-                                    HorizontalOptions="Start">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="8"/>
-                                </Border.StrokeShape>
-                                <Label Text="&#x2764;" FontSize="14" TextColor="#10b981"
-                                       HorizontalOptions="Center" VerticalOptions="Center"/>
-                            </Border>
-                            <Border Grid.Column="2"
-                                    BackgroundColor="{StaticResource BadgeBg}"
-                                    Padding="10,4"
-                                    HorizontalOptions="End">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="6"/>
-                                </Border.StrokeShape>
-                                <Label Text="Diagnostics"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="11"
-                                       TextColor="{StaticResource TextSecondary}"/>
-                            </Border>
-                        </Grid>
-
-                        <!-- Title -->
-                        <Label Text="RUNTIME"
-                               FontFamily="RajdhaniSemiBold"
-                               FontSize="15"
-                               TextColor="{StaticResource TextPrimary}"
-                               CharacterSpacing="0.5"/>
-
-                        <!-- Diagnostics Fields -->
-                        <VerticalStackLayout Spacing="10">
-                            <!-- Local Runtime: not active in this build -->
-                            <VerticalStackLayout Spacing="2" IsVisible="false">
-                                <Label Text="Local Runtime Capability"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding LocalRuntimeStatus}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="13"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="Brain Provider"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding BrainProvider}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="13"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="Voice Provider"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding VoiceProviderDisplay}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="13"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-                            <!-- Local STT/TTS: not active in this build -->
-                            <VerticalStackLayout Spacing="2" IsVisible="false">
-                                <Label Text="Local Speech Input (STT)"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding SttStatus}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="13"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-                            <VerticalStackLayout Spacing="2" IsVisible="false">
-                                <Label Text="Local Speech Output (TTS)"
-                                       FontFamily="RajdhaniRegular"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextMuted}"/>
-                                <Label Text="{Binding TtsStatus}"
-                                       FontFamily="RajdhaniSemiBold"
-                                       FontSize="13"
-                                       TextColor="{StaticResource TextPrimary}"/>
-                            </VerticalStackLayout>
-                        </VerticalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
+                </VerticalStackLayout>
 
             </Grid>
-            <!-- ═══ END BENTO GRID ═══ -->
+        </Border>
 
-        </VerticalStackLayout>
-    </ScrollView>
+        <!-- ═══ CONTENT AREA ═══ -->
+        <Grid Grid.Column="1">
 
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- ── TAB 1: VISION ──────────────────────────── -->
+            <!-- ══════════════════════════════════════════════ -->
+            <ScrollView x:Name="VisionPanel">
+                <VerticalStackLayout Spacing="0" Padding="40,32"
+                                     MaximumWidthRequest="800" HorizontalOptions="Start">
+
+                    <Label Text="Vision" FontFamily="Krophed" FontSize="22"
+                           TextColor="{StaticResource TextPrimary}" CharacterSpacing="2"
+                           Margin="0,0,0,24"/>
+
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Vision Model -->
+                        <Label Text="Model" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,0,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="Gemini 2.5 Flash"
+                                           FontFamily="RajdhaniSemiBold" FontSize="16"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Set by active agent"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                                <Border Grid.Column="1"
+                                        BackgroundColor="#0d2a1a"
+                                        Padding="10,5" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                    <Label Text="Active" FontFamily="RajdhaniSemiBold" FontSize="12"
+                                           TextColor="#4ade80"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Capture Rate -->
+                        <Label Text="Capture" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,12,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding CaptureRate}"
+                                       FontFamily="RajdhaniSemiBold" FontSize="16"
+                                       TextColor="{StaticResource TextPrimary}"/>
+                                <Label Text="Frequency adapts per agent — chess uses board-change detection, generalist uses timed intervals"
+                                       FontFamily="RajdhaniRegular" FontSize="13"
+                                       TextColor="{StaticResource TextMuted}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- ── TAB 2: VOICE ───────────────────────────── -->
+            <!-- ══════════════════════════════════════════════ -->
+            <ScrollView x:Name="VoicePanel" IsVisible="False">
+                <VerticalStackLayout Spacing="0" Padding="40,32"
+                                     MaximumWidthRequest="800" HorizontalOptions="Start">
+
+                    <Label Text="Voice" FontFamily="Krophed" FontSize="22"
+                           TextColor="{StaticResource TextPrimary}" CharacterSpacing="2"
+                           Margin="0,0,0,24"/>
+
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Voice Provider (read-only) -->
+                        <Label Text="Provider" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,0,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="{Binding VoiceEngine}"
+                                           FontFamily="RajdhaniSemiBold" FontSize="16"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Voice provider is set per agent configuration"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                                <Border Grid.Column="1"
+                                        BackgroundColor="#0d2a1a"
+                                        Padding="10,5" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                    <Label Text="Active" FontFamily="RajdhaniSemiBold" FontSize="12"
+                                           TextColor="#4ade80"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Voice Gender (read-only) -->
+                        <Label Text="Gender" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,12,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding VoiceGenderDisplay}"
+                                       FontFamily="RajdhaniSemiBold" FontSize="16"
+                                       TextColor="{StaticResource TextPrimary}"/>
+                                <Label Text="Gender is assigned per agent — Leroy and RASA are male, Wasp is female"
+                                       FontFamily="RajdhaniRegular" FontSize="13"
+                                       TextColor="{StaticResource TextMuted}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- ── Barge-In ── -->
+                        <Label Text="Barge-In" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,12,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="Allow interruptions"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="When enabled, the AI can speak up with observations even while you're talking"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1"
+                                        IsToggled="{Binding IsBargeInEnabled}"
+                                        OnColor="{StaticResource AccentCyan}"
+                                        ThumbColor="White"
+                                        VerticalOptions="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Feature gate notice -->
+                        <Border BackgroundColor="#0d0a16"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="0.5" Padding="16,12">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Voice selection coming soon"
+                                       FontFamily="RajdhaniSemiBold" FontSize="13"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                                <Label Text="Custom voice selection and additional voice options will be available in a future update."
+                                       FontFamily="RajdhaniRegular" FontSize="13"
+                                       TextColor="{StaticResource TextMuted}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- ── TAB 3: BRAIN ───────────────────────────── -->
+            <!-- ══════════════════════════════════════════════ -->
+            <ScrollView x:Name="BrainPanel" IsVisible="False">
+                <VerticalStackLayout Spacing="0" Padding="40,32"
+                                     MaximumWidthRequest="800" HorizontalOptions="Start">
+
+                    <Label Text="Brain" FontFamily="Krophed" FontSize="22"
+                           TextColor="{StaticResource TextPrimary}" CharacterSpacing="2"
+                           Margin="0,0,0,24"/>
+
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Brain Model (read-only) -->
+                        <Label Text="Model" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,0,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="{Binding BrainModel}"
+                                           FontFamily="RajdhaniSemiBold" FontSize="16"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Analyzes screen captures and generates game insights"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                                <Border Grid.Column="1"
+                                        BackgroundColor="#0d2a1a"
+                                        Padding="10,5" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="6"/></Border.StrokeShape>
+                                    <Label Text="Active" FontFamily="RajdhaniSemiBold" FontSize="12"
+                                           TextColor="#4ade80"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Inference Mode (read-only) -->
+                        <Label Text="Inference" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,12,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Cloud Only"
+                                       FontFamily="RajdhaniSemiBold" FontSize="16"
+                                       TextColor="{StaticResource TextPrimary}"/>
+                                <Label Text="All AI processing runs in the cloud via API providers"
+                                       FontFamily="RajdhaniRegular" FontSize="13"
+                                       TextColor="{StaticResource TextMuted}"/>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Diagnostics -->
+                        <Label Text="Diagnostics" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,12,0,4"/>
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="120,*">
+                                    <Label Grid.Column="0" Text="Brain Provider"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
+                                    <Label Grid.Column="1" Text="{Binding BrainProvider}"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="{StaticResource RowDivider}"/>
+                                <Grid ColumnDefinitions="120,*">
+                                    <Label Grid.Column="0" Text="Voice Provider"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
+                                    <Label Grid.Column="1" Text="{Binding VoiceProviderDisplay}"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="{StaticResource RowDivider}"/>
+                                <Grid ColumnDefinitions="120,*">
+                                    <Label Grid.Column="0" Text="Voice Engine"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
+                                    <Label Grid.Column="1" Text="{Binding VoiceEngine}"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!-- ── TAB 4: TEAM ────────────────────────────── -->
+            <!-- ══════════════════════════════════════════════ -->
+            <ScrollView x:Name="TeamPanel" IsVisible="False">
+                <VerticalStackLayout Spacing="0" Padding="40,32"
+                                     MaximumWidthRequest="800" HorizontalOptions="Start">
+
+                    <Label Text="Team" FontFamily="Krophed" FontSize="22"
+                           TextColor="{StaticResource TextPrimary}" CharacterSpacing="2"
+                           Margin="0,0,0,24"/>
+
+                    <VerticalStackLayout Spacing="16">
+
+                        <!-- ── Configure with Claude CTA ── -->
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,20">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                            <VerticalStackLayout Spacing="16">
+
+                                <!-- Header -->
+                                <HorizontalStackLayout Spacing="12">
+                                    <Border BackgroundColor="#0d2a3a"
+                                            Stroke="#1a3d50"
+                                            StrokeThickness="1"
+                                            WidthRequest="40" HeightRequest="40">
+                                        <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                        <Label Text="⚡" FontSize="18"
+                                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                        <Label Text="Configure with Claude"
+                                               FontFamily="RajdhaniSemiBold" FontSize="16"
+                                               TextColor="{StaticResource TextPrimary}"/>
+                                        <Label x:Name="TeamStatusLabel"
+                                               Text="Claude CLI detected"
+                                               FontFamily="RajdhaniRegular" FontSize="13"
+                                               TextColor="{StaticResource TextMuted}"/>
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+
+                                <!-- Description -->
+                                <Label Text="Ghost Team lets your AI agents delegate complex tasks to Claude Code running in the background. Claude researches, plans, and executes — your agent narrates the results."
+                                       FontFamily="RajdhaniRegular" FontSize="13"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       LineHeight="1.4"/>
+
+                                <!-- Status indicator -->
+                                <Border x:Name="TeamConnectionStatus"
+                                        BackgroundColor="#0d2a1a"
+                                        Stroke="#1a3d2a"
+                                        StrokeThickness="1"
+                                        Padding="16,10">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                                    <HorizontalStackLayout Spacing="8">
+                                        <Border BackgroundColor="#4ade80"
+                                                WidthRequest="8" HeightRequest="8">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="4"/></Border.StrokeShape>
+                                        </Border>
+                                        <Label x:Name="TeamConnectionLabel"
+                                               Text="Ready — launches automatically when you connect to a game"
+                                               FontFamily="RajdhaniRegular" FontSize="13"
+                                               TextColor="#4ade80" VerticalOptions="Center"/>
+                                    </HorizontalStackLayout>
+                                </Border>
+
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- ── Auto-Launch ── -->
+                        <Border BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="24,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                                    <Label Text="Auto-launch on connect"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Start a Team session automatically when you connect to a game"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                                <Switch Grid.Column="1"
+                                        IsToggled="{Binding TeamAutoLaunch}"
+                                        OnColor="{StaticResource AccentCyan}"
+                                        ThumbColor="White"
+                                        VerticalOptions="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- ── Permission Mode Checklist ── -->
+                        <Label Text="Permissions" FontFamily="RajdhaniSemiBold" FontSize="16"
+                               TextColor="{StaticResource TextPrimary}" Margin="4,4,0,2"/>
+
+                        <Label Text="Control how much autonomy Claude has during Team sessions"
+                               FontFamily="RajdhaniRegular" FontSize="13"
+                               TextColor="{StaticResource TextMuted}" Margin="4,0,0,8"/>
+
+                        <!-- Ask for everything (default) -->
+                        <Border x:Name="PermDefault"
+                                BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource AccentCyan}"
+                                StrokeThickness="1" Padding="20,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPermDefaultSelected"/>
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border x:Name="PermDefaultCheck"
+                                        Grid.Column="0"
+                                        BackgroundColor="{StaticResource AccentCyan}"
+                                        WidthRequest="20" HeightRequest="20"
+                                        Margin="0,0,14,0" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                    <Label Text="✓" FontSize="12" TextColor="Black" FontAttributes="Bold"
+                                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label Text="Ask for everything"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Claude asks before every action"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <!-- Auto-approve edits -->
+                        <Border x:Name="PermEdits"
+                                BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="20,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPermEditsSelected"/>
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border x:Name="PermEditsCheck"
+                                        Grid.Column="0"
+                                        BackgroundColor="{StaticResource CheckInactive}"
+                                        WidthRequest="20" HeightRequest="20"
+                                        Margin="0,0,14,0" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                    <Label Text="" FontSize="12" TextColor="Black"
+                                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label Text="Auto-approve edits"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Claude edits freely, asks for other actions"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <!-- Plan only -->
+                        <Border x:Name="PermPlan"
+                                BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="20,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPermPlanSelected"/>
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border x:Name="PermPlanCheck"
+                                        Grid.Column="0"
+                                        BackgroundColor="{StaticResource CheckInactive}"
+                                        WidthRequest="20" HeightRequest="20"
+                                        Margin="0,0,14,0" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                    <Label Text="" FontSize="12" TextColor="Black"
+                                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label Text="Plan only"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Claude plans but waits for your approval to act"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <!-- Auto-approve most -->
+                        <Border x:Name="PermAuto"
+                                BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="20,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPermAutoSelected"/>
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border x:Name="PermAutoCheck"
+                                        Grid.Column="0"
+                                        BackgroundColor="{StaticResource CheckInactive}"
+                                        WidthRequest="20" HeightRequest="20"
+                                        Margin="0,0,14,0" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                    <Label Text="" FontSize="12" TextColor="Black"
+                                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label Text="Auto-approve most"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="Claude acts freely on most tasks"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                        <!-- Full autonomy -->
+                        <Border x:Name="PermBypass"
+                                BackgroundColor="{StaticResource CardBg}"
+                                Stroke="{StaticResource CardBorder}"
+                                StrokeThickness="1" Padding="20,16">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPermBypassSelected"/>
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border x:Name="PermBypassCheck"
+                                        Grid.Column="0"
+                                        BackgroundColor="{StaticResource CheckInactive}"
+                                        WidthRequest="20" HeightRequest="20"
+                                        Margin="0,0,14,0" VerticalOptions="Center">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                    <Label Text="" FontSize="12" TextColor="Black"
+                                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                    <Label Text="Full autonomy"
+                                           FontFamily="RajdhaniSemiBold" FontSize="14"
+                                           TextColor="#f87171"/>
+                                    <Label Text="Claude acts without asking — use with caution"
+                                           FontFamily="RajdhaniRegular" FontSize="13"
+                                           TextColor="{StaticResource TextMuted}"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </Grid>
+    </Grid>
 </ContentPage>

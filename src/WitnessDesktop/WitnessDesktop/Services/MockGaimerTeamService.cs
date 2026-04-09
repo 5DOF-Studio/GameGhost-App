@@ -22,7 +22,7 @@ public sealed class MockGaimerTeamService : IGaimerTeamService
         "The streaming setup looks good. OBS is detecting your game window correctly. I'd suggest switching to the Game Capture source instead of Window Capture for better frame rates."
     ];
 
-    public double PermissionProbability { get; set; } = 0.0; // Phase G: re-enable when permission UI exists
+    public double PermissionProbability { get; set; } = 0.15;
     public int ResponseDelayMs { get; set; } = 3000;
 
     public MockGaimerTeamService(ILogger<MockGaimerTeamService> logger)
@@ -32,6 +32,7 @@ public sealed class MockGaimerTeamService : IGaimerTeamService
 
     public bool IsConnected { get; private set; }
     public bool IsConfigured => true;
+    public string? LastError { get; private set; }
 
     public event EventHandler<GaimerTeamResultEventArgs>? TaskCompleted;
     public event EventHandler<GaimerTeamProgressEventArgs>? TaskProgress;
@@ -171,7 +172,7 @@ public sealed class MockGaimerTeamService : IGaimerTeamService
 
             var index = Interlocked.Increment(ref _responseIndex) - 1;
             var response = CannedResponses[index % CannedResponses.Length];
-            RaiseCompleted(task.Id, "complete", response);
+            RaiseCompleted(task.Id, "complete", response, responseFormat: task.ResponseFormat);
         }
         catch (OperationCanceledException)
         {
@@ -184,7 +185,8 @@ public sealed class MockGaimerTeamService : IGaimerTeamService
         }
     }
 
-    private void RaiseCompleted(string taskId, string status, string response, string? errorCode = null)
+    private void RaiseCompleted(string taskId, string status, string response,
+        string? errorCode = null, string responseFormat = "voice")
     {
         TaskCompleted?.Invoke(this, new GaimerTeamResultEventArgs
         {
@@ -194,7 +196,8 @@ public sealed class MockGaimerTeamService : IGaimerTeamService
                 Status = status,
                 Response = response,
                 ErrorCode = errorCode
-            }
+            },
+            ResponseFormat = responseFormat
         });
     }
 }

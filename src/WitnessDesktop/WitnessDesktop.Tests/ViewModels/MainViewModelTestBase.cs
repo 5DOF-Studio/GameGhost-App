@@ -49,6 +49,12 @@ public abstract class MainViewModelTestBase
     protected Mock<IExchangeManager>? MockExchangeManager { get; set; }
 
     /// <summary>
+    /// Optional Gaimer Team mock. Set before calling CreateSut() to inject team service.
+    /// When null, MainViewModel receives no team service (team features disabled).
+    /// </summary>
+    protected Mock<IGaimerTeamService>? MockGaimerTeam { get; set; }
+
+    /// <summary>
     /// Channel used to provide a valid ChannelReader for IBrainService.Results.
     /// Tests can write to this channel to simulate brain results.
     /// </summary>
@@ -164,7 +170,8 @@ public abstract class MainViewModelTestBase
         MockVoiceTranscriptStore?.Object,
         MockObservationStore.Object,
         replayRecording: MockReplayRecording?.Object,
-        exchangeManager: MockExchangeManager?.Object);
+        exchangeManager: MockExchangeManager?.Object,
+        gaimerTeam: MockGaimerTeam?.Object);
 
     /// <summary>
     /// Helper: Creates an Agent for testing.

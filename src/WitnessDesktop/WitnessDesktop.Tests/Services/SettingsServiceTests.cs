@@ -131,4 +131,146 @@ public class SettingsServiceTests
 
         changedName.Should().Be("InferenceMode");
     }
+
+    // --- Team Settings ---
+
+    [Fact]
+    public void ClaudeCliPath_Default_IsEmpty()
+    {
+        var svc = new SettingsService();
+        svc.ClaudeCliPath.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ClaudeCliPath_SetGet_RoundTrips()
+    {
+        var svc = new SettingsService();
+        svc.ClaudeCliPath = "/usr/local/bin/claude";
+        svc.ClaudeCliPath.Should().Be("/usr/local/bin/claude");
+    }
+
+    [Fact]
+    public void ClaudeCliPath_Set_FiresSettingChangedEvent()
+    {
+        var svc = new SettingsService();
+        string? changedName = null;
+        svc.SettingChanged += (_, name) => changedName = name;
+        svc.ClaudeCliPath = "/usr/local/bin/claude";
+        changedName.Should().Be("ClaudeCliPath");
+    }
+
+    [Fact]
+    public void BunPath_Default_IsEmpty()
+    {
+        var svc = new SettingsService();
+        svc.BunPath.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void BunPath_SetGet_RoundTrips()
+    {
+        var svc = new SettingsService();
+        svc.BunPath = "/usr/local/bin/bun";
+        svc.BunPath.Should().Be("/usr/local/bin/bun");
+    }
+
+    [Fact]
+    public void BunPath_Set_FiresSettingChangedEvent()
+    {
+        var svc = new SettingsService();
+        string? changedName = null;
+        svc.SettingChanged += (_, name) => changedName = name;
+        svc.BunPath = "/usr/local/bin/bun";
+        changedName.Should().Be("BunPath");
+    }
+
+    [Fact]
+    public void TeamAutoLaunch_Default_IsTrue()
+    {
+        var svc = new SettingsService();
+        svc.TeamAutoLaunch.Should().BeTrue();
+    }
+
+    [Fact]
+    public void TeamAutoLaunch_SetGet_RoundTrips()
+    {
+        var svc = new SettingsService();
+        svc.TeamAutoLaunch = false;
+        svc.TeamAutoLaunch.Should().BeFalse();
+    }
+
+    [Fact]
+    public void TeamAutoLaunch_Set_FiresSettingChangedEvent()
+    {
+        var svc = new SettingsService();
+        string? changedName = null;
+        svc.SettingChanged += (_, name) => changedName = name;
+        svc.TeamAutoLaunch = false;
+        changedName.Should().Be("TeamAutoLaunch");
+    }
+
+    [Fact]
+    public void PluginDirPath_Default_IsEmpty()
+    {
+        var svc = new SettingsService();
+        svc.PluginDirPath.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void PluginDirPath_SetGet_RoundTrips()
+    {
+        var svc = new SettingsService();
+        svc.PluginDirPath = "/custom/plugin";
+        svc.PluginDirPath.Should().Be("/custom/plugin");
+    }
+
+    [Fact]
+    public void PluginDirPath_Set_FiresSettingChangedEvent()
+    {
+        var svc = new SettingsService();
+        string? changedName = null;
+        svc.SettingChanged += (_, name) => changedName = name;
+        svc.PluginDirPath = "/custom/plugin";
+        changedName.Should().Be("PluginDirPath");
+    }
+
+    // --- TeamPermissionMode ---
+
+    [Fact]
+    public void TeamPermissionMode_DefaultsToDefault()
+    {
+        var sut = new SettingsService();
+        sut.TeamPermissionMode.Should().Be("default");
+    }
+
+    [Fact]
+    public void TeamPermissionMode_PersistsValue()
+    {
+        var sut = new SettingsService();
+        sut.TeamPermissionMode = "plan";
+        sut.TeamPermissionMode.Should().Be("plan");
+    }
+
+    [Fact]
+    public void TeamPermissionMode_FiresSettingChanged()
+    {
+        var sut = new SettingsService();
+        string? changed = null;
+        sut.SettingChanged += (_, name) => changed = name;
+
+        sut.TeamPermissionMode = "auto";
+        changed.Should().Be(nameof(sut.TeamPermissionMode));
+    }
+
+    [Fact]
+    public void TeamPermissionMode_EqualityGuardPreventsSpuriousEvent()
+    {
+        var sut = new SettingsService();
+        sut.TeamPermissionMode = "default";
+        string? changed = null;
+        sut.SettingChanged += (_, name) => changed = name;
+
+        sut.TeamPermissionMode = "default"; // same value
+        changed.Should().BeNull();
+    }
 }

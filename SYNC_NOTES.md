@@ -35,11 +35,15 @@ Keep `GameGhost-App` current with shared engine/features from `gaimer-desktop` w
 - Immediately for security/stability fixes.
 - Milestone-based for larger architectural changes.
 
-## Current Handoff (2026-04-07)
-- Previous baseline: `5992eea` on `gaimer-v2` (2026-04-06)
-- New baseline: `40163ce` on `gaimer-v2` (incremental overlay sync)
-- Sync method: Targeted overlay of 48 new commits (89 source files, +5,307 lines)
-- New features synced: Gaimer Team (Claude CLI integration), voice sprint (OpenAI migration, Gemini binary frame fix, wake phrase gate), telemetry (+28 trace events), GaimerSpeech xcframework, native build script
-- Branding pass applied: all previous branding + new "Ghost Team" user-facing references
+## Current Handoff (2026-04-09)
+- Previous baseline: `40163ce` on `gaimer-v2` (2026-04-07)
+- New baseline: `643b680` on `gaimer-v2` (incremental overlay sync)
+- Sync method: Targeted overlay of 31 new commits (30 source files, +9,414 lines)
+- New features synced: Team Phase C+D (settings, ConnectorCard, pre-flight, context population), Team Phase G (permission request UI, event wiring, countdown/timeout), Settings sidebar-nav migration (Vision/Voice/Brain/Team tabs), BrainPromptBuilder pack-driven constructor fix, voice deferral ack fix, BrainContextFormatter
+- Branding pass applied via `scripts/apply_branding.sh`: Game Ghost Dashboard, Ghost Team references, Settings sidebar
 - Internal service/interface names (`IGaimerTeamService`, `GaimerPipeClient`, etc.) preserved as internal identifiers
-- Resume cherry-pick or overlay from `40163ce` for future syncs
+- Resume overlay from `643b680` for future syncs
+
+## Previous Handoff (2026-04-07)
+- Baseline: `40163ce` on `gaimer-v2`
+- Synced: Gaimer Team (Claude CLI integration), voice sprint, telemetry (+28 trace events), GaimerSpeech xcframework, native build script
