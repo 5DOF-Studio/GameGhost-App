@@ -117,6 +117,7 @@ final class HarnessDelegate: NSObject, NSApplicationDelegate {
         case .none: card = "none"
         case .text(let t, _, _, _, let a): card = "text(\(t ?? "-"), alert=\(a))"
         case .image(let t, _, _, let a): card = "image(\(t ?? "-"), alert=\(a))"
+        case .video(let t, _, _, let d): card = "video(\(t ?? "-"), dur=\(d)s)"
         }
         let audio = [
             state.audioState.voiceChat ? "VC" : nil,
@@ -178,6 +179,7 @@ final class HarnessDelegate: NSObject, NSApplicationDelegate {
         button("Show Long Text Card", action: #selector(showLongTextCard))
         button("Show Alert Card (no auto-dismiss)", action: #selector(showAlertCard))
         button("Show Image Card", action: #selector(showImageCard))
+        button("Show Video Card", action: #selector(showVideoCard))
         button("Dismiss Card", action: #selector(dismissCard))
         y -= 6
 
@@ -271,6 +273,30 @@ final class HarnessDelegate: NSObject, NSApplicationDelegate {
             return nil
         }
         return NSImage(contentsOf: url)
+    }
+
+    @objc private func showVideoCard() {
+        log("ACTION  showVideoCard")
+        // Use a system screen recording or any .mp4/.mov file on disk for testing.
+        // The harness looks for test-video.mp4 in Harness/Resources/, falling back
+        // to a file picker dialog if not found.
+        if let url = Bundle.module.url(forResource: "test-video", withExtension: "mp4", subdirectory: "Resources") {
+            sdk.showVideoCard(title: "REPLAY", fileURL: url, startTime: 0, duration: 10)
+        } else {
+            // Fallback: open file picker for manual testing
+            let panel = NSOpenPanel()
+            panel.allowedContentTypes = [.movie, .mpeg4Movie, .quickTimeMovie]
+            panel.canChooseFiles = true
+            panel.canChooseDirectories = false
+            panel.allowsMultipleSelection = false
+            panel.message = "Select a video file for testing"
+            if panel.runModal() == .OK, let url = panel.url {
+                // Play first 10 seconds (or less if the file is shorter)
+                sdk.showVideoCard(title: "REPLAY", fileURL: url, startTime: 0, duration: 10)
+            } else {
+                log("WARNING: No video file selected")
+            }
+        }
     }
 
     @objc private func dismissCard() {

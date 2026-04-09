@@ -12,6 +12,8 @@ internal sealed class ReplayRecordingService : IReplayRecordingService, IDisposa
     private const int MaxCompletedSegments = 2;
     private const int DefaultRecordingWidth = 1920;
     private const int DefaultRecordingHeight = 1080;
+    private const string RecentSubdir = "recent";
+    private static readonly TimeSpan StaleReplayThreshold = TimeSpan.FromHours(24);
 
     private readonly INativeRecordingBridge _bridge;
     private readonly string _baseDir;
@@ -153,12 +155,60 @@ internal sealed class ReplayRecordingService : IReplayRecordingService, IDisposa
     /// <inheritdoc/>
     public void CleanupSessionFiles()
     {
-        if (_currentSessionDir != null && Directory.Exists(_currentSessionDir))
+        if (_currentSessionDir == null || !Directory.Exists(_currentSessionDir))
         {
+            lock (_lock) { _completedSegments.Clear(); }
+            return;
+        }
+
+        var recentDir = Path.Combine(_baseDir, RecentSubdir);
+        Directory.CreateDirectory(recentDir);
+
+        try
+        {
+            // Move all .mp4 files from session dir to recent/
+            foreach (var file in Directory.GetFiles(_currentSessionDir, "*.mp4"))
+            {
+                var destPath = Path.Combine(recentDir,
+                    $"{_currentSessionId}_{Path.GetFileName(file)}");
+                try
+                {
+                    File.Move(file, destPath, overwrite: true);
+                }
+                catch (IOException) { }
+            }
+
+            // Remove the now-empty session directory
             try { Directory.Delete(_currentSessionDir, recursive: true); }
             catch (IOException) { }
         }
+        catch (IOException) { }
+
         lock (_lock) { _completedSegments.Clear(); }
+    }
+
+    /// <inheritdoc/>
+    public void SweepStaleReplays()
+    {
+        var recentDir = Path.Combine(_baseDir, RecentSubdir);
+        if (!Directory.Exists(recentDir))
+            return;
+
+        var cutoff = DateTime.UtcNow - StaleReplayThreshold;
+        foreach (var file in Directory.GetFiles(recentDir))
+        {
+            try
+            {
+                if (File.GetLastWriteTimeUtc(file) < cutoff)
+                    File.Delete(file);
+            }
+            catch (IOException) { }
+        }
+
+        _trace?.TrackEvent("replay.sweep_stale_completed", new Dictionary<string, string>
+        {
+            ["recent_dir"] = recentDir
+        });
     }
 
     /// <summary>

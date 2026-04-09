@@ -204,7 +204,8 @@ public class SettingsViewModel_InferenceMode_Tests
     {
         return new SettingsViewModel(
             settings ?? new SettingsService(),
-            runtime ?? new MockLocalModelRuntime());
+            runtime ?? new MockLocalModelRuntime(),
+            new Mock<IBargeInPolicyService>().Object);
     }
 
     [Fact]

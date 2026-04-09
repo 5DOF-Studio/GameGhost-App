@@ -142,6 +142,22 @@ public final class GhostFabPanelSDK {
         }
     }
 
+    public func showVideoCard(
+        title: String? = nil,
+        fileURL: URL,
+        startTime: TimeInterval,
+        duration: TimeInterval
+    ) {
+        updateState {
+            $0.cardContent = .video(
+                title: title,
+                fileURL: fileURL,
+                startTime: startTime,
+                duration: duration
+            )
+        }
+    }
+
     public func setAgentImage(_ image: NSImage?) {
         updateState { $0.agentImage = image }
     }

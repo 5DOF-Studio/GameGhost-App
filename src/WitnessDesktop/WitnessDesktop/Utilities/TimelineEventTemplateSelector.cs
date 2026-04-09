@@ -9,6 +9,8 @@ public class TimelineEventTemplateSelector : DataTemplateSelector
     public DataTemplate? ProactiveAlertTemplate { get; set; }
     public DataTemplate? ToolCallTemplate { get; set; }
     public DataTemplate? ArchivedTemplate { get; set; }
+    public DataTemplate? ImageCardTemplate { get; set; }
+    public DataTemplate? VideoCardTemplate { get; set; }
     public DataTemplate? DefaultTemplate { get; set; }
 
     protected override DataTemplate? OnSelectTemplate(object item, BindableObject container)
@@ -23,7 +25,12 @@ public class TimelineEventTemplateSelector : DataTemplateSelector
             EventOutputType.Opportunity when evt.Role == MessageRole.Proactive => ProactiveAlertTemplate ?? DefaultTemplate,
             EventOutputType.ToolCall => ToolCallTemplate ?? DefaultTemplate,
             EventOutputType.Archived => ArchivedTemplate ?? DefaultTemplate,
+            EventOutputType.ImageCard => ImageCardTemplate ?? DefaultTemplate,
+            EventOutputType.VideoCard => VideoCardTemplate ?? DefaultTemplate,
             _ => DefaultTemplate
         };
     }
+
+    /// <summary>Test helper — calls OnSelectTemplate with a null container.</summary>
+    internal DataTemplate? SelectTemplate(object item) => OnSelectTemplate(item, null!);
 }

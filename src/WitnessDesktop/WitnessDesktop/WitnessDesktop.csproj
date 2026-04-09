@@ -23,7 +23,7 @@
 
 		<!-- Display name -->
 		<ApplicationTitle>Game Ghost</ApplicationTitle>
-		<AssemblyName>GameGhost</AssemblyName>
+		<AssemblyName>Gaimer</AssemblyName>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.5dof.gameghost</ApplicationId>
@@ -62,6 +62,7 @@
 	<!-- MAUI packages — only for platform targets -->
 	<ItemGroup Condition="'$(TargetFramework)' != 'net8.0'">
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="4.1.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.1" />
@@ -89,6 +90,7 @@
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<Compile Remove="Views\**" />
 		<Compile Remove="Controls\**" />
+		<Compile Remove="Connectors\**" />
 		<Compile Remove="Platforms\**" />
 		<Compile Remove="ViewModels\**" />
 		<Compile Remove="Utilities\**" />
@@ -171,7 +173,7 @@
 	<Target Name="InjectSpeechRecognitionUsageDescription" AfterTargets="Build" Condition="$(TargetFramework.Contains('maccatalyst'))">
 		<PropertyGroup>
 			<_AppInfoPlist>$(AppBundleDir)/Contents/Info.plist</_AppInfoPlist>
-			<_SpeechUsageDescription>Game Ghost needs speech recognition access to transcribe your voice for local AI conversations.</_SpeechUsageDescription>
+			<_SpeechUsageDescription>Gaimer needs speech recognition access to transcribe your voice for local AI conversations.</_SpeechUsageDescription>
 		</PropertyGroup>
 		<Message Text="Ensuring NSSpeechRecognitionUsageDescription exists in app bundle Info.plist..." Importance="high" />
 		<Exec Condition="Exists('$(_AppInfoPlist)')" IgnoreExitCode="true" Command="/usr/libexec/PlistBuddy -c &quot;Set :NSSpeechRecognitionUsageDescription '$(_SpeechUsageDescription)'&quot; &quot;$(_AppInfoPlist)&quot;" />

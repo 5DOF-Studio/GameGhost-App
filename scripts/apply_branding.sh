@@ -91,6 +91,15 @@ do_sed "$SRC/Services/Brain/ToolExecutor.cs" \
     '"Gaimer Team is not connected"' \
     '"Ghost Team is not connected"'
 
+# ToolDefinition display name + description
+do_sed "$SRC/Models/ToolDefinition.cs" \
+    'DisplayName = "Gaimer Team"' \
+    'DisplayName = "Ghost Team"'
+
+do_sed "$SRC/Models/ToolDefinition.cs" \
+    'Hand off a task to Gaimer Team' \
+    'Hand off a task to Ghost Team'
+
 # ---------------------------------------------------------------
 # 4. Prompt identity strings
 # ---------------------------------------------------------------

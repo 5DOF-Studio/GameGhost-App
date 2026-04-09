@@ -27,6 +27,8 @@ public enum EventOutputType
     Archived,         // Archive boundary marker — end of visible hot window
     TeamResult,       // Gaimer Team task result (background capability)
     PermissionRequest, // Team permission request (allow/deny)
+    ImageCard,         // Screenshot or internet-fetched image
+    VideoCard,         // Replay clip
 
     // === AGENT-SPECIFIC MARKER ===
     AgentSpecific = 100

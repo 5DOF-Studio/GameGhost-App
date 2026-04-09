@@ -278,6 +278,26 @@ public class GaimerTeamServiceTests : IDisposable
         results[0].Status.Should().Be("error");
     }
 
+    [Fact]
+    public async Task ConnectionLost_OnExistingSession_DisconnectsAndOnlyErrorsPendingTasksOnce()
+    {
+        SimulateConnected(owned: false);
+        var task = CreateTask();
+        await _sut.SubmitTaskAsync(task);
+
+        var results = new List<GaimerTeamResult>();
+        _sut.TaskCompleted += (_, e) => results.Add(e.Result);
+
+        _mockPipe.Raise(p => p.ConnectionLost += null, _mockPipe.Object, EventArgs.Empty);
+        _mockPipe.Raise(p => p.ConnectionLost += null, _mockPipe.Object, EventArgs.Empty);
+
+        _sut.IsConnected.Should().BeFalse();
+        _mockPipe.Verify(p => p.Disconnect(), Times.Once);
+        results.Should().ContainSingle();
+        results[0].TaskId.Should().Be(task.Id);
+        results[0].Status.Should().Be("error");
+    }
+
     // ── Pre-flight Checks ──────────────────────────────────────
 
     [Fact]
@@ -365,6 +385,87 @@ public class GaimerTeamServiceTests : IDisposable
         finally
         {
             Directory.Delete(tmpDir, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task LaunchSessionAsync_WhenHandshakeFails_ReturnsFalse_AndDoesNotMarkConnected()
+    {
+        var tmpDir = Path.Combine(Path.GetTempPath(), $"gaimer-team-{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tmpDir);
+        File.WriteAllText(Path.Combine(tmpDir, "server.ts"), "// stub");
+
+        var socketDir = Path.GetDirectoryName(GaimerTeamService.SocketPath)!;
+        Directory.CreateDirectory(socketDir);
+        var socketExisted = File.Exists(GaimerTeamService.SocketPath);
+
+        try
+        {
+            if (socketExisted)
+                return;
+
+            _mockSettings.Setup(s => s.PluginDirPath).Returns(tmpDir);
+            _mockSettings.Setup(s => s.ClaudeCliPath).Returns("/bin/sh");
+            _mockSettings.Setup(s => s.BunPath).Returns("/bin/sh");
+
+            _mockProcess.Setup(p => p.LaunchAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback(() => File.WriteAllText(GaimerTeamService.SocketPath, string.Empty))
+                .ReturnsAsync(true);
+            _mockPipe.Setup(p => p.ConnectAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _mockPipe.Setup(p => p.SendAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(20);
+
+            var result = await _sut.LaunchSessionAsync(cts.Token);
+
+            result.Should().BeFalse();
+            _sut.IsConnected.Should().BeFalse();
+            _mockPipe.Verify(p => p.Disconnect(), Times.Once);
+            _mockProcess.Verify(p => p.TerminateAsync(), Times.Once);
+        }
+        finally
+        {
+            if (!socketExisted && File.Exists(GaimerTeamService.SocketPath))
+                File.Delete(GaimerTeamService.SocketPath);
+            Directory.Delete(tmpDir, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task ConnectExistingAsync_WhenHandshakeFails_ReturnsFalse_AndDoesNotMarkConnected()
+    {
+        var socketDir = Path.GetDirectoryName(GaimerTeamService.SocketPath)!;
+        Directory.CreateDirectory(socketDir);
+        var socketExisted = File.Exists(GaimerTeamService.SocketPath);
+
+        try
+        {
+            if (socketExisted)
+                return;
+
+            File.WriteAllText(GaimerTeamService.SocketPath, string.Empty);
+            _mockPipe.Setup(p => p.ConnectAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(true);
+            _mockPipe.Setup(p => p.SendAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(20);
+
+            var result = await _sut.ConnectExistingAsync(cts.Token);
+
+            result.Should().BeFalse();
+            _sut.IsConnected.Should().BeFalse();
+            _mockPipe.Verify(p => p.Disconnect(), Times.Once);
+            _mockProcess.Verify(p => p.TerminateAsync(), Times.Never);
+        }
+        finally
+        {
+            if (!socketExisted && File.Exists(GaimerTeamService.SocketPath))
+                File.Delete(GaimerTeamService.SocketPath);
         }
     }
 

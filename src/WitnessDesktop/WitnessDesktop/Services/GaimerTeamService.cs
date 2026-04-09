@@ -229,12 +229,17 @@ public sealed class GaimerTeamService : IGaimerTeamService
             var pong = await PingPongAsync(ct);
             if (!pong)
             {
-                _logger.LogWarning("[GaimerTeam] Ping/pong handshake failed, proceeding anyway");
+                _logger.LogWarning("[GaimerTeam] Ping/pong handshake failed during launch");
+                UnwireEvents();
+                _pipe.Disconnect();
+                await _process.TerminateAsync();
+                return false;
             }
 
             // 9. Set state (_restartAttempts reset on pong, not here — PB-C3)
             _ownsProcess = true;
             Interlocked.Exchange(ref _missedPings, 0);
+            _restartAttempts = 0;
 
             // 10. Start health timer
             StartHealthTimer();
@@ -280,11 +285,15 @@ public sealed class GaimerTeamService : IGaimerTeamService
             if (!pong)
             {
                 _logger.LogWarning("[GaimerTeam] Ping/pong handshake failed on existing session");
+                UnwireEvents();
+                _pipe.Disconnect();
+                return false;
             }
 
             // 5. Not owned
             _ownsProcess = false;
             Interlocked.Exchange(ref _missedPings, 0);
+            _restartAttempts = 0;
 
             // 6. Start health timer
             StartHealthTimer();
@@ -671,6 +680,8 @@ public sealed class GaimerTeamService : IGaimerTeamService
     private void MarkDisconnected()
     {
         StopHealthTimer();
+        UnwireEvents();
+        _pipe.Disconnect();
         _isConnected = false;
         ErrorOutPendingTasks("Connection to Gaimer Team session lost.");
         _logger.LogWarning("[GaimerTeam] Marked as disconnected");

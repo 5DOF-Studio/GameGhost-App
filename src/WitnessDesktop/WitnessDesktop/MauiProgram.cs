@@ -1,5 +1,6 @@
 using System.Text;
 using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkiaSharp.Views.Maui.Controls.Hosting;
@@ -34,6 +35,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
+            .UseMauiCommunityToolkitMediaElement()
             .UseSkiaSharp()
             .ConfigureFonts(fonts =>
             {
@@ -283,10 +285,7 @@ public static class MauiProgram
             new GameJournalService(sp.GetService<ITelemetryService>()));
         services.AddSingleton<ISessionManager, SessionManager>();
         services.AddSingleton<ITimelineFeed>(sp =>
-            new TimelineFeed(
-                sp.GetRequiredService<ISessionManager>(),
-                sp.GetService<ISessionTraceService>(),
-                sp.GetService<ISessionHistoryService>()));
+            new TimelineFeed());
         services.AddSingleton<IChatPromptBuilder, ChatPromptBuilder>();
         services.AddSingleton<IVoiceGroundingCoordinator>(sp =>
             new VoiceGroundingCoordinator(packService: sp.GetService<IGameSkillPackService>()));

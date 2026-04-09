@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows.Input;
+using WitnessDesktop.Models;
 
 namespace WitnessDesktop.Models.Timeline;
 
@@ -32,6 +33,7 @@ public class TimelineEvent : INotifyPropertyChanged
     public bool IsDirectChat => Type == EventOutputType.DirectMessage;
     public ChatMessage? LinkedMessage { get; set; }
     public ToolCallInfo? ToolCall { get; set; }
+    public MediaContent? Media { get; set; }
 
     /// <summary>True when this event should render as a full readable bubble. The global latest event is expanded by default.</summary>
     public bool IsExpanded

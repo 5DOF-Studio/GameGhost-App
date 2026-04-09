@@ -4,7 +4,7 @@
 - **Phase:** Post-sync — gaimer-v2 overlay complete, build verified
 - **Branch:** `sync/gaimer-v2-april-07`
 - **Last Activity:** 2026-04-09
-- **Baseline:** gaimer-v2 @ `643b680` (incremental overlay sync)
+- **Baseline:** gaimer-v2 @ `9b8c1e0` (incremental overlay sync)
 
 ## Project Identity
 - **Product Name:** Game Ghost
@@ -50,7 +50,7 @@ dotnet build src/WitnessDesktop/WitnessDesktop/WitnessDesktop.csproj -f net8.0-m
 ## Sync Model
 - Source: `/Users/tonynlemadim/Developer/gAImer_desktop` (gaimer remote)
 - Method: Targeted overlay (replaced full-overlay model with selective source sync)
-- Baseline: `643b680` on `gaimer-v2`
+- Baseline: `9b8c1e0` on `gaimer-v2`
 - Future syncs: Resume overlay from this baseline
 - Branding: automated via `scripts/apply_branding.sh`
 - See: `SYNC_NOTES.md` for workflow details
@@ -66,5 +66,5 @@ dotnet build src/WitnessDesktop/WitnessDesktop/WitnessDesktop.csproj -f net8.0-m
 
 ## Session Continuity
 - **Last session:** 2026-04-09
-- **Stopping point:** Incremental overlay sync (643b680), branding applied, build verified
+- **Stopping point:** Incremental overlay sync (9b8c1e0), branding applied, build verified
 - **Next session start:** Read `chronicles/HANDOFF.md`

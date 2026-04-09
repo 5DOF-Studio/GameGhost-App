@@ -93,7 +93,7 @@ public sealed class ExchangeManager : IExchangeManager, IDisposable
             var now = DateTime.UtcNow;
             _currentExchange = new ExchangeSession
             {
-                State = ExchangeState.ExchangeActive,
+                State = ExchangeState.WakeDetected,
                 OpenedAtUtc = now,
                 LastActivityUtc = now,
                 AgentName = agentName,
@@ -109,9 +109,12 @@ public sealed class ExchangeManager : IExchangeManager, IDisposable
             ["mode"] = _mode.ToString()
         });
 
-        // Fire all state change events outside lock
+        // Advance through the open sequence so observers reading CurrentState during
+        // callbacks see a state consistent with the event being raised.
         ExchangeStateChanged?.Invoke(this, ExchangeState.WakeDetected);
+        UpdateExchangeState(ExchangeState.ExchangeOpening);
         ExchangeStateChanged?.Invoke(this, ExchangeState.ExchangeOpening);
+        activeSession = UpdateExchangeState(ExchangeState.ExchangeActive);
         ExchangeStateChanged?.Invoke(this, ExchangeState.ExchangeActive);
         ExchangeOpened?.Invoke(this, activeSession);
     }
@@ -199,6 +202,18 @@ public sealed class ExchangeManager : IExchangeManager, IDisposable
             _disposed = true;
             StopSilenceTimer();
             _currentExchange = null;
+        }
+    }
+
+    private ExchangeSession UpdateExchangeState(ExchangeState state)
+    {
+        lock (_lock)
+        {
+            if (_currentExchange is null)
+                throw new InvalidOperationException("Cannot update state when no exchange is active.");
+
+            _currentExchange = _currentExchange with { State = state };
+            return _currentExchange;
         }
     }
 }

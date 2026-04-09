@@ -39,7 +39,6 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
 
     private const int MinWindowDimension = 200;
     private const int DefaultCaptureIntervalMs = 5000; // Default: 1 frame per 5 seconds
-    private const int ChangeDetectionPollIntervalMs = 5000;
     private int _captureIntervalMs = DefaultCaptureIntervalMs;
     private int _captureCount;
 
@@ -245,7 +244,7 @@ public sealed class WindowCaptureService : IWindowCaptureService, IDisposable
             lock (_gate)
             {
                 if (IsCapturing && !_disposed)
-                    _captureTimer?.Change(Math.Min(_captureIntervalMs, ChangeDetectionPollIntervalMs), Timeout.Infinite);
+                    _captureTimer?.Change(_captureIntervalMs, Timeout.Infinite);
             }
         }
     }

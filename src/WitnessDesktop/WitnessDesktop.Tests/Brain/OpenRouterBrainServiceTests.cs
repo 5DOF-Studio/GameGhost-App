@@ -356,6 +356,55 @@ public class OpenRouterBrainServiceTests : IDisposable
         delta.Should().BeGreaterThan(TimeSpan.FromMilliseconds(120));
     }
 
+    [Fact]
+    public async Task SubmitImageAsync_FailureStillStartsCooldown_ForNextRequest()
+    {
+        var requestTimes = new List<DateTime>();
+        var callCount = 0;
+        var handler = new MockHttpHandler(async (_, _) =>
+        {
+            requestTimes.Add(DateTime.UtcNow);
+            await Task.Delay(10);
+            callCount++;
+
+            if (callCount == 1)
+            {
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(
+                        """{"error":{"message":"transient upstream failure"}}""",
+                        System.Text.Encoding.UTF8,
+                        "application/json")
+                };
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """{"choices":[{"message":{"content":"recovered"},"finish_reason":"stop"}]}""",
+                    System.Text.Encoding.UTF8,
+                    "application/json")
+            };
+        });
+
+        using var sut = CreateServiceWithHandler(
+            handler,
+            imageAnalysisMinInterval: TimeSpan.FromMilliseconds(150),
+            maxOpenRouterRetries: 0,
+            openRouterRetryBaseDelay: TimeSpan.Zero);
+
+        await sut.SubmitImageAsync(new byte[] { 1 }, "first");
+        var first = await ReadResultWithTimeout(sut);
+
+        await sut.SubmitImageAsync(new byte[] { 2 }, "second");
+        var second = await ReadResultWithTimeout(sut);
+
+        first.Type.Should().Be(BrainResultType.Error);
+        second.Type.Should().Be(BrainResultType.ImageAnalysis);
+        requestTimes.Should().HaveCount(2);
+        (requestTimes[1] - requestTimes[0]).Should().BeGreaterThan(TimeSpan.FromMilliseconds(120));
+    }
+
     // ── SubmitQueryAsync ──────────────────────────────────────────────────────
 
     [Fact]

@@ -34,6 +34,13 @@ public interface IGhostModeService
     /// <summary>Dismiss the current event card.</summary>
     void DismissCard();
 
+    /// <summary>Show a video replay clip in ghost mode.</summary>
+    /// <param name="filePath">Absolute path to the local video file.</param>
+    /// <param name="startTime">Seek offset in seconds within the file.</param>
+    /// <param name="duration">Clip length in seconds.</param>
+    /// <param name="title">Optional title displayed above the video.</param>
+    void ShowVideoCard(string filePath, double startTime, double duration, string? title);
+
     /// <summary>Position the ghost panel at the given screen coordinates (AppKit origin).</summary>
     void SetPosition(double x, double y);
 

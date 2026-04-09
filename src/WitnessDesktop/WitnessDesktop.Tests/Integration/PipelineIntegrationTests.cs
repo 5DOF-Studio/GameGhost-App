@@ -32,8 +32,7 @@ public class PipelineIntegrationTests
         var logger = NullLogger<MockBrainService>.Instance;
         var brain = new MockBrainService(logger);
 
-        var sessionManager = new SessionManager();
-        var timeline = new TimelineFeed(sessionManager);
+        var timeline = new TimelineFeed();
         var contextService = new BrainContextService(new VisualReelService());
         var router = new BrainEventRouter(timeline, brainContext: contextService);
 

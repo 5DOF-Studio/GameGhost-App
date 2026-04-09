@@ -93,6 +93,14 @@ internal static class GhostModeNativeMethods
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void ghost_panel_dismiss_card();
 
+    /// <summary>Shows a video card with file path, seek offset, and duration.</summary>
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern void ghost_panel_show_video(
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string filePath,
+        double startTime,
+        double duration,
+        [MarshalAs(UnmanagedType.LPUTF8Str)] string? title);
+
     // --- Callbacks ---
 
     /// <summary>Registers a callback invoked when the user taps the FAB.</summary>

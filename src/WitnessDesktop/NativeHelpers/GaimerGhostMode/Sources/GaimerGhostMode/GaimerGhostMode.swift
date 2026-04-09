@@ -108,6 +108,30 @@ public func ghostPanelShowCard(
     }
 }
 
+/// Export 6b: Shows a video card with file path, seek offset, and duration.
+/// String pointer converted BEFORE async block (.NET frees buffer after return).
+@_cdecl("ghost_panel_show_video")
+public func ghostPanelShowVideo(
+    filePathPtr: UnsafePointer<CChar>,
+    startTime: Double,
+    duration: Double,
+    titlePtr: UnsafePointer<CChar>?
+) {
+    // Convert strings BEFORE async block (pointer freed by .NET after return)
+    let filePath = String(cString: filePathPtr)
+    let title: String? = titlePtr.map { String(cString: $0) }
+
+    DispatchQueue.main.async {
+        let fileURL = URL(fileURLWithPath: filePath)
+        sharedGhostFabSDK.showVideoCard(
+            title: title,
+            fileURL: fileURL,
+            startTime: startTime,
+            duration: duration
+        )
+    }
+}
+
 /// Export 7: Dismisses the current card (cancels auto-dismiss, fires callback).
 @_cdecl("ghost_panel_dismiss_card")
 public func ghostPanelDismissCard() {

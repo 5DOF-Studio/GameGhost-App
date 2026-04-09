@@ -1,3 +1,4 @@
+using Moq;
 using WitnessDesktop.Models;
 using WitnessDesktop.Services;
 using WitnessDesktop.Services.Local;
@@ -77,7 +78,7 @@ public class EndToEndTests
         // Cloud-first UX: diagnostics always show cloud regardless of persisted mode
         var settings = new SettingsService();
         var runtime = new MockLocalModelRuntime(available: false);
-        var vm = new SettingsViewModel(settings, runtime);
+        var vm = new SettingsViewModel(settings, runtime, new Mock<IBargeInPolicyService>().Object);
 
         // Set LocalFirst — persists to settings but diagnostics still show cloud
         vm.InferenceMode = InferenceMode.LocalFirst;

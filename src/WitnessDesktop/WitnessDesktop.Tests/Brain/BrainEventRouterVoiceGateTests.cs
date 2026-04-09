@@ -50,7 +50,7 @@ public class BrainEventRouterVoiceGateTests
     [Fact]
     public void OnBrainHint_GateDeliver_SendsToVoice()
     {
-        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.WhenIdle))
+        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.WhenIdle, BrainResultType.ProactiveAlert))
             .Returns(DeliveryDecision.Deliver);
         var sut = CreateSut(_mockGate.Object);
 
@@ -63,7 +63,7 @@ public class BrainEventRouterVoiceGateTests
     [Fact]
     public void OnBrainHint_GateSuppress_SkipsVoice()
     {
-        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.WhenIdle))
+        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.WhenIdle, BrainResultType.ProactiveAlert))
             .Returns(DeliveryDecision.Suppress);
         var sut = CreateSut(_mockGate.Object);
 
@@ -119,7 +119,7 @@ public class BrainEventRouterVoiceGateTests
     [Fact]
     public void OnBrainHint_GateSuppress_StillRoutesToTimeline()
     {
-        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.WhenIdle))
+        _mockGate.Setup(g => g.ShouldDeliver(BrainResultPriority.WhenIdle, BrainResultType.ProactiveAlert))
             .Returns(DeliveryDecision.Suppress);
         var sut = CreateSut(_mockGate.Object);
 

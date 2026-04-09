@@ -681,6 +681,9 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
             {
                 try
                 {
+                    if (toolCall.ToolName == "show_replay")
+                        return;
+
                     if (!_ghostModeService.IsGhostModeActive && !IsFabActive) return;
 
                     SlidingPanelContent = new SlidingPanelContent
@@ -711,6 +714,39 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                 }
                 catch (Exception ex) { Services.CrashLogger.LogMainThreadException("ToolCallReceived", ex); }
             });
+
+        // Subscribe to show_replay tool results for ghost video playback only.
+        _brainEventRouter.ToolCallReceived += (toolCall) =>
+        {
+            if (toolCall.ToolName != "show_replay") return;
+            if (string.IsNullOrEmpty(toolCall.OutputJson)) return;
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                try
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(toolCall.OutputJson!);
+                    var root = doc.RootElement;
+                    if (root.GetProperty("status").GetString() != "success") return;
+
+                    var filePath = root.GetProperty("filePath").GetString();
+                    var startTime = root.GetProperty("startTime").GetDouble();
+                    var duration = root.GetProperty("duration").GetDouble();
+                    var title = root.TryGetProperty("title", out var titleProp)
+                        ? titleProp.GetString() : null;
+
+                    if (string.IsNullOrEmpty(filePath)) return;
+
+                    if (!_ghostModeService.IsGhostModeActive) return;
+
+                    _ghostModeService.ShowVideoCard(filePath, startTime, duration, title);
+                }
+                catch (Exception ex)
+                {
+                    Services.CrashLogger.LogMainThreadException("ShowReplayRouting", ex);
+                }
+            });
+        };
 
         // Subscribe to drip-fed analysis events for ghost/FAB card rendering
         _brainEventRouter.AnalysisEventEmitted += (evt) =>
@@ -1797,6 +1833,9 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                 SelectedTarget?.WindowTitle,
                 SelectedTarget?.ProcessName);
 
+            // Sweep stale replays from previous sessions before starting new recording
+            _replayRecording?.SweepStaleReplays();
+
             // Start replay recording alongside brain capture (fire-and-forget)
             if (SelectedTarget?.Handle is { } windowHandle)
             {
@@ -2833,9 +2872,6 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
         _brainEventRouter.OnDirectMessage(userMsg, brainReply);
 
         await Task.Delay(500);
-
-        // === OUT-GAME CHECKPOINT: Post-game analysis events ===
-        _timelineFeed.NewConversationCheckpoint();
 
         await Task.Delay(300);
 

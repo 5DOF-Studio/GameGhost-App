@@ -35,14 +35,14 @@ Keep `GameGhost-App` current with shared engine/features from `gaimer-desktop` w
 - Immediately for security/stability fixes.
 - Milestone-based for larger architectural changes.
 
-## Current Handoff (2026-04-09)
-- Previous baseline: `40163ce` on `gaimer-v2` (2026-04-07)
-- New baseline: `643b680` on `gaimer-v2` (incremental overlay sync)
-- Sync method: Targeted overlay of 31 new commits (30 source files, +9,414 lines)
-- New features synced: Team Phase C+D (settings, ConnectorCard, pre-flight, context population), Team Phase G (permission request UI, event wiring, countdown/timeout), Settings sidebar-nav migration (Vision/Voice/Brain/Team tabs), BrainPromptBuilder pack-driven constructor fix, voice deferral ack fix, BrainContextFormatter
-- Branding pass applied via `scripts/apply_branding.sh`: Game Ghost Dashboard, Ghost Team references, Settings sidebar
-- Internal service/interface names (`IGaimerTeamService`, `GaimerPipeClient`, etc.) preserved as internal identifiers
-- Resume overlay from `643b680` for future syncs
+## Current Handoff (2026-04-09b)
+- Previous baseline: `643b680` on `gaimer-v2` (2026-04-09)
+- New baseline: `9b8c1e0` on `gaimer-v2` (incremental overlay sync)
+- Sync method: Targeted overlay of 35 new commits (59 source files, +7,621 / -1,300 lines)
+- New features synced: Timeline redesign (flat list replacing checkpoint/bucket architecture), media cards (ImageCard/VideoCard), show_replay tool (timestamp resolution, surface routing), Ghost FAB video (SpineCardView with AVPlayerLayer), replay cleanup (24h retention sweep), codebase audit fixes (1723 tests)
+- Deleted files: EventLine.cs, TimelineCheckpoint.cs (timeline refactor)
+- Branding pass applied via `scripts/apply_branding.sh` (3 replacements + 1 manual fix in ToolDefinition.cs, script updated)
+- Resume overlay from `9b8c1e0` for future syncs
 
 ## Previous Handoff (2026-04-07)
 - Baseline: `40163ce` on `gaimer-v2`

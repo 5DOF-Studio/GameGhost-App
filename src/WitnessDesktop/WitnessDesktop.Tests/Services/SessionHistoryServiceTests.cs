@@ -96,36 +96,6 @@ public class SessionHistoryServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task PersistTimelineCheckpoint_RoundTrips()
-    {
-        // Arrange
-        var sut = new SessionHistoryService(_dbPath);
-        await sut.StartSessionAsync("sess-cp01", null, null, null, null, null);
-
-        var checkpoint = new TimelineCheckpoint
-        {
-            Id = "cp-round01",
-            Timestamp = DateTime.UtcNow,
-            ScreenshotRef = "/captures/frame001.jpg",
-            GameTimeIn = TimeSpan.FromMinutes(3.5),
-            CaptureMethod = "ScreenCaptureKit"
-        };
-
-        // Act
-        await sut.PersistTimelineCheckpointAsync("sess-cp01", checkpoint, displayOrder: 2);
-
-        // Assert
-        using var ctx = GaimerHistoryDbContext.CreateForPath(_dbPath);
-        var loaded = await ctx.TimelineCheckpoints.FindAsync("cp-round01");
-        loaded.Should().NotBeNull();
-        loaded!.SessionId.Should().Be("sess-cp01");
-        loaded.ScreenshotRef.Should().Be("/captures/frame001.jpg");
-        loaded.GameTimeMs.Should().Be(210000); // 3.5 min = 210000 ms
-        loaded.Method.Should().Be("ScreenCaptureKit");
-        loaded.DisplayOrder.Should().Be(2);
-    }
-
-    [Fact]
     public async Task PersistTimelineEvent_WithBrainMetadata_FlattensFields()
     {
         // Arrange
@@ -169,15 +139,6 @@ public class SessionHistoryServiceTests : IDisposable
         var sut = new SessionHistoryService(_dbPath);
         await sut.StartSessionAsync("sess-tool01", null, null, null, null, null);
 
-        // Create the parent checkpoint first (FK constraint)
-        var parentCheckpoint = new TimelineCheckpoint
-        {
-            Id = "cp-parent",
-            Timestamp = DateTime.UtcNow,
-            CaptureMethod = "ScreenCaptureKit"
-        };
-        await sut.PersistTimelineCheckpointAsync("sess-tool01", parentCheckpoint, displayOrder: 0);
-
         var evt = new TimelineEvent
         {
             Id = "evt-tool01",
@@ -191,8 +152,8 @@ public class SessionHistoryServiceTests : IDisposable
             }
         };
 
-        // Act
-        await sut.PersistTimelineEventAsync("sess-tool01", evt, checkpointId: "cp-parent", displayOrder: 3);
+        // Act — pass null for checkpointId (no checkpoint records created from managed code)
+        await sut.PersistTimelineEventAsync("sess-tool01", evt, checkpointId: null, displayOrder: 3);
 
         // Assert
         using var ctx = GaimerHistoryDbContext.CreateForPath(_dbPath);
@@ -200,7 +161,7 @@ public class SessionHistoryServiceTests : IDisposable
         loaded.Should().NotBeNull();
         loaded!.ToolName.Should().Be("analyze_position");
         loaded.ToolDurationMs.Should().Be(1250);
-        loaded.CheckpointId.Should().Be("cp-parent");
+        loaded.CheckpointId.Should().BeNull();
         loaded.DisplayOrder.Should().Be(3);
     }
 
@@ -300,12 +261,13 @@ public class SessionHistoryServiceTests : IDisposable
             Timestamp = DateTime.UtcNow
         });
 
-        var writeTask2 = sut.PersistTimelineCheckpointAsync("sess-race01", new TimelineCheckpoint
+        var writeTask2 = sut.PersistTimelineEventAsync("sess-race01", new TimelineEvent
         {
-            Id = "cp-race01",
-            Timestamp = DateTime.UtcNow,
-            CaptureMethod = "test"
-        }, displayOrder: 0);
+            Id = "evt-race01",
+            Type = EventOutputType.SageAdvice,
+            Summary = "Race event 1",
+            Timestamp = DateTime.UtcNow
+        }, null, 0);
 
         // Wait for everything to complete
         await Task.WhenAll(startTask, writeTask1, writeTask2);
@@ -316,8 +278,8 @@ public class SessionHistoryServiceTests : IDisposable
         msg.Should().NotBeNull();
         msg!.Content.Should().Be("Race message 1");
 
-        var cp = await ctx.TimelineCheckpoints.FindAsync("cp-race01");
-        cp.Should().NotBeNull();
+        var evt = await ctx.TimelineEvents.FindAsync("evt-race01");
+        evt.Should().NotBeNull();
     }
 
     [Fact]

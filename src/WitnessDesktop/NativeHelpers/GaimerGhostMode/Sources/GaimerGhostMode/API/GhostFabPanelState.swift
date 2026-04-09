@@ -50,6 +50,7 @@ public enum GhostFabCardContent {
     case none
     case text(title: String?, message: String, eventIcon: NSImage? = nil, fixedHeight: CGFloat? = nil, isAlert: Bool = false)
     case image(title: String? = nil, image: NSImage, fixedHeight: CGFloat, isAlert: Bool = false)
+    case video(title: String?, fileURL: URL, startTime: TimeInterval, duration: TimeInterval)
 }
 
 public struct GhostFabPanelState {

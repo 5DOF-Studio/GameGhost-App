@@ -22,6 +22,7 @@ public static class ToolDefinitions
         AnalyzePositionStrategic,
         GameJournal,
         SearchReplay,
+        ShowReplay,
         DelegateToTeam
     ];
 
@@ -140,6 +141,19 @@ public static class ToolDefinitions
         ActionLabel = "Searching footage",
         ParametersSchema = """{"type":"object","properties":{"query":{"type":"string","description":"What to search for in gameplay footage"},"time_hint":{"type":"string","description":"Optional time context like 'last 2 minutes' or 'round 3'"}},"required":["query"]}""",
         RequiresInGame = false
+    };
+
+    // ── Show Replay (Media Cards) ─────────────────────────────────────────
+
+    public static readonly ToolDefinition ShowReplay = new()
+    {
+        Name = "show_replay",
+        DisplayName = "Show Replay",
+        Description = "Show a short video replay clip. Use when the user asks to see something that just happened, or when pointing out a notable moment.",
+        Icon = "tool_history.png",
+        ActionLabel = "Showing replay",
+        ParametersSchema = """{"type":"object","properties":{"timestamp":{"type":"string","description":"When to start the clip. Absolute session time ('2:15'), relative ('now-30s'), or anchor ('last_kill', 'last_death')."},"duration":{"type":"integer","description":"Clip length in seconds. Default 30, max 60.","default":30},"title":{"type":"string","description":"Optional title shown above the video (e.g. 'THAT FLANK', 'WATCH THIS')"}},"required":["timestamp"]}""",
+        RequiresInGame = true
     };
 
     // ── Gaimer Team (Phase A) ─────────────────────────────────────────────

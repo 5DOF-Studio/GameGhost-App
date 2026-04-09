@@ -75,8 +75,14 @@ public class VoiceTranscriptStoreTests
     public void AddTurn_CapsAt100Turns()
     {
         var store = new VoiceTranscriptStore();
+        var baseTime = DateTime.UtcNow;
         for (int i = 0; i < 120; i++)
-            store.AddTurn(new VoiceTranscriptTurn { Role = TranscriptRole.User, Text = $"msg-{i}" });
+            store.AddTurn(new VoiceTranscriptTurn
+            {
+                TimestampUtc = baseTime.AddSeconds(i),
+                Role = TranscriptRole.User,
+                Text = $"msg-{i}"
+            });
 
         var recent = store.GetRecent(200);
         recent.Should().HaveCount(100);

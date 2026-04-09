@@ -21,7 +21,7 @@ public class ToolDefinitionTests
         var allTools = ToolDefinitions.All;
 
         allTools.Count(t => !t.RequiresInGame).Should().Be(3);
-        allTools.Count(t => t.RequiresInGame).Should().Be(5);
+        allTools.Count(t => t.RequiresInGame).Should().Be(6); // +1 for ShowReplay (Plan 3)
     }
 
     [Fact]

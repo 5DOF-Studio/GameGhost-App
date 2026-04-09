@@ -44,6 +44,11 @@
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.1" />
 	</ItemGroup>
 
+	<!-- Exclude tests that require MAUI types (DataTemplate, etc.) from net8.0 build -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<Compile Remove="Models\MediaContentTests.cs" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\WitnessDesktop\WitnessDesktop.csproj" />
 	</ItemGroup>

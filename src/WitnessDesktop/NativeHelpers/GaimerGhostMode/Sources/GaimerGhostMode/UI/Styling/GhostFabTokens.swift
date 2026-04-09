@@ -87,6 +87,9 @@ public enum GhostFabTokens {
     /// #EF4444 -- microphone indicator
     public static let MicRed = _color(0xEF, 0x44, 0x44)
 
+    /// #00D4FF -- cyan accent (progress bar, highlights)
+    public static let CyanAccent = _color(0x00, 0xD4, 0xFF)
+
     // MARK: - Gradient Layer Factories
 
     /// Radial gradient from center for the ghost FAB fill.

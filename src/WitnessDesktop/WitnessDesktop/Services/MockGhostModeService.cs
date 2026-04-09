@@ -51,6 +51,11 @@ public class MockGhostModeService : IGhostModeService
         Console.WriteLine("[MockGhostModeService] DismissCard (no-op)");
     }
 
+    public void ShowVideoCard(string filePath, double startTime, double duration, string? title)
+    {
+        Console.WriteLine($"[MockGhostModeService] ShowVideoCard: path={filePath}, start={startTime}, duration={duration}, title={title} (no-op)");
+    }
+
     public void SetPosition(double x, double y) { }
 
     public void SetSize(double width, double height) { }

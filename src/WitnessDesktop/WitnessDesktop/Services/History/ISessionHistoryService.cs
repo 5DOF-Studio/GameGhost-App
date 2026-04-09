@@ -22,7 +22,5 @@ public interface ISessionHistoryService
 
     Task PersistChatMessageAsync(string sessionId, ChatMessage message);
 
-    Task PersistTimelineCheckpointAsync(string sessionId, TimelineCheckpoint checkpoint, int displayOrder);
-
     Task PersistTimelineEventAsync(string sessionId, TimelineEvent evt, string? checkpointId, int displayOrder);
 }

@@ -2,7 +2,6 @@ using System.Threading.Channels;
 using WitnessDesktop.Models;
 using WitnessDesktop.Models.Timeline;
 using WitnessDesktop.Services;
-using WitnessDesktop.Services.Conversation;
 
 namespace WitnessDesktop.Tests.Integration;
 
@@ -45,9 +44,7 @@ public class ChannelPipelineTests
     public async Task BrainEventRouter_ChannelConsumer_RoutesAllResults()
     {
         var channel = Channel.CreateUnbounded<BrainResult>();
-        var mockSession = new Mock<ISessionManager>();
-        mockSession.Setup(s => s.CurrentState).Returns(SessionState.InGame);
-        var timeline = new TimelineFeed(mockSession.Object);
+        var timeline = new TimelineFeed();
 
         var router = new BrainEventRouter(timeline);
         router.StartConsuming(channel.Reader, CancellationToken.None);
@@ -75,11 +72,7 @@ public class ChannelPipelineTests
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
         while (!cts.IsCancellationRequested)
         {
-            var eventCount = timeline.Checkpoints
-                .SelectMany(cp => cp.EventLines)
-                .SelectMany(el => el.Events)
-                .Count();
-            if (eventCount >= 1)
+            if (timeline.Events.Count >= 1)
             {
                 break;
             }
@@ -88,12 +81,8 @@ public class ChannelPipelineTests
         router.StopConsuming();
 
         // Verify ToolResult event was routed to timeline
-        timeline.Checkpoints.Should().NotBeEmpty();
-        var allEvents = timeline.Checkpoints
-            .SelectMany(cp => cp.EventLines)
-            .SelectMany(el => el.Events)
-            .ToList();
-        allEvents.Should().HaveCountGreaterThanOrEqualTo(1);
-        allEvents.Should().NotContain(e => e.Type == EventOutputType.ImageAnalysis);
+        timeline.Events.Should().NotBeEmpty();
+        timeline.Events.Should().HaveCountGreaterThanOrEqualTo(1);
+        timeline.Events.Should().NotContain(e => e.Type == EventOutputType.ImageAnalysis);
     }
 }

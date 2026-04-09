@@ -3,6 +3,7 @@ using WitnessDesktop.Models;
 using WitnessDesktop.Models.Timeline;
 using WitnessDesktop.Services;
 using WitnessDesktop.Services.Conversation;
+using WitnessDesktop.Services.History;
 
 namespace WitnessDesktop.Tests.Brain;
 
@@ -12,6 +13,8 @@ public class BrainEventRouterTests
     private readonly Mock<IConversationProvider> _mockVoice;
     private readonly Mock<IBrainContextService> _mockBrainContext;
     private readonly Mock<IGameJournalService> _mockJournal;
+    private readonly Mock<ISessionHistoryService> _mockHistory;
+    private readonly Mock<ISessionTraceService> _mockSessionTrace;
     private readonly Mock<IVoiceGroundingCoordinator> _mockVoiceGrounding;
     private string? _capturedTopStrip;
 
@@ -21,6 +24,8 @@ public class BrainEventRouterTests
         _mockVoice = new Mock<IConversationProvider>();
         _mockBrainContext = new Mock<IBrainContextService>();
         _mockJournal = new Mock<IGameJournalService>();
+        _mockHistory = new Mock<ISessionHistoryService>();
+        _mockSessionTrace = new Mock<ISessionTraceService>();
         _mockVoiceGrounding = new Mock<IVoiceGroundingCoordinator>();
 
         _mockVoice.Setup(v => v.SendContextualUpdateAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -32,6 +37,13 @@ public class BrainEventRouterTests
         // Default: validation passes (tests override as needed)
         _mockJournal.Setup(j => j.ValidateTemporalConsistency(It.IsAny<string?>()))
             .Returns(new TemporalValidation(true, null, "Consistent"));
+        _mockHistory.Setup(h => h.PersistTimelineEventAsync(
+                It.IsAny<string>(),
+                It.IsAny<TimelineEvent>(),
+                It.IsAny<string?>(),
+                It.IsAny<int>()))
+            .Returns(Task.CompletedTask);
+        _mockSessionTrace.SetupGet(t => t.SessionId).Returns("session-replay-1");
     }
 
     private BrainEventRouter CreateSut(bool withVoice = false, bool withJournal = false, bool withGrounding = false)
@@ -42,7 +54,9 @@ public class BrainEventRouterTests
             s => _capturedTopStrip = s,
             _mockBrainContext.Object,
             gameJournal: withJournal ? _mockJournal.Object : null,
-            voiceGrounding: withGrounding ? _mockVoiceGrounding.Object : null);
+            voiceGrounding: withGrounding ? _mockVoiceGrounding.Object : null,
+            historyService: _mockHistory.Object,
+            sessionTrace: _mockSessionTrace.Object);
     }
 
     private static BrainHint MakeHint(
@@ -286,15 +300,6 @@ public class BrainEventRouterTests
     }
 
     // ── OnScreenCapture ─────────────────────────────────────────────────────
-
-    [Fact]
-    public void OnScreenCapture_CallsNewCapture()
-    {
-        var sut = CreateSut();
-        sut.OnScreenCapture("screenshot-001.png", TimeSpan.FromMinutes(5), "manual");
-
-        _mockTimeline.Verify(t => t.NewCapture("screenshot-001.png", TimeSpan.FromMinutes(5), "manual"));
-    }
 
     [Fact]
     public void OnScreenCapture_InvokesTopStrip()
@@ -936,6 +941,50 @@ public class BrainEventRouterTests
 
         sut.OnToolCall(toolCall);
 
+        received.Should().BeSameAs(toolCall);
+    }
+
+    [Fact]
+    public void OnToolCall_ShowReplay_RoutesVideoCardAndPersistsIt()
+    {
+        var sut = CreateSut();
+        ToolCallInfo? received = null;
+        sut.ToolCallReceived += tc => received = tc;
+
+        var toolCall = new ToolCallInfo
+        {
+            ToolName = "show_replay",
+            Success = true,
+            OutputJson = """
+            {
+              "status": "success",
+              "filePath": "/tmp/replays/segment-0.mp4",
+              "startTime": 60.0,
+              "duration": 30.0,
+              "title": "WATCH THIS"
+            }
+            """
+        };
+
+        sut.OnToolCall(toolCall);
+
+        _mockTimeline.Verify(t => t.AddEvent(It.Is<TimelineEvent>(e =>
+            e.Type == EventOutputType.ToolCall)), Times.Never);
+        _mockTimeline.Verify(t => t.AddEvent(It.Is<TimelineEvent>(e =>
+            e.Type == EventOutputType.VideoCard &&
+            e.Media != null &&
+            e.Media.FilePath == "/tmp/replays/segment-0.mp4" &&
+            e.Media.StartTime == 60.0 &&
+            e.Media.Duration == 30.0 &&
+            e.Media.Title == "WATCH THIS")), Times.Once);
+        _mockHistory.Verify(h => h.PersistTimelineEventAsync(
+            "session-replay-1",
+            It.Is<TimelineEvent>(e =>
+                e.Type == EventOutputType.VideoCard &&
+                e.Media != null &&
+                e.Media.FilePath == "/tmp/replays/segment-0.mp4"),
+            null,
+            0), Times.Once);
         received.Should().BeSameAs(toolCall);
     }
 

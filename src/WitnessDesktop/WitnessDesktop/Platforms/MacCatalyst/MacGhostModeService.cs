@@ -167,6 +167,13 @@ public class MacGhostModeService : IGhostModeService, IDisposable
         GhostModeNativeMethods.ghost_panel_dismiss_card();
     }
 
+    public void ShowVideoCard(string filePath, double startTime, double duration, string? title)
+    {
+        if (!_isSupported) return;
+
+        GhostModeNativeMethods.ghost_panel_show_video(filePath, startTime, duration, title);
+    }
+
     public void SetPosition(double x, double y)
     {
         if (!_isSupported) return;

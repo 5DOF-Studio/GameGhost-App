@@ -97,6 +97,7 @@ public sealed class ToolExecutor
                 "game_journal" => ExecuteGameJournal(argumentsJson),
                 "web_search" => await ExecuteWebSearchAsync(argumentsJson, ct),
                 "search_replay" => await ExecuteSearchReplayAsync(argumentsJson, ct),
+                "show_replay" => await ExecuteShowReplayAsync(argumentsJson, ct),
                 "delegate_to_team" => await ExecuteDelegateToTeamAsync(argumentsJson, ct),
                 _ => JsonSerializer.Serialize(new { error = "Unknown tool", tool_name = toolName })
             };
@@ -783,6 +784,110 @@ public sealed class ToolExecutor
         }
     }
 
+    // ── show_replay (timestamp → video card) ────────────────────────────
+
+    private async Task<string> ExecuteShowReplayAsync(string argumentsJson, CancellationToken ct)
+    {
+        string? timestamp = null;
+        int duration = 30;
+        string? title = null;
+
+        try
+        {
+            using var doc = JsonDocument.Parse(argumentsJson);
+            if (doc.RootElement.TryGetProperty("timestamp", out var tsProp))
+                timestamp = tsProp.GetString();
+            if (doc.RootElement.TryGetProperty("duration", out var durProp))
+                duration = Math.Clamp(durProp.GetInt32(), 1, 60);
+            if (doc.RootElement.TryGetProperty("title", out var titleProp))
+                title = titleProp.GetString();
+        }
+        catch (JsonException) { }
+
+        if (string.IsNullOrWhiteSpace(timestamp))
+        {
+            return JsonSerializer.Serialize(new
+            {
+                status = "error",
+                reason = "Missing required 'timestamp' parameter"
+            });
+        }
+
+        if (_replayRecording is null || !_replayRecording.IsRecording)
+        {
+            return JsonSerializer.Serialize(new
+            {
+                status = "no_footage",
+                reason = "Replay recording is not active. No footage available."
+            });
+        }
+
+        var segments = _replayRecording.GetAvailableSegments();
+        if (segments.Count == 0)
+        {
+            return JsonSerializer.Serialize(new
+            {
+                status = "no_footage",
+                reason = "No recorded segments available yet."
+            });
+        }
+
+        // Determine session start from context
+        var ctx = _sessionManager.Context;
+        var sessionStartUtc = ctx.GameStartedAt.HasValue
+            ? new DateTimeOffset(ctx.GameStartedAt.Value, TimeSpan.Zero)
+            : segments[0].StartUtc; // Fallback to first segment start
+
+        // Try synchronous resolution first (absolute "M:SS" or relative "now-Ns")
+        var resolved = ResolveTimestamp(timestamp, segments, sessionStartUtc, duration);
+
+        // If not resolved, try anchor resolution via analysis store
+        if (resolved is null && _segmentAnalysisStore is not null)
+        {
+            try
+            {
+                resolved = await ResolveTimestampWithAnchorAsync(
+                    timestamp, segments, sessionStartUtc, _segmentAnalysisStore, duration, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "[ToolExecutor] show_replay: anchor resolution failed for '{Timestamp}'", timestamp);
+            }
+        }
+
+        if (resolved is null)
+        {
+            _logger.LogDebug("[ToolExecutor] show_replay: could not resolve timestamp '{Timestamp}'", timestamp);
+            return JsonSerializer.Serialize(new
+            {
+                status = "not_found",
+                reason = $"Could not find footage for timestamp '{timestamp}'. Available footage covers the last ~5 minutes.",
+                timestamp
+            });
+        }
+
+        var (filePath, seekOffset, clampedDuration) = resolved.Value;
+
+        _logger.LogDebug("[ToolExecutor] show_replay: resolved '{Timestamp}' → {FilePath} @ {Offset}s for {Duration}s",
+            timestamp, filePath, seekOffset, clampedDuration);
+        _sessionTrace?.TrackEvent("tool.show_replay.resolved", new Dictionary<string, string>
+        {
+            ["timestamp"] = timestamp,
+            ["file_path"] = filePath,
+            ["seek_offset"] = seekOffset.ToString("F1"),
+            ["duration"] = clampedDuration.ToString("F1")
+        });
+
+        return JsonSerializer.Serialize(new
+        {
+            status = "success",
+            filePath,
+            startTime = seekOffset,
+            duration = clampedDuration,
+            title = title ?? ""
+        });
+    }
+
     // ── Time Hint Parsing ─────────────────────────────────────────────────────
 
     private static readonly Regex TimeHintPattern = new(
@@ -813,6 +918,135 @@ public sealed class ToolExecutor
 
         // Unrecognized hint — don't filter, let search run against all data
         return (null, null);
+    }
+
+    // ── Timestamp Resolution (show_replay) ──────────────────────────────────
+
+    private static readonly Regex AbsoluteTimestampPattern = new(
+        @"^(\d{1,3}):(\d{2})$",
+        RegexOptions.Compiled);
+
+    private static readonly Regex RelativeTimestampPattern = new(
+        @"^now-(\d+)s$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    /// <summary>
+    /// Resolve a timestamp string to a segment file path + seek offset + clamped duration.
+    /// Supports absolute ("M:SS"), relative ("now-Ns"). For anchors, use ResolveTimestampWithAnchorAsync.
+    /// Returns null if timestamp cannot be resolved to any available segment.
+    /// </summary>
+    internal static (string filePath, double seekOffset, double clampedDuration)? ResolveTimestamp(
+        string timestamp,
+        IReadOnlyList<ReplaySegment> segments,
+        DateTimeOffset sessionStart,
+        double requestedDuration = 30,
+        DateTimeOffset? nowUtc = null)
+    {
+        if (segments.Count == 0)
+            return null;
+
+        var now = nowUtc ?? DateTimeOffset.UtcNow;
+        double? sessionRelativeSeconds = null;
+
+        // Try absolute "M:SS"
+        var absMatch = AbsoluteTimestampPattern.Match(timestamp);
+        if (absMatch.Success)
+        {
+            var minutes = int.Parse(absMatch.Groups[1].Value);
+            var seconds = int.Parse(absMatch.Groups[2].Value);
+            sessionRelativeSeconds = (minutes * 60) + seconds;
+        }
+
+        // Try relative "now-Ns"
+        if (sessionRelativeSeconds is null)
+        {
+            var relMatch = RelativeTimestampPattern.Match(timestamp);
+            if (relMatch.Success)
+            {
+                var offsetSec = int.Parse(relMatch.Groups[1].Value);
+                var sessionElapsed = (now - sessionStart).TotalSeconds;
+                sessionRelativeSeconds = sessionElapsed - offsetSec;
+            }
+        }
+
+        if (sessionRelativeSeconds is null || sessionRelativeSeconds < 0)
+            return null;
+
+        return FindSegmentAndOffset(segments, sessionStart, sessionRelativeSeconds.Value, requestedDuration);
+    }
+
+    /// <summary>
+    /// Resolve an anchor timestamp (e.g. "last_kill") by querying the analysis store
+    /// for the most recent matching event, then resolving to segment + offset.
+    /// </summary>
+    internal static async Task<(string filePath, double seekOffset, double clampedDuration)?> ResolveTimestampWithAnchorAsync(
+        string anchor,
+        IReadOnlyList<ReplaySegment> segments,
+        DateTimeOffset sessionStart,
+        ISegmentAnalysisStore store,
+        double requestedDuration,
+        CancellationToken ct)
+    {
+        if (segments.Count == 0)
+            return null;
+
+        var beats = await store.SearchAsync(anchor, startUtc: null, endUtc: null, ct: ct);
+        if (beats.Count == 0)
+            return null;
+
+        // SearchAsync can return results in FTS relevance order, so pick the chronologically latest beat.
+        var beat = beats
+            .Select(beat =>
+            {
+                if (!TimeSpan.TryParse(beat.StartTime, out var startTime))
+                    return (beat, isValid: false, startTime: TimeSpan.Zero);
+
+                return (beat, isValid: true, startTime);
+            })
+            .Where(x => x.isValid)
+            .OrderBy(x => x.startTime)
+            .ThenBy(x => TimeSpan.TryParse(x.beat.EndTime, out var endTime) ? endTime : TimeSpan.Zero)
+            .LastOrDefault().beat;
+
+        if (beat is null)
+            return null;
+
+        // Parse beat.StartTime (format "HH:mm:ss") to session-relative seconds
+        if (!TimeSpan.TryParse(beat.StartTime, out var beatTime))
+            return null;
+
+        var sessionRelativeSeconds = beatTime.TotalSeconds;
+        return FindSegmentAndOffset(segments, sessionStart, sessionRelativeSeconds, requestedDuration);
+    }
+
+    private static (string filePath, double seekOffset, double clampedDuration)? FindSegmentAndOffset(
+        IReadOnlyList<ReplaySegment> segments,
+        DateTimeOffset sessionStart,
+        double sessionRelativeSeconds,
+        double requestedDuration)
+    {
+        // Clamp requested duration to max 60s
+        var duration = Math.Min(Math.Max(requestedDuration, 1), 60);
+
+        var targetUtc = sessionStart.AddSeconds(sessionRelativeSeconds);
+
+        // Prefer the latest segment that starts before the timestamp and ends after it.
+        // This avoids pinning exact boundary timestamps to the earlier segment.
+        var segment = segments
+            .Where(s => s.StartUtc <= targetUtc && s.EndUtc > targetUtc)
+            .OrderByDescending(s => s.StartUtc)
+            .ThenByDescending(s => s.SegmentIndex)
+            .FirstOrDefault();
+        if (segment is null)
+            return null;
+
+        var seekOffset = (targetUtc - segment.StartUtc).TotalSeconds;
+
+        // Clamp duration so it doesn't exceed segment boundary
+        var maxDuration = (segment.EndUtc - targetUtc).TotalSeconds;
+        var clampedDuration = Math.Min(duration, maxDuration);
+
+        return (segment.FilePath, seekOffset, clampedDuration);
     }
 
     // ── delegate_to_team ────────────────────────────────────────────────────

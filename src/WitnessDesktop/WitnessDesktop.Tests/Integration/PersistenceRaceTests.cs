@@ -371,14 +371,6 @@ public sealed class PersistenceRaceTests : IDisposable
                 Timestamp = DateTime.UtcNow
             }));
 
-        var checkpointTasks = Enumerable.Range(0, 3).Select(i =>
-            sut.PersistTimelineCheckpointAsync(sessionId, new TimelineCheckpoint
-            {
-                Id = $"cp-mix-{i:D2}",
-                Timestamp = DateTime.UtcNow,
-                CaptureMethod = "test"
-            }, displayOrder: i));
-
         var eventTasks = Enumerable.Range(0, 5).Select(i =>
             sut.PersistTimelineEventAsync(sessionId,
                 new TimelineEvent
@@ -392,18 +384,15 @@ public sealed class PersistenceRaceTests : IDisposable
         // Wait for everything
         await Task.WhenAll(
             chatTasks
-                .Concat(checkpointTasks)
                 .Concat(eventTasks)
                 .Prepend(startTask));
 
-        // Assert — all three types persisted
+        // Assert — both types persisted
         using var ctx = GaimerHistoryDbContext.CreateForPath(_dbPath);
         var chatCount = await ctx.ChatMessages.CountAsync(m => m.SessionId == sessionId);
-        var cpCount = await ctx.TimelineCheckpoints.CountAsync(c => c.SessionId == sessionId);
         var evtCount = await ctx.TimelineEvents.CountAsync(e => e.SessionId == sessionId);
 
         chatCount.Should().Be(5, "all chat messages should be persisted");
-        cpCount.Should().Be(3, "all checkpoints should be persisted");
         evtCount.Should().Be(5, "all timeline events should be persisted");
     }
 

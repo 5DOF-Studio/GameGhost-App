@@ -34,6 +34,8 @@ public extension GhostContentView {
             )
         case let .image(_, image, fixedHeight, isAlert):
             showCardImage(image: image, fixedHeight: fixedHeight, isAlert: isAlert)
+        case let .video(_, fileURL, startTime, duration):
+            showCardVideo(url: fileURL, startTime: startTime, duration: duration)
         }
     }
 }

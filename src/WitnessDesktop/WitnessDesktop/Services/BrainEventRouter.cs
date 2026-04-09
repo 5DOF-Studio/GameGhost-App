@@ -96,13 +96,11 @@ public class BrainEventRouter : IBrainEventRouter
     private void PersistEventIfActive(TimelineEvent evt, string? checkpointId = null, int displayOrder = 0)
     {
         if (_historyService is null || _sessionTrace?.SessionId is not { } sid) return;
-        checkpointId ??= _timeline.CurrentCheckpoint?.Id;
         _ = _historyService.PersistTimelineEventAsync(sid, evt, checkpointId, displayOrder);
     }
 
     public void OnScreenCapture(string screenshotRef, TimeSpan gameTime, string method)
     {
-        _timeline.NewCapture(screenshotRef, gameTime, method);
         var captureText = $"Analyzing capture at {gameTime:m\\:ss}...";
         _topStrip?.Invoke(captureText);
         TopStripUpdated?.Invoke(captureText);
@@ -135,7 +133,7 @@ public class BrainEventRouter : IBrainEventRouter
         TopStripUpdated?.Invoke(hint.Summary);
 
         if (_voiceAgent?.IsConnected == true
-            && (_voiceDeliveryGate?.ShouldDeliver(BrainResultPriority.WhenIdle) ?? DeliveryDecision.Deliver) == DeliveryDecision.Deliver)
+            && (_voiceDeliveryGate?.ShouldDeliver(BrainResultPriority.WhenIdle, BrainResultType.ProactiveAlert) ?? DeliveryDecision.Deliver) == DeliveryDecision.Deliver)
         {
             var voiceText = PrefixWithGrounding(FormatForVoice(hint));
             _ = _voiceAgent.SendContextualUpdateAsync(voiceText)
@@ -315,6 +313,12 @@ public class BrainEventRouter : IBrainEventRouter
 
     public void OnToolCall(ToolCallInfo toolCall)
     {
+        if (TryRouteShowReplay(toolCall))
+        {
+            ToolCallReceived?.Invoke(toolCall);
+            return;
+        }
+
         var evt = new TimelineEvent
         {
             Type = EventOutputType.ToolCall,
@@ -330,6 +334,57 @@ public class BrainEventRouter : IBrainEventRouter
         _timeline.AddEvent(evt);
         PersistEventIfActive(evt);
         ToolCallReceived?.Invoke(toolCall);
+    }
+
+    private bool TryRouteShowReplay(ToolCallInfo toolCall)
+    {
+        if (!string.Equals(toolCall.ToolName, "show_replay", StringComparison.Ordinal) ||
+            !toolCall.Success ||
+            string.IsNullOrWhiteSpace(toolCall.OutputJson))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(toolCall.OutputJson);
+            var root = doc.RootElement;
+            if (!string.Equals(root.GetProperty("status").GetString(), "success", StringComparison.Ordinal))
+                return false;
+
+            var filePath = root.GetProperty("filePath").GetString();
+            if (string.IsNullOrWhiteSpace(filePath))
+                return false;
+
+            var startTime = root.GetProperty("startTime").GetDouble();
+            var duration = root.GetProperty("duration").GetDouble();
+            var title = root.TryGetProperty("title", out var titleProp)
+                ? titleProp.GetString()
+                : null;
+
+            var evt = new TimelineEvent
+            {
+                Type = EventOutputType.VideoCard,
+                Summary = title ?? "Replay",
+                Media = new MediaContent
+                {
+                    Type = MediaContentType.Video,
+                    FilePath = filePath,
+                    StartTime = startTime,
+                    Duration = duration,
+                    Title = title
+                }
+            };
+
+            _timeline.AddEvent(evt);
+            PersistEventIfActive(evt);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[BrainEventRouter] show_replay routing failed: {ex.Message}");
+            return false;
+        }
     }
 
     public void OnGeneralChat(string text)

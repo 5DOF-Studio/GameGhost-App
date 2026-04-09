@@ -431,6 +431,32 @@ public class GhostContentView: NSView {
         }
     }
 
+    /// Shows the spine card with a video clip, orchestrating all related visual changes.
+    /// Coordinates: spine animation + separator hide + ghost shadow show + panel resize.
+    /// Auto-dismiss is handled internally by SpineCardView's 4-second post-playback timer.
+    /// - Parameters:
+    ///   - url: Local file URL for the video segment
+    ///   - startTime: Seek offset in seconds within the file
+    ///   - duration: Clip length in seconds
+    ///   - title: Optional title (currently unused in video display but reserved)
+    public func showCardVideo(url: URL, startTime: TimeInterval, duration: TimeInterval, title: String? = nil) {
+        // Cancel any existing text/image auto-dismiss timer
+        cancelAutoDismiss()
+
+        // Hide separator
+        separatorView.isHidden = true
+
+        // Show ghost shadow
+        fabView.setShadowVisible(true)
+
+        // Animate spine open with video
+        // Video cards use a fixed height of 200pt (same as image cards)
+        spineCard.showSpineVideo(url: url, startTime: startTime, duration: duration, height: 200)
+
+        // Note: no scheduleAutoDismiss here — the SpineCardView handles its own
+        // 4-second post-playback auto-dismiss via onVideoPlaybackEnded -> dismissCard
+    }
+
     /// Hides the spine card, restoring separator and hiding shadow.
     /// Coordinates: spine collapse + separator restore + ghost shadow animated fade.
     public func hideCard() {

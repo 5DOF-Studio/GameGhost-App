@@ -183,31 +183,6 @@ public class SessionHistoryService : ISessionHistoryService
         }
     }
 
-    public async Task PersistTimelineCheckpointAsync(string sessionId, TimelineCheckpoint checkpoint, int displayOrder)
-    {
-        try
-        {
-            if (!await WaitForSessionReadyAsync()) return;
-
-            using var ctx = GaimerHistoryDbContext.CreateForPath(_dbPath);
-            ctx.TimelineCheckpoints.Add(new TimelineCheckpointRecord
-            {
-                Id = checkpoint.Id,
-                SessionId = sessionId,
-                CreatedAtUtc = checkpoint.Timestamp,
-                ScreenshotRef = checkpoint.ScreenshotRef,
-                GameTimeMs = checkpoint.GameTimeIn is { } gt ? (long)gt.TotalMilliseconds : null,
-                Method = checkpoint.CaptureMethod,
-                DisplayOrder = displayOrder
-            });
-            await ctx.SaveChangesAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[SessionHistoryService] PersistTimelineCheckpointAsync failed: {ex.Message}");
-        }
-    }
-
     public async Task PersistTimelineEventAsync(string sessionId, TimelineEvent evt, string? checkpointId, int displayOrder)
     {
         try

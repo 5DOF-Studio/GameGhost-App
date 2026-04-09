@@ -51,6 +51,20 @@ public class ExchangeManagerTests
     }
 
     [Fact]
+    public void OnWakeDetected_StateCallbacksObserveMatchingCurrentState()
+    {
+        var observedStates = new List<(ExchangeState EventState, ExchangeState CurrentState)>();
+        _sut.ExchangeStateChanged += (_, state) => observedStates.Add((state, _sut.CurrentState));
+
+        _sut.OnWakeDetected("Leroy");
+
+        observedStates.Should().ContainInOrder(
+            (ExchangeState.WakeDetected, ExchangeState.WakeDetected),
+            (ExchangeState.ExchangeOpening, ExchangeState.ExchangeOpening),
+            (ExchangeState.ExchangeActive, ExchangeState.ExchangeActive));
+    }
+
+    [Fact]
     public void OnWakeDetected_WhenAlreadyActive_IsIgnored()
     {
         _sut.OnWakeDetected("Leroy");

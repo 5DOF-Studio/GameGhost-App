@@ -1,3 +1,3 @@
 namespace WitnessDesktop.Models;
 
-public enum FabCardVariant { None, Voice, Text, TextWithImage }
+public enum FabCardVariant { None, Voice, Text, TextWithImage, Video }

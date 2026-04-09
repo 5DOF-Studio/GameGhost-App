@@ -400,6 +400,7 @@ public sealed class OpenRouterBrainService : IBrainService
         CancellationToken ct)
     {
         await _imageAnalysisGate.WaitAsync(ct).ConfigureAwait(false);
+        var shouldAdvanceCooldown = false;
         try
         {
             var nowUtc = DateTime.UtcNow;
@@ -423,10 +424,21 @@ public sealed class OpenRouterBrainService : IBrainService
             }
 
             await ProcessFrameInternalAsync(imageData, context, correlationId, ct).ConfigureAwait(false);
+            shouldAdvanceCooldown = true;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch
+        {
+            shouldAdvanceCooldown = true;
+            throw;
         }
         finally
         {
-            _lastImageAnalysisCompletedAtUtc = DateTime.UtcNow;
+            if (shouldAdvanceCooldown)
+                _lastImageAnalysisCompletedAtUtc = DateTime.UtcNow;
             _imageAnalysisGate.Release();
         }
     }
