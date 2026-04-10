@@ -60,6 +60,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             description: "List of tools/actions you used (optional)",
           },
           follow_up: { type: "string", description: "Suggested next step (optional)" },
+          surface: {
+            type: "string",
+            enum: ["voice", "timeline", "both"],
+            description: "Where to present: voice (speak only), timeline (text only), both (default)",
+          },
           artifacts: {
             type: "array",
             items: {
@@ -102,6 +107,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       task_id: args?.task_id,
       status: args?.status,
       response: args?.response,
+      surface: args?.surface ?? "both",
       actions_taken: args?.actions_taken ?? [],
       follow_up: args?.follow_up ?? null,
       artifacts: args?.artifacts ?? [],

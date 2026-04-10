@@ -35,9 +35,14 @@ Keep `GameGhost-App` current with shared engine/features from `gaimer-desktop` w
 - Immediately for security/stability fixes.
 - Milestone-based for larger architectural changes.
 
-## Current Handoff (2026-04-09b)
-- Previous baseline: `643b680` on `gaimer-v2` (2026-04-09)
-- New baseline: `9b8c1e0` on `gaimer-v2` (incremental overlay sync)
+## Current Handoff (2026-04-09c)
+- Previous baseline: `9b8c1e0` on `gaimer-v2` (2026-04-09)
+- New baseline: `0cb84a2` on `gaimer-v2` (incremental overlay sync)
+- Sync method: Targeted overlay of 6 new commits (13 source files)
+- New features synced: Team surface routing (Claude controls voice vs timeline rendering), voice truncation helper, TeamProgress timeline events, design decision annotations, channel plugin dist rebuild
+- Resume overlay from `0cb84a2` for future syncs
+
+## Previous Handoff (2026-04-09b)
 - Sync method: Targeted overlay of 35 new commits (59 source files, +7,621 / -1,300 lines)
 - New features synced: Timeline redesign (flat list replacing checkpoint/bucket architecture), media cards (ImageCard/VideoCard), show_replay tool (timestamp resolution, surface routing), Ghost FAB video (SpineCardView with AVPlayerLayer), replay cleanup (24h retention sweep), codebase audit fixes (1723 tests)
 - Deleted files: EventLine.cs, TimelineCheckpoint.cs (timeline refactor)

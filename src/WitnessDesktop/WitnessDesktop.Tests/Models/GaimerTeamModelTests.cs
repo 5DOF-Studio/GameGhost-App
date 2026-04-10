@@ -56,6 +56,36 @@ public class GaimerTeamModelTests
     }
 
     [Fact]
+    public void GaimerTeamResult_Surface_DefaultsToNull()
+    {
+        var result = new GaimerTeamResult
+        {
+            TaskId = "gt_surf1",
+            Status = "complete",
+            Response = "Done."
+        };
+
+        result.Surface.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("voice")]
+    [InlineData("timeline")]
+    [InlineData("both")]
+    public void GaimerTeamResult_Surface_AcceptsValidValues(string surface)
+    {
+        var result = new GaimerTeamResult
+        {
+            TaskId = "gt_surf2",
+            Status = "complete",
+            Response = "Done.",
+            Surface = surface
+        };
+
+        result.Surface.Should().Be(surface);
+    }
+
+    [Fact]
     public void GaimerTeamPermissionRequest_TimeoutSeconds_DefaultsTo60()
     {
         var perm = new GaimerTeamPermissionRequest

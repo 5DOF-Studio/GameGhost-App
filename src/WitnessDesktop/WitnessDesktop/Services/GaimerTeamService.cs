@@ -475,7 +475,8 @@ public sealed class GaimerTeamService : IGaimerTeamService
                     Title = a.GetProperty("title").GetString()!,
                     Content = a.GetProperty("content").GetString()!
                 }).ToList()
-                : []
+                : [],
+            Surface = root.TryGetProperty("surface", out var surf) ? surf.GetString() : null
         };
 
         TaskCompleted?.Invoke(this, new GaimerTeamResultEventArgs

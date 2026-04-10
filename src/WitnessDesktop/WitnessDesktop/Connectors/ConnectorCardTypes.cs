@@ -37,7 +37,7 @@ public record ConnectorCardWindowMetadata(
 public record ConnectorCardMatch(
     string Title,
     string? Subtitle,
-    ConnectorCardImageSource? PreviewImage,
+    ConnectorCardImageSource? PreviewImage, // Declared but not rendered — ported from prototype, planned for future use
     string? BadgeText,
     ConnectorCardWindowMetadata Metadata,
     string PrimaryCta = "Connect"

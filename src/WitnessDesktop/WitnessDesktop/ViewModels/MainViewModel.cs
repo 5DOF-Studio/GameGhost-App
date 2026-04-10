@@ -502,37 +502,42 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                     {
+                        // Surface priority: Claude's explicit choice > ResponseFormat inference > default "both"
+                        var surface = e.Result.Surface
+                            ?? (e.ResponseFormat == "detailed" ? "timeline" : "both");
+
                         if (e.Result.Status == "complete")
                         {
-                            if (_conversationProvider?.IsConnected == true)
+                            if (surface is "timeline" or "both")
                             {
-                                _ = _conversationProvider.SendContextualUpdateWithResponseAsync(
-                                    $"The team's back. {e.Result.Response}");
+                                _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+                                {
+                                    Type = Models.Timeline.EventOutputType.TeamResult,
+                                    Summary = e.Result.Response,
+                                    Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.TeamResult),
+                                    CapsuleColorHex = Models.Timeline.EventIconMap.GetCapsuleColorHex(Models.Timeline.EventOutputType.TeamResult),
+                                    CapsuleStrokeHex = Models.Timeline.EventIconMap.GetCapsuleStrokeHex(Models.Timeline.EventOutputType.TeamResult),
+                                });
                             }
 
-                            _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+                            if (surface is "voice" or "both"
+                                && _conversationProvider?.IsConnected == true)
                             {
-                                Type = Models.Timeline.EventOutputType.TeamResult,
-                                Summary = e.Result.Response,
-                                Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.TeamResult),
-                                CapsuleColorHex = Models.Timeline.EventIconMap.GetCapsuleColorHex(Models.Timeline.EventOutputType.TeamResult),
-                                CapsuleStrokeHex = Models.Timeline.EventIconMap.GetCapsuleStrokeHex(Models.Timeline.EventOutputType.TeamResult),
-                            });
+                                var voiceText = TruncateForVoice(e.Result.Response, maxSentences: 3);
+                                _ = _conversationProvider.SendContextualUpdateWithResponseAsync(
+                                    $"The team's back. {voiceText}");
+                            }
 
                             _sessionTrace?.TrackEvent("gaimer_team.task_completed", new Dictionary<string, string>
                             {
                                 ["task_id"] = e.Result.TaskId,
-                                ["status"] = "complete"
+                                ["status"] = "complete",
+                                ["surface"] = surface
                             });
                         }
                         else
                         {
-                            if (_conversationProvider?.IsConnected == true)
-                            {
-                                _ = _conversationProvider.SendContextualUpdateWithResponseAsync(
-                                    "The team ran into an issue with that one.");
-                            }
-
+                            // Errors: always timeline, short voice notice
                             _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
                             {
                                 Type = Models.Timeline.EventOutputType.TeamResult,
@@ -541,6 +546,12 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
                                 CapsuleColorHex = "#30808080",
                                 CapsuleStrokeHex = "#50808080",
                             });
+
+                            if (_conversationProvider?.IsConnected == true)
+                            {
+                                _ = _conversationProvider.SendContextualUpdateWithResponseAsync(
+                                    "The team ran into an issue with that one.");
+                            }
 
                             _sessionTrace?.TrackEvent("gaimer_team.task_completed", new Dictionary<string, string>
                             {
@@ -561,6 +572,18 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
             {
                 try
                 {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        _timelineFeed.AddEvent(new Models.Timeline.TimelineEvent
+                        {
+                            Type = Models.Timeline.EventOutputType.TeamProgress,
+                            Summary = e.Message,
+                            Icon = Models.Timeline.EventIconMap.GetIcon(Models.Timeline.EventOutputType.TeamProgress),
+                            CapsuleColorHex = Models.Timeline.EventIconMap.GetCapsuleColorHex(Models.Timeline.EventOutputType.TeamProgress),
+                            CapsuleStrokeHex = Models.Timeline.EventIconMap.GetCapsuleStrokeHex(Models.Timeline.EventOutputType.TeamProgress),
+                        });
+                    });
+
                     _sessionTrace?.TrackEvent("gaimer_team.task_progress", new Dictionary<string, string>
                     {
                         ["task_id"] = e.TaskId,
@@ -2939,5 +2962,15 @@ public partial class MainViewModel : ObservableObject, IQueryAttributable
             if (Shell.Current is not null)
                 await Shell.Current.DisplayAlert("Image", "Full image view coming soon", "OK");
         }
+    }
+
+    private static string TruncateForVoice(string text, int maxSentences = 3)
+    {
+        // Split on sentence boundaries while preserving original punctuation.
+        // Regex splits after sentence-ending punctuation followed by a space.
+        var sentences = System.Text.RegularExpressions.Regex.Split(text, @"(?<=[.!?])\s+");
+        if (sentences.Length <= maxSentences)
+            return text;
+        return string.Join(" ", sentences.Take(maxSentences));
     }
 }

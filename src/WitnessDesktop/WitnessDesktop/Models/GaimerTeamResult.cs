@@ -9,4 +9,6 @@ public record GaimerTeamResult
     public string? FollowUp { get; init; }
     public string? ErrorCode { get; init; }
     public List<GaimerTeamArtifact> Artifacts { get; init; } = [];
+    /// <summary>Where to present: "voice", "timeline", or "both" (default). Null falls back to ResponseFormat.</summary>
+    public string? Surface { get; init; }
 }

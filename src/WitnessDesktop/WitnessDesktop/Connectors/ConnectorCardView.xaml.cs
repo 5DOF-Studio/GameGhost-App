@@ -72,6 +72,8 @@ public partial class ConnectorCardView : ContentView
         };
         GameIconBorder.Stroke = new SolidColorBrush(accent.WithAlpha(0.25f));
 
+        // Each ConnectorCard is instantiated per-provider in SettingsPage.xaml — not recycled
+        // between providers. No stale-image cleanup needed on reconfiguration.
         var iconAsset = config.Provider.IconAsset();
         if (iconAsset != null)
             GameIconImage.Source = ImageSource.FromFile(iconAsset);

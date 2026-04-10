@@ -20,6 +20,7 @@ public static class EventIconMap
         [EventOutputType.Archived] = "history_clock.png",
         [EventOutputType.TeamResult] = "tool_generic.png",
         [EventOutputType.PermissionRequest] = "alert.png",
+        [EventOutputType.TeamProgress] = "tool_generic.png",
         [EventOutputType.ImageCard] = "video_reel.png",
         [EventOutputType.VideoCard] = "video_reel.png",
     };
@@ -42,6 +43,7 @@ public static class EventIconMap
         [EventOutputType.Archived] = "#18808080",
         [EventOutputType.TeamResult] = "#3000CC66",
         [EventOutputType.PermissionRequest] = "#30FFA726",
+        [EventOutputType.TeamProgress] = "#2000d4ff",
         [EventOutputType.ImageCard] = "#3000BCD4",
         [EventOutputType.VideoCard] = "#307C4DFF",
     };
@@ -64,6 +66,7 @@ public static class EventIconMap
         [EventOutputType.Archived] = "#28808080",
         [EventOutputType.TeamResult] = "#5000CC66",
         [EventOutputType.PermissionRequest] = "#50FFA726",
+        [EventOutputType.TeamProgress] = "#4000d4ff",
         [EventOutputType.ImageCard] = "#5000BCD4",
         [EventOutputType.VideoCard] = "#507C4DFF",
     };

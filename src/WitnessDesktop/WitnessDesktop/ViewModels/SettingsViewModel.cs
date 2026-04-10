@@ -20,6 +20,11 @@ public class SettingsViewModel : INotifyPropertyChanged
     private string _sttStatus = "Unknown";
     private string _ttsStatus = "Unknown";
 
+    /// <summary>
+    /// No SettingChanged/PolicyChanged subscriptions needed — Settings page refreshes
+    /// via RefreshDiagnosticsAsync on OnAppearing. No background process mutates these
+    /// values while the user is viewing the page.
+    /// </summary>
     public SettingsViewModel(ISettingsService settings, ILocalModelRuntime localRuntime, IBargeInPolicyService bargeInPolicy)
     {
         _settings = settings;
@@ -143,6 +148,8 @@ public class SettingsViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Only set via hard-coded tap handlers (SelectPermission) — no free-text input.
+    /// ClaudeProcessManager falls back to "default" for unknown values.</summary>
     public string TeamPermissionMode
     {
         get => _settings.TeamPermissionMode;
@@ -176,7 +183,11 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     public string BrainModel => "Gemini 2.5 Flash";
     public string CaptureRate => "On every board change + on demand";
+    /// <summary>Informational only — runtime provider selection happens in ConversationProviderFactory
+    /// based on env vars, API keys, and agent config. This reflects the persisted preference, not
+    /// the active provider. Will need runtime injection when Settings becomes editable.</summary>
     public string VoiceEngine => IsGeminiSelected ? "Gemini Live" : "OpenAI Realtime";
+    // TODO: read from assembly/package version at runtime
     public string AppVersion => "1.0.0-alpha";
 
     public string LocalRuntimeStatus

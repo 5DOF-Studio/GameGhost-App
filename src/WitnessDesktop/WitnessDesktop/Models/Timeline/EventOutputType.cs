@@ -27,6 +27,7 @@ public enum EventOutputType
     Archived,         // Archive boundary marker — end of visible hot window
     TeamResult,       // Gaimer Team task result (background capability)
     PermissionRequest, // Team permission request (allow/deny)
+    TeamProgress,      // Team task progress update (transient)
     ImageCard,         // Screenshot or internet-fetched image
     VideoCard,         // Replay clip
 
